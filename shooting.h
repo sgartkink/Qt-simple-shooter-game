@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QTimer>
 #include <QGraphicsScene>
+#include <QRandomGenerator>
 
 class Hero;
 #include "gun.h"
