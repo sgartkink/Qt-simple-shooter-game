@@ -34,7 +34,6 @@ MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, QWidget *parent, Qt::Wind
 
     connect(&throwingGrenadeTimer, SIGNAL(timeout()), this, SLOT(stopThrowingGrenade()));
 
-    player = new Player(scene, mapView);
     scene->addItem(player);
     player->setPos(200,240);
 
