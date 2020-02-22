@@ -12,7 +12,7 @@ void Player::updateLineHeroMouse(QPoint mousePoint)
     savedMousePoint = mousePoint;
     mappedPoint = mainView->mapToScene(mousePoint);
 
-    lineHeroMouse.setLine(pos().x(), pos().y(), mappedPoint.x(), mappedPoint.y());
+    lineHeroMouse.setLine(x(), y(), mappedPoint.x(), mappedPoint.y());
     setRotation(-1 * lineHeroMouse.angle());
 }
 
@@ -28,15 +28,15 @@ void Player::moveHero()
         changePosAndUpdateLine(-2, 0);
 }
 
-void Player::changePosAndUpdateLine(int x, int y)
+void Player::changePosAndUpdateLine(int x_, int y_)
 {
-    if (x == -2 && pos().x() > 0 && pos().x() <= 2048)
+    if (x_ == -2 && x() > 0 && x() <= 2048)
         checkCorners(-2, 0, -2, size, -2, 0);
-    else if (x == 2 && pos().x() > 0 && pos().x() <= 2048)
+    else if (x_ == 2 && x() > 0 && x() <= 2048)
         checkCorners(size+2, 0, size+2, size, 2, 0);
-    else if (y == -2 && pos().y() > 0 && pos().y() <= 2048)
+    else if (y_ == -2 && y() > 0 && y() <= 2048)
         checkCorners(0, -2, size, -2, 0, -2);
-    else if (y == 2 && pos().y() > 0 && pos().y() <= 2048)
+    else if (y_ == 2 && y() > 0 && y() <= 2048)
         checkCorners(0, size+2, size, size+2, 0, 2);
 }
 
