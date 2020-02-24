@@ -8,6 +8,7 @@
 #include <QObject>
 #include <QTimer>
 
+class Player;
 #include "itemsonscene.h"
 #include "grenadeellipseitem.h"
 
@@ -24,9 +25,14 @@ private:
     double currentHeight = 10;
     int damage = 2;
     int size = 4;
+    bool mayMove = true;
 
     GrenadeEllipseItem * ellipse = new GrenadeEllipseItem();
     QGraphicsScene * mainScene;
+    QList<QGraphicsItem *> corner0;
+    QList<QGraphicsItem *> corner1;
+    QList<QGraphicsItem *> corner2;
+    QGraphicsItem * previousHitItem = nullptr;
 
     QDateTime dateTimeStart;
     QTimer moveTimer;
@@ -35,7 +41,8 @@ private:
     double dy;
 
     void setNewSize(int size_);
-    void checkCorner(ItemsOnScene * corner);
+    bool checkCorner(ItemsOnScene * corner);
+    void setNewRotation();
     void stopMoving();
 
 private slots:

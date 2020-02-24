@@ -78,7 +78,7 @@ void Hero::addArmor(int armor_)
 void Hero::addAmmo(int ammo)
 {
     currentGun->addAmmo(ammo);
-    emit (ammoChangedReloading());
+    emit (ammoChangedNoReloading());
 }
 
 void Hero::addValue(int &valueChanged, int &valueAdded, const int valueMax)
@@ -92,13 +92,13 @@ void Hero::addValue(int &valueChanged, int &valueAdded, const int valueMax)
 void Hero::refillCurrentLoadedAmmo()
 {
     currentGun->refillCurrentOwnedAmmo();
-    emit (ammoChangedReloading());
+    emit (ammoChangedNoReloading());
 }
 
 void Hero::refillCurrentOwnedAmmo()
 {
     currentGun->refillCurrentLoadedAmmo();
-    emit (ammoChangedReloading());
+    emit (ammoChangedNoReloading());
 }
 
 void Hero::throwGrenade(int addedVelocity)

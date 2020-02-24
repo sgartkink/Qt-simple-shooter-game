@@ -7,7 +7,7 @@ Grenade::Grenade(double dx_, double dy_, double angle, double addedVelocity, QGr
     : QGraphicsRectItem(0, 0, 4, 4), mainScene(mainScene)
 {
     setTransformOriginPoint(2,2);
-    setRotation(-1 * angle);
+    setRotation(angle);
     dateTimeStart = QDateTime::currentDateTime();
 
     velocity += addedVelocity;
@@ -28,40 +28,90 @@ void Grenade::move()
     currentVelocity = velocity * qSin(sqrt(3)/2) - 9.81*secondsDiff;
     currentHeight = 10 + currentVelocity * secondsDiff * qSin(sqrt(3)/2)  - 9.81*secondsDiff*secondsDiff/2;
 
-    if (currentHeight > 0 && currentHeight < 10)
-        setNewSize(4);
-    else if (currentHeight > 10 && currentHeight < 20)
-        setNewSize(5);
-    else if (currentHeight > 20 && currentHeight < 30)
-        setNewSize(6);
-    else if (currentHeight > 30)
-        setNewSize(7);
-    else if (currentHeight < 0)
+//    if (currentHeight > 0 && currentHeight < 10)
+//        setNewSize(4);
+//    else if (currentHeight > 10 && currentHeight < 20)
+//        setNewSize(5);
+//    else if (currentHeight > 20 && currentHeight < 30)
+//        setNewSize(6);
+//    else if (currentHeight > 30)
+//        setNewSize(7);
+    if (currentHeight < 0)
         stopMoving();
 
-    ItemsOnScene * corner0 = dynamic_cast<ItemsOnScene*>(mainScene->itemAt(pos(), QTransform()));
-    ItemsOnScene * corner1 = dynamic_cast<ItemsOnScene*>(mainScene->itemAt(pos().x() + size+1, pos().y(), QTransform()));
-    ItemsOnScene * corner2 = dynamic_cast<ItemsOnScene*>(mainScene->itemAt(pos().x(), pos().y() + size+1, QTransform()));
-    ItemsOnScene * corner3 = dynamic_cast<ItemsOnScene*>(mainScene->itemAt(pos().x() + size+1, pos().y() + size+1, QTransform()));
+    QRectF rect1(x()-0.25, y()-0.25, 0.5, 0.5);
+    QRectF rect2(x()+size-0.25, y()-0.25, 0.5, 0.5);
+    QRectF rect3(x(), y() + size - 0.25, 0.5, 0.5);
+    corner0 = mainScene->items(rect1);
+    corner1 = mainScene->items(rect2);
+    corner2 = mainScene->items(rect3);
 
-    Player * corner10 = dynamic_cast<Player*>(corner0);
-    Player * corner11 = dynamic_cast<Player*>(corner1);
-    Player * corner12 = dynamic_cast<Player*>(corner2);
-    Player * corner13 = dynamic_cast<Player*>(corner3);
-
-    if ((corner0 || corner1 || corner2 || corner3) && (!corner10 && !corner11 && !corner12 && !corner13))
+    mayMove = true;
+    for (auto it = corner0.begin(); it != corner0.end(); it++)
     {
-        if (corner0)
-            checkCorner(corner0);
-        else if (corner1)
-            checkCorner(corner1);
-        else if (corner2)
-            checkCorner(corner2);
-        else if (corner3)
-            checkCorner(corner3);
+        ItemsOnScene * item = dynamic_cast<ItemsOnScene *>(*it);
+        if (item && (*it) != dynamic_cast<Player *>(*it)
+                && (*it) != previousHitItem && item->getHeight() > currentHeight)
+        {
+            mayMove = false;
+            previousHitItem = (*it);
+
+            if (dx >= 0 && dy >= 0)
+                dy *= -1;
+            else if (dx > 0 && dy < 0)
+                dy *= -1;
+            else if (dx <= 0 && dy <= 0)
+            {
+                if (dynamic_cast<ItemsOnScene *>(mainScene->itemAt(x() - 2, y(), QTransform())))
+                    dx *= -1;
+                else
+                    dy *= -1;
+            }
+            else
+                dx *= -1;
+
+            break;
+        }
     }
-    else
+
+    for (auto it = corner1.begin(); it != corner1.end(); it++)
+    {
+        ItemsOnScene * item = dynamic_cast<ItemsOnScene *>(*it);
+        if (item && (*it) != dynamic_cast<Player *>(*it)
+                && (*it) != previousHitItem && item->getHeight() > currentHeight)
+        {
+            mayMove = false;
+            previousHitItem = (*it);
+
+            if (dx >= 0 && dy >= 0)
+                dx *= -1;
+            else if (dx > 0 && dy < 0)
+                dx *= -1;
+            else if (dx <= 0 && dy <= 0)
+                dy *= -1;
+            else
+                dy *= -1;
+            break;
+        }
+    }
+
+    for (auto it = corner2.begin(); it != corner2.end(); it++)
+    {
+        ItemsOnScene * item = dynamic_cast<ItemsOnScene *>(*it);
+        if (item && (*it) != dynamic_cast<Player *>(*it)
+                && (*it) != previousHitItem && item->getHeight() > currentHeight)
+            if (dx < 0 && dy > 0)
+            {
+                dy *= -1;
+                previousHitItem = (*it);
+                mayMove = false;
+            }
+    }
+
+    if (mayMove)
         setPos(x() + dx, y() + dy);
+    else
+        setNewRotation();
 
     if (x() < 0 || x() > 1000 || y() < 0 || y() > 1000)
         stopMoving();
@@ -73,12 +123,26 @@ void Grenade::setNewSize(int size_)
     setRect(0,0,size,size);
 }
 
-void Grenade::checkCorner(ItemsOnScene *corner)
+bool Grenade::checkCorner(ItemsOnScene *corner)
 {
     if (currentHeight > corner->getHeight())
-        setPos(x() + dx, y() + dy);
+        return true;
     else
-        stopMoving();
+        return false;
+}
+
+void Grenade::setNewRotation()
+{
+    qreal newRotation = -1 * rotation();
+    if (newRotation < 90)
+        newRotation = 180 - (90 - newRotation)*2;
+    else if (newRotation < 180)
+        newRotation = 180 - (90 - 180 - newRotation)*2;
+    else if (newRotation < 270)
+        newRotation = 180 - (90 - (newRotation - 180))*2;
+    else
+        newRotation = 180 - (90 - (360 - newRotation))*2;
+    setRotation(-1 * newRotation);
 }
 
 void Grenade::stopMoving()
