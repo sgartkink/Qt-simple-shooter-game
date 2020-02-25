@@ -20,6 +20,7 @@ class MapWidget : public QWidget
     Q_OBJECT
 public:
     explicit MapWidget(PlayerBarWidget * playerBarWidget, QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags()); 
+    ~MapWidget();
 
 private:
     const int mainItemSize = 10;
@@ -28,8 +29,8 @@ private:
     MapView * mapView = new MapView(scene, this);
     QHBoxLayout * qhboxLayout = new QHBoxLayout(this);
     Player * player = new Player(scene, mapView);
-    PlayerBarWidget * playerBarWidget = nullptr;
     PowerGrenadeThrowing * powerGrenadeThrowing = new PowerGrenadeThrowing();
+    PlayerBarWidget * playerBarWidget = nullptr;
 
     QTimer timerChestCreating;
     QTimer throwingGrenadeTimer;

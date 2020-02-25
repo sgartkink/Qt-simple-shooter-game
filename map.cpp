@@ -83,3 +83,11 @@ Map::Map(QGraphicsScene * scene)
     chest->setPos(150,180);
     scene->addItem(chest);
 }
+
+Map::~Map()
+{
+    delete line1;
+    delete line2;
+    delete line3;
+    delete line4;
+}

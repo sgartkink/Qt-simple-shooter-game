@@ -14,6 +14,7 @@ class PlayerBarWidget : public QWidget
     Q_OBJECT
 public:
     explicit PlayerBarWidget(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    ~PlayerBarWidget();
 
 public slots:
     void updateCurrentGun(int gun);

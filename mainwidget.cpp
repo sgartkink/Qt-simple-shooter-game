@@ -9,3 +9,10 @@ MainWidget::MainWidget(QWidget *parent, Qt::WindowFlags f)
     qvboxLayout->addWidget(playerBarWidget);
     playerBarWidget->setMinimumHeight(100);
 }
+
+MainWidget::~MainWidget()
+{
+    delete qvboxLayout;
+    delete playerBarWidget;
+    delete mapWidget;
+}

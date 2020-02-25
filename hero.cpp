@@ -128,3 +128,8 @@ void Hero::stopShooting()
     currentlyShooting = false;
     shooting->stop();
 }
+
+Hero::~Hero()
+{
+    delete shooting;
+}

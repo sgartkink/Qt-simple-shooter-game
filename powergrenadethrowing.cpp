@@ -33,3 +33,9 @@ void PowerGrenadeThrowing::stop()
     animationValue->stop();
     animationOpacity->start();
 }
+
+PowerGrenadeThrowing::~PowerGrenadeThrowing()
+{
+    delete animationValue;
+    delete animationOpacity;
+}

@@ -20,8 +20,8 @@ protected slots:
 
 private:
     const QGraphicsView * mainView;
-    ItemsOnScene* corner1 = nullptr;
-    ItemsOnScene* corner2 = nullptr;
+    ItemsOnScene * corner1 = nullptr;
+    ItemsOnScene * corner2 = nullptr;
 
     QPoint savedMousePoint;
     QPointF mappedPoint;

@@ -26,3 +26,8 @@ void MapView::mouseReleaseEvent(QMouseEvent *event)
     if (event->button() == 1)
         emit (mouseReleased());
 }
+
+MapView::~MapView()
+{
+    delete map;
+}

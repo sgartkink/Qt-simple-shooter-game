@@ -10,6 +10,7 @@ class MapView : public QGraphicsView
     Q_OBJECT
 public:
     MapView(QGraphicsScene *scene, QWidget *parent = nullptr);
+    ~MapView();
 
 private:
     Map * map;

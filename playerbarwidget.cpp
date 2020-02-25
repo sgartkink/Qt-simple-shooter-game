@@ -84,5 +84,10 @@ void PlayerBarWidget::reloadingAnimation()
     animation->setDuration(RELOADING_TIME);
     animation->setStartValue(0);
     animation->setEndValue(100);
-    animation->start();
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+PlayerBarWidget::~PlayerBarWidget()
+{
+    delete reloadingBar;
 }

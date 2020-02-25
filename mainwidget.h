@@ -11,6 +11,7 @@ class MainWidget : public QWidget
 {
 public:
     explicit MainWidget(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    ~MainWidget();
 
 private:
     QVBoxLayout * qvboxLayout = new QVBoxLayout(this);

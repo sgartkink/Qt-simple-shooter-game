@@ -9,6 +9,7 @@ class PowerGrenadeThrowing : public QProgressBar
 {
 public:
     explicit PowerGrenadeThrowing(QWidget *parent = nullptr);
+    ~PowerGrenadeThrowing();
 
     void start();
     void stop();

@@ -174,3 +174,12 @@ void MapWidget::createChest()
     scene->addItem(chest);
     chest->setPos(newX, newY);
 }
+
+MapWidget::~MapWidget()
+{
+    delete scene;
+    delete mapView;
+    delete qhboxLayout;
+    delete player;
+    delete powerGrenadeThrowing;
+}

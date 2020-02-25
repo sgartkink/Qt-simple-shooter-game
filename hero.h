@@ -22,6 +22,7 @@ class Hero : public QObject, public ItemsOnScene
 public:
     explicit Hero(qreal x, qreal y, qreal width, qreal height, QGraphicsItem * parent = nullptr,
                   QGraphicsScene * mainScene = nullptr, Qt::GlobalColor color = Qt::transparent);
+    ~Hero();
 
     Shooting * getShooting() { return shooting; }
     qreal lineAngle() { return lineHeroMouse.angle(); }

@@ -11,6 +11,7 @@ class Map
 {
 public:
     explicit Map(QGraphicsScene * scene = nullptr);
+    ~Map();
 
 private:
     const QGraphicsScene * scene;
