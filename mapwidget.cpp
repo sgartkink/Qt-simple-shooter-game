@@ -1,13 +1,13 @@
 #include "mapwidget.h"
-#include <QtDebug>
 #include "global_consts.h"
+#include "mainwidget.h"
 
-MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, QWidget *parent, Qt::WindowFlags f)
-    : QWidget(parent, f), playerBarWidget(playerBarWidget)
+MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, MainWidget *parent, Qt::WindowFlags f)
+    : QWidget(parent, f),
+      playerBarWidget(playerBarWidget)
 {
     qhboxLayout->addWidget(mapView);
     setStyleSheet("border: 0px");
-    scene->addWidget(powerGrenadeThrowing);
 
     connect(player, &Player::ammoChangedReloading, [playerBarWidget, this]()
         { playerBarWidget->updateAmmoReloading(player->gun()->ammoLoaded(), player->gun()->ammoOwned()); }
@@ -177,9 +177,8 @@ void MapWidget::createChest()
 
 MapWidget::~MapWidget()
 {
-    delete scene;
-    delete mapView;
-    delete qhboxLayout;
     delete player;
     delete powerGrenadeThrowing;
+    delete qhboxLayout;
+    delete mapView;
 }

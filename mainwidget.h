@@ -6,6 +6,7 @@
 
 #include "mapwidget.h"
 #include "playerbarwidget.h"
+#include "powergrenadethrowing.h"
 
 class MainWidget : public QWidget
 {
@@ -13,10 +14,13 @@ public:
     explicit MainWidget(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~MainWidget();
 
+    PowerGrenadeThrowing * getPowerGrenadeThrowing() { return powerGrenadeThrowing; }
+
 private:
     QVBoxLayout * qvboxLayout = new QVBoxLayout(this);
     PlayerBarWidget * playerBarWidget = new PlayerBarWidget(this);
-    MapWidget * mapWidget = new MapWidget(playerBarWidget, this);
+    PowerGrenadeThrowing * powerGrenadeThrowing = nullptr;
+    MapWidget * mapWidget = nullptr;
 };
 
 #endif // MAINWIDGET_H

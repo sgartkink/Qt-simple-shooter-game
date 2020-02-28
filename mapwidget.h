@@ -8,6 +8,7 @@
 #include <QTimer>
 #include <QRandomGenerator>
 
+class MainWidget;
 #include "mapview.h"
 #include "bot.h"
 #include "player.h"
@@ -19,8 +20,11 @@ class MapWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit MapWidget(PlayerBarWidget * playerBarWidget, QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags()); 
+    explicit MapWidget(PlayerBarWidget * playerBarWidget,
+                       MainWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~MapWidget();
+
+    void setPowerGrenadeThrowing(PowerGrenadeThrowing * p) { powerGrenadeThrowing = p; }
 
 private:
     const int mainItemSize = 10;
@@ -29,7 +33,7 @@ private:
     MapView * mapView = new MapView(scene, this);
     QHBoxLayout * qhboxLayout = new QHBoxLayout(this);
     Player * player = new Player(scene, mapView);
-    PowerGrenadeThrowing * powerGrenadeThrowing = new PowerGrenadeThrowing();
+    PowerGrenadeThrowing * powerGrenadeThrowing = nullptr;
     PlayerBarWidget * playerBarWidget = nullptr;
 
     QTimer timerChestCreating;

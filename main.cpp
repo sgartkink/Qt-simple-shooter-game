@@ -23,6 +23,6 @@ int main(int argc, char *argv[])
  * 12. poprawa granatów: animacja wybuchu, zmiana obrażeń, zasięgu, inaczej liczony tor ruchu, możliwość ustalania prędkości - DONE
  * 13. pole widzenia gracza
  * 14. shotgun wystrzeliwuje kilka naboi na raz - DONE
- * 15. playerbarwidget jest zawsze w rogu
+ * 15. playerbarwidget jest zawsze w rogu - DONE
  * 16. bouncing grenade off the itemsonscene - works but not perfect
  */
