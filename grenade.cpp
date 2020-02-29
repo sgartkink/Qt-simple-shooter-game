@@ -2,9 +2,10 @@
 #include <QtDebug>
 #include "player.h"
 #include <QtMath>
+#include "mapview.h"
 
-Grenade::Grenade(double dx_, double dy_, double angle, double addedVelocity, QGraphicsScene *mainScene)
-    : QGraphicsRectItem(0, 0, 4, 4), mainScene(mainScene)
+Grenade::Grenade(double dx_, double dy_, double angle, double addedVelocity, QGraphicsScene *mainScene, MapView *mapView)
+    : QGraphicsRectItem(0, 0, 4, 4), mainScene(mainScene), mapView(mapView)
 {
     setTransformOriginPoint(2,2);
     setRotation(angle);
@@ -171,5 +172,6 @@ void Grenade::explode()
         if (Hero * h = dynamic_cast<Hero*>(*it))
             h->attackItem(damage);
 
+    mapView->startShakeScreen();
     QTimer::singleShot(300, [this](){ delete ellipse; delete this; });
 }

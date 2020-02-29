@@ -1,6 +1,7 @@
 #ifndef MAPVIEW_H
 #define MAPVIEW_H
 
+class ShakeScreen;
 #include <QGraphicsView>
 #include <QMouseEvent>
 #include "map.h"
@@ -12,8 +13,11 @@ public:
     MapView(QGraphicsScene *scene, QWidget *parent = nullptr);
     ~MapView();
 
+    void startShakeScreen();
+
 private:
     Map * map;
+    ShakeScreen * shakeScreen;
 
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);

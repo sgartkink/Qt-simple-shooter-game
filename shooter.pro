@@ -46,7 +46,8 @@ SOURCES += \
     grenadeellipseitem.cpp \
     shotgun.cpp \
     powergrenadethrowing.cpp \
-    shooting.cpp
+    shooting.cpp \
+    shakescreen.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -70,7 +71,8 @@ HEADERS += \
     grenadeellipseitem.h \
     shotgun.h \
     powergrenadethrowing.h \
-    shooting.h
+    shooting.h \
+    shakescreen.h
 
 FORMS +=
 

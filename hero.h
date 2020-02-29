@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QtMath>
 
+class MapView;
 #include "shooting.h"
 #include "global_consts.h"
 #include "itemsonscene.h"
@@ -42,7 +43,7 @@ public:
     void addAmmo(int ammo);
     void refillCurrentLoadedAmmo();
     void refillCurrentOwnedAmmo();
-    void throwGrenade(int addedVelocity);
+    void throwGrenade(int addedVelocity, MapView * mapView);
 
     void toggleDirectionUp() { directionUp = !directionUp; }
     void toggleDirectionRight() { directionRight = !directionRight; }

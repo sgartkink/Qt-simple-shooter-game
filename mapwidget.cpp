@@ -53,7 +53,6 @@ void MapWidget::changeSceneRect()
     mapView->setSceneRect(xPos, yPos, mapView->width(), mapView->height());
 }
 
-
 void MapWidget::keyPressEvent(QKeyEvent *event)
 {
     if (!event->isAutoRepeat())
@@ -135,7 +134,7 @@ void MapWidget::stopThrowingGrenade()
 {
     powerGrenadeThrowing->stop();
     throwingGrenadeTimer.stop();
-    player->throwGrenade(powerGrenadeThrowing->value());
+    player->throwGrenade(powerGrenadeThrowing->value(), mapView);
     player->toggleThrowingGrenade();
 }
 

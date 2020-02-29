@@ -101,13 +101,14 @@ void Hero::refillCurrentOwnedAmmo()
     emit (ammoChangedNoReloading());
 }
 
-void Hero::throwGrenade(int addedVelocity)
+void Hero::throwGrenade(int addedVelocity, MapView *mapView)
 {
     Grenade * grenade = new Grenade(5*qCos(qDegreesToRadians(lineHeroMouse.angle())),
                                     -5*qSin(qDegreesToRadians(lineHeroMouse.angle())),
                                     lineHeroMouse.angle(),
                                     addedVelocity,
-                                    mainScene);
+                                    mainScene,
+                                    mapView);
     grenade->setPos(x() + 5, y() + 5);
     mainScene->addItem(grenade);
     grenades--;
