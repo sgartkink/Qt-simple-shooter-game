@@ -9,8 +9,7 @@ Hero::Hero(qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent, Q
     currentGunENUM = RIFLE;
     height = 10;
 
-    connect(&moveTimer, SIGNAL(timeout()), this, SLOT(moveHero()));
-    moveTimer.start(20);
+    connect(&moveTimer, SIGNAL(timeout()), this, SLOT(nextMove()));
 }
 
 void Hero::attackItem(int dmg)

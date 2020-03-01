@@ -16,7 +16,7 @@ void Player::updateLineHeroMouse(QPoint mousePoint)
     setRotation(-1 * lineHeroMouse.angle());
 }
 
-void Player::moveHero()
+void Player::nextMove()
 {
     if (directionUp)
         changePosAndUpdateLine(0, -2);

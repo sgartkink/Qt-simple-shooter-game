@@ -53,6 +53,7 @@ public:
     void toggleCurrentlyShooting() { currentlyShooting = !currentlyShooting; }
 
 public slots:
+    void start() { moveTimer.start(20); }
     void startShooting();
     void stopShooting();
 
@@ -83,7 +84,7 @@ protected:
 
 protected slots:
     virtual void updateLineHeroMouse(QPoint mousePoint) = 0;
-    virtual void moveHero() = 0;
+    virtual void nextMove() = 0;
 
 private:
     const int MAX_HP = 15;

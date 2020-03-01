@@ -37,9 +37,11 @@ MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, MainWidget *parent, Qt::W
     scene->addItem(player);
     player->setPos(200,240);
 
-    Bot * bot = new Bot();
+    Bot * bot = new Bot(scene);
     bot->setPos(450,300);
     scene->addItem(bot);
+
+    QTimer::singleShot(500, [this, bot](){ player->start(); bot->start(); });
 }
 
 void MapWidget::changeSceneRect()

@@ -38,9 +38,9 @@ Map::Map(QGraphicsScene * scene)
     Building * building17 = new Building();
     Building * building18 = new Building();
     Building * building19 = new Building();
-    building0->setPos(1152,523);
-    building1->setPos(100,100);
-    building2->setPos(315,89);
+    building0->setPos(450,312);
+    building1->setPos(410,312);
+    building2->setPos(406,272);
     building3->setPos(63,568);
     building4->setPos(345,76);
     building5->setPos(231,9);
