@@ -46,6 +46,17 @@ void Shooting::shot()
         emit (owner->ammoChangedNoReloading());
 }
 
+void Shooting::createBullet()
+{
+    Bullet * bullet = new Bullet(5*qCos(qDegreesToRadians(lineAngle)),
+                                 -5*qSin(qDegreesToRadians(lineAngle)),
+                                 lineAngle,
+                                 mainScene,
+                                 gun->getDamage());
+    bullet->setPos(owner->x() + 5, owner->y() + 5);
+    mainScene->addItem(bullet);
+}
+
 void Shooting::createBullet(int xy_)
 {
     Bullet * bullet = new Bullet(5*qCos(qDegreesToRadians(lineAngle + QRandomGenerator::global()->bounded(-7,7))),

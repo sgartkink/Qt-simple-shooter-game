@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
  * 7. skrzynie - DONE
  * 8. snajperka
  * 9. AI dla botow
- * 10. prostsze generowanie mapy
+ * 10. prostsze generowanie mapy - DONE
  * 11. menu gracza, paski życia, amunicji itp - DONE
  * 12. poprawa granatów: animacja wybuchu, zmiana obrażeń, zasięgu, inaczej liczony tor ruchu, możliwość ustalania prędkości - DONE
  * 13. pole widzenia gracza

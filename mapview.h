@@ -11,12 +11,10 @@ class MapView : public QGraphicsView
     Q_OBJECT
 public:
     MapView(QGraphicsScene *scene, QWidget *parent = nullptr);
-    ~MapView();
 
     void startShakeScreen();
 
 private:
-    Map * map;
     ShakeScreen * shakeScreen;
 
     void mouseMoveEvent(QMouseEvent *event);

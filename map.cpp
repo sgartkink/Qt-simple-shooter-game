@@ -18,69 +18,73 @@ Map::Map(QGraphicsScene * scene)
     scene->addItem(line3);
     scene->addItem(line4);
 
-    Building * building0 = new Building();
-    Building * building1 = new Building();
-    Building * building2 = new Building();
-    Building * building3 = new Building();
-    Building * building4 = new Building();
-    Building * building5 = new Building();
-    Building * building6 = new Building();
-    Building * building7 = new Building();
-    Building * building8 = new Building();
-    Building * building9 = new Building();
-    Building * building10 = new Building();
-    Building * building11 = new Building();
-    Building * building12 = new Building();
-    Building * building13 = new Building();
-    Building * building14 = new Building();
-    Building * building15 = new Building();
-    Building * building16 = new Building();
-    Building * building17 = new Building();
-    Building * building18 = new Building();
-    Building * building19 = new Building();
-    building0->setPos(450,312);
-    building1->setPos(410,312);
-    building2->setPos(406,272);
-    building3->setPos(63,568);
-    building4->setPos(345,76);
-    building5->setPos(231,9);
-    building6->setPos(568,541);
-    building7->setPos(453,453);
-    building8->setPos(520,320);
-    building9->setPos(678,98);
-    building10->setPos(820,793);
-    building11->setPos(1256,120);
-    building12->setPos(983,855);
-    building13->setPos(1000,1000);
-    building14->setPos(638,985);
-    building15->setPos(25,600);
-    building16->setPos(356,852);
-    building17->setPos(526,1156);
-    building18->setPos(741,963);
-    building19->setPos(889,951);
-    scene->addItem(building0);
-    scene->addItem(building1);
-    scene->addItem(building2);
-    scene->addItem(building3);
-    scene->addItem(building4);
-    scene->addItem(building5);
-    scene->addItem(building6);
-    scene->addItem(building7);
-    scene->addItem(building8);
-    scene->addItem(building9);
-    scene->addItem(building10);
-    scene->addItem(building11);
-    scene->addItem(building12);
-    scene->addItem(building13);
-    scene->addItem(building14);
-    scene->addItem(building15);
-    scene->addItem(building16);
-    scene->addItem(building17);
-    scene->addItem(building18);
-    scene->addItem(building19);
+    vector.resize(248);
+    int i = 0;
+    for (auto it = vector.begin(); it != vector.end(); ++it)
+    {
+        (*it).resize(248);
 
+        int j = 0;
+        for (auto it2 = (*it).begin(); it2 != (*it).end(); ++it2)
+        {
+            (*it2) = new GridElement(i, j);
+            j++;
+        }
+        i++;
+    }
+
+    addBuilding(QPoint(41,31));
+    addBuilding(QPoint(40,27));
+    addBuilding(QPoint(6,56));
+    addBuilding(QPoint(34,7));
+    addBuilding(QPoint(23,0));
+    addBuilding(QPoint(56,54));
+    addBuilding(QPoint(45,45));
+    addBuilding(QPoint(52,32));
+    addBuilding(QPoint(67,9));
+    addBuilding(QPoint(82,79));
+    addBuilding(QPoint(98,85));
+    addBuilding(QPoint(125,12));
+    addBuilding(QPoint(98,85));
+    addBuilding(QPoint(100,100));
+    addBuilding(QPoint(63,98));
+    addBuilding(QPoint(2,60));
+    addBuilding(QPoint(35,85));
+    addBuilding(QPoint(52,115));
+    addBuilding(QPoint(74,96));
+    addBuilding(QPoint(89,95));
+
+    addChest(QPoint(15,18));
+}
+
+QVector<QPoint> neighbours(GridElement center)
+{
+    QVector<QPoint> n;
+    if (center.x() - 1 >= 0)
+        n.append(QPoint(center.x() - 1, center.y()));
+    if (center.x() + 1 <= 248)
+        n.append(QPoint(center.x() + 1, center.y()));
+    if (center.y() - 1 >= 0)
+        n.append(QPoint(center.x(), center.y() - 1));
+    if (center.y() + 1 <= 248)
+        n.append(QPoint(center.x(), center.y() + 1));
+
+    return n;
+}
+
+void Map::addBuilding(QPoint p)
+{
+    Building * building = new Building();
+    building->setPos(p.x() * 10, p.y() * 10);
+//    vector[p.x()][p.y()].toggleTaken();
+    scene->addItem(building);
+}
+
+void Map::addChest(QPoint p)
+{
     Chest * chest = new Chest();
-    chest->setPos(150,180);
+    chest->setPos(p.x() * 10, p.y() * 10);
+//    vector[p.x()][p.y()].toggleTaken();
     scene->addItem(chest);
 }
 

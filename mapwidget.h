@@ -15,6 +15,7 @@ class MainWidget;
 #include "playerbarwidget.h"
 #include "chest.h"
 #include "powergrenadethrowing.h"
+#include "map.h"
 
 class MapWidget : public QWidget
 {
@@ -35,6 +36,7 @@ private:
     Player * player = new Player(scene, mapView);
     PowerGrenadeThrowing * powerGrenadeThrowing = nullptr;
     PlayerBarWidget * playerBarWidget = nullptr;
+    Map * map = new Map(scene);
 
     QTimer timerChestCreating;
     QTimer throwingGrenadeTimer;

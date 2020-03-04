@@ -12,7 +12,7 @@ public:
     Player(QGraphicsScene * mainScene, QGraphicsView * mainView);
 
 public slots:
-    virtual void updateLineHeroMouse(QPoint mousePoint);
+    void updateLineHeroMouse(QPoint mousePoint);
 
 protected slots:
     virtual void nextMove();

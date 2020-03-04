@@ -47,7 +47,8 @@ SOURCES += \
     shotgun.cpp \
     powergrenadethrowing.cpp \
     shooting.cpp \
-    shakescreen.cpp
+    shakescreen.cpp \
+    gridelement.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -72,7 +73,8 @@ HEADERS += \
     shotgun.h \
     powergrenadethrowing.h \
     shooting.h \
-    shakescreen.h
+    shakescreen.h \
+    gridelement.h
 
 FORMS +=
 

@@ -37,9 +37,13 @@ MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, MainWidget *parent, Qt::W
     scene->addItem(player);
     player->setPos(200,240);
 
-    Bot * bot = new Bot(scene);
+    Bot * bot = new Bot(scene, map);
     bot->setPos(450,300);
     scene->addItem(bot);
+
+    Chest * chest = new Chest;
+    scene->addItem(chest);
+    chest->setPos(320, 240);
 
     QTimer::singleShot(500, [this, bot](){ player->start(); bot->start(); });
 }
@@ -153,31 +157,17 @@ void MapWidget::checkChestsInArea()
 
 void MapWidget::createChest()
 {
-    bool empty;
-    int newX, newY;
+    QPoint p;
     do {
-        empty = false;
-        QPainterPath path;
-        newX = QRandomGenerator::global()->bounded(1300);
-        newY = QRandomGenerator::global()->bounded(1300);
-        path.addRect(newX, newY, 20, 10);
+        p = QPoint(QRandomGenerator::global()->bounded(248), QRandomGenerator::global()->bounded(248));
+    } while(map->checkIfPointIsTaken(p));
 
-        QList<QGraphicsItem *> listOfItemsWithinRange = scene->items(path);
-        for (auto it = listOfItemsWithinRange.begin(); it != listOfItemsWithinRange.end(); it++)
-            if (ItemsOnScene * i = dynamic_cast<ItemsOnScene*>(*it))
-            {
-                empty = true;
-                break;
-            }
-    } while(empty);
-
-    Chest * chest = new Chest;
-    scene->addItem(chest);
-    chest->setPos(newX, newY);
+    map->addChest(p);
 }
 
 MapWidget::~MapWidget()
 {
+    delete map;
     delete player;
     delete powerGrenadeThrowing;
     delete qhboxLayout;

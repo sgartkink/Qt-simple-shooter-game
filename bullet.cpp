@@ -4,7 +4,7 @@
 #include "bot.h"
 
 Bullet::Bullet(double dx, double dy, double angle, QGraphicsScene *mainScene, int damage)
-    : QGraphicsRectItem(0, 0, 4, 2), dx(dx), dy(dy), mainScene(mainScene), damage(damage)
+    : QGraphicsRectItem(0, 0, 4, 2), mainScene(mainScene), dx(dx), dy(dy), damage(damage)
 {
     setRotation(-1 * angle);
 
