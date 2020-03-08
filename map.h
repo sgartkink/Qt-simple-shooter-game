@@ -16,11 +16,11 @@ public:
     ~Map();
 
     GridElement * getGridElement(int x, int y) { return vector[x][y]; }
-    QVector<QPoint> neighbours(GridElement center);
-    bool checkIfPointIsTaken(QPoint center) { return vector[center.x()][center.y()]->isTaken() == true ? true : false; }
-    void togglePoint(QPoint p) { vector[p.x()][p.y()]->toggleTaken(); }
+    QVector<QPoint> neighbours(GridElement * center);
+    bool checkIfPointIsTaken(QPointF center) { return vector[center.x()][center.y()]->isTaken() == true ? true : false; }
+    void togglePoint(QPointF p) { vector[p.x()][p.y()]->toggleTaken(); }
 
-    void addChest(QPoint p);
+    void addChest(QPointF p);
 
 private:
     QGraphicsScene * scene;
@@ -31,7 +31,7 @@ private:
 
     QVector<QVector<GridElement *>> vector;
 
-    void addBuilding(QPoint p);
+    void addBuilding(QPointF p);
 };
 
 #endif // MAP_H

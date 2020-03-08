@@ -14,9 +14,6 @@ void Bot::nextMove()
 {
     checkNearestArea();
 
-//    randomNewDestinationPoint();
-//    qDebug() << aStar(map->getGridElement(10,10), map->getGridElement(20,15));
-
     switch (currentState)
     {
     case STATE_MOVE:
@@ -73,28 +70,47 @@ void Bot::updateLineHeroMouse()
 
 void Bot::randomNewDestinationPoint()
 {
-    if (!goingOpenChest)
-    {
-        directionUp = false;
-        directionDown = false;
-        directionLeft = false;
-        directionRight = false;
+    directionUp = false;
+    directionDown = false;
+    directionLeft = false;
+    directionRight = false;
 
-        do
-        {
-            destinationPoint = QPointF(x() + QRandomGenerator::global()->bounded(-300,300),
-                                       y() + QRandomGenerator::global()->bounded(-300,300));
-            corner1 = dynamic_cast<ItemsOnScene*>(mainScene->itemAt(destinationPoint.x(), destinationPoint.y(), QTransform()));
-        } while(destinationPoint.x() < 0 || destinationPoint.x() > 2048 || destinationPoint.y() < 0 || destinationPoint.y() > 2048
-                || corner1);
-    }
+    do
+    {
+        do {
+            destinationPoint = QPointF(qRound(x() + QRandomGenerator::global()->bounded(-300,300))/10,
+                                       qRound(y() + QRandomGenerator::global()->bounded(-300,300))/10);
+        } while(destinationPoint.x() < 0 || destinationPoint.x() > 248 ||
+                destinationPoint.y() < 0 || destinationPoint.y() > 248);
+
+    } while(map->checkIfPointIsTaken(destinationPoint));
+    destinationPoint.setX(destinationPoint.x()*10);
+    destinationPoint.setY(destinationPoint.y()*10);
 }
 
 void Bot::move()
 {
-    if (qFabs(x() - destinationPoint.x()) < 35 && qFabs(y() - destinationPoint.y()) < 35)
+    if ((qFabs(x() - destinationPoint.x()) <= 2 && qFabs(y() - destinationPoint.y()) <= 2) ||
+            (goingOpenChest && qFabs(x() - destinationPoint.x()) <= 25 && qFabs(y() - destinationPoint.y()) <= 25))
     {
-        if (goingOpenChest)
+        if (pathFromAlgorithm)
+        {
+            directionUp = false;
+            directionDown = false;
+            directionLeft = false;
+            directionRight = false;
+
+            path.removeLast();
+            if (path.length() != 0)
+                destinationPoint = *path.last();
+            else
+            {
+                pathFromAlgorithm = false;
+                path.clear();
+                randomNewDestinationPoint();
+            }
+        }
+        else if (goingOpenChest)
         {
             QPainterPath findingChestPath;
             findingChestPath.addRect(x() - 20, y()- 20, 50, 50);
@@ -124,19 +140,29 @@ void Bot::move()
     {
         if (x() < destinationPoint.x())
         {
-            shouldDirectionRight = true;
-            if (!checkCorners(size+2, 0, size+2, size))
-                directionRight = true;
+            if (!pathFromAlgorithm)
+            {
+                shouldDirectionRight = true;
+                if (!checkCorners(size+2, 0, size+2, size))
+                    directionRight = true;
+                else
+                    directionRight = false;
+            }
             else
-                directionRight = false;
+                directionRight = true;
         }
         else
         {
-            shouldDirectionLeft = true;
-            if (!checkCorners(-2, 0, -2, size))
-                directionLeft = true;
+            if (!pathFromAlgorithm)
+            {
+                shouldDirectionLeft = true;
+                if (!checkCorners(-2, 0, -2, size))
+                    directionLeft = true;
+                else
+                    directionLeft = false;
+            }
             else
-                directionLeft = false;
+                directionLeft = true;
         }
     }
 
@@ -144,23 +170,34 @@ void Bot::move()
     {
         if (y() < destinationPoint.y())
         {
-            shouldDirectionDown = true;
-            if (!checkCorners(0, size+2, size, size+2))
-                directionDown = true;
+            if (!pathFromAlgorithm)
+            {
+                shouldDirectionDown = true;
+                if (!checkCorners(0, size+2, size, size+2))
+                    directionDown = true;
+                else
+                    directionDown = false;
+            }
             else
-                directionDown = false;
+                directionDown = true;
         }
         else
         {
-            shouldDirectionUp = true;
-            if (!checkCorners(0, -2, size, -2))
-                directionUp = true;
+            if (!pathFromAlgorithm)
+            {
+                shouldDirectionUp = true;
+                if (!checkCorners(0, -2, size, -2))
+                    directionUp = true;
+                else
+                    directionUp = false;
+            }
             else
-                directionUp = false;
+                directionUp = true;
         }
     }
 
-    checkIfBotMayGo();
+    if (!pathFromAlgorithm)
+        checkIfBotMayGo();
 
     shouldDirectionUp = false;
     shouldDirectionDown = false;
@@ -196,21 +233,120 @@ bool Bot::checkCorners(int addToX_corner1, int addToY_corner1, int addToX_corner
 void Bot::checkIfBotMayGo()
 {
     if (shouldDirectionUp && shouldDirectionLeft && !directionUp && !directionLeft)
-        randomNewDestinationPoint();
+        search();
     else if (shouldDirectionUp && shouldDirectionRight && !directionUp && !directionRight)
-        randomNewDestinationPoint();
+        search();
     else if (shouldDirectionDown && shouldDirectionLeft && !directionDown && !directionLeft)
-        randomNewDestinationPoint();
+        search();
     else if (shouldDirectionDown && shouldDirectionRight && !directionDown && !directionRight)
-        randomNewDestinationPoint();
-    else if (shouldDirectionUp && !directionUp)
-        randomNewDestinationPoint();
-    else if (shouldDirectionDown && !directionDown)
-        randomNewDestinationPoint();
-    else if (shouldDirectionLeft && !directionLeft)
-        randomNewDestinationPoint();
-    else if (shouldDirectionRight && !directionRight)
-        randomNewDestinationPoint();
+        search();
+    else if (shouldDirectionUp && !directionUp && !directionLeft && !directionRight)
+        search();
+    else if (shouldDirectionDown && !directionDown && !directionLeft && !directionRight)
+        search();
+    else if (shouldDirectionLeft && !directionLeft && !directionUp && !directionDown)
+        search();
+    else if (shouldDirectionRight && !directionRight && !directionUp && !directionDown)
+        search();
+}
+
+void Bot::search()
+{
+    currentChecking.append(map->getGridElement(qRound(x()/10), qRound(y()/10)));
+    int position = 0;
+    bool last = false;
+    for (auto it = currentChecking.begin(); it != currentChecking.end();)
+    {
+        last = false;
+        if (!(*it)->isTaken())
+        {
+            bool gridChecked = false;
+            for (auto it2 = checked.begin(); it2 != checked.end(); it2++)
+                if (*it == *it2)
+                {
+                    gridChecked = true;
+                    break;
+                }
+
+            if (!gridChecked)
+            {
+                checked.append(map->getGridElement((*it)->x(), (*it)->y()));
+                map->getGridElement((*it)->x(), (*it)->y())->setPosition(position);
+
+                if ((*it)->x() == destinationPoint.x()/10 && (*it)->y() == destinationPoint.y()/10)
+                    break;
+
+                if ((*it)->x()/10 - 1 >= 0)
+                    checkLater.append(map->getGridElement((*it)->x() - 1, (*it)->y()));
+                if ((*it)->x()/10 + 1 <= 248)
+                    checkLater.append(map->getGridElement((*it)->x() + 1, (*it)->y()));
+                if ((*it)->y() - 1 >= 0)
+                    checkLater.append(map->getGridElement((*it)->x(), (*it)->y() - 1));
+                if ((*it)->y() + 1 <= 248)
+                    checkLater.append(map->getGridElement((*it)->x(), (*it)->y() + 1));
+            }
+        }
+
+        if (it - currentChecking.end() == -1)
+        {
+            currentChecking = checkLater;
+            it = currentChecking.begin();
+            checkLater.clear();
+            position++;
+            last = true;
+        }
+
+        if (!last)
+            ++it;
+    }
+
+    path << checked.last();
+    position--;
+    while (position != 0)
+    {
+        if (path.last()->x() - 1 >= 0)
+            if (map->getGridElement(path.last()->x() - 1, path.last()->y())->getPosition() == position)
+            {
+                position--;
+                path.append(map->getGridElement(path.last()->x() - 1, path.last()->y()));
+            }
+
+        if (path.last()->x() + 1 <= 248)
+            if (map->getGridElement(path.last()->x() + 1, path.last()->y())->getPosition() == position)
+            {
+                position--;
+                path.append(map->getGridElement(path.last()->x() + 1, path.last()->y()));
+            }
+
+        if (path.last()->y() - 1 >= 0)
+            if (map->getGridElement(path.last()->x(), path.last()->y() - 1)->getPosition() == position)
+            {
+                position--;
+                path.append(map->getGridElement(path.last()->x(), path.last()->y() - 1));
+            }
+
+        if (path.last()->y() + 1 <= 248)
+            if (map->getGridElement(path.last()->x(), path.last()->y() + 1)->getPosition() == position)
+            {
+                position--;
+                path.append(map->getGridElement(path.last()->x(), path.last()->y() + 1));
+            }
+    }
+
+    for (auto it = checked.begin(); it != checked.end(); ++it)
+        (*it)->setPosition(-1);
+    checked.clear();
+    currentChecking.clear();
+    checkLater.clear();
+
+    for (auto it = path.begin(); it != path.end(); ++it)
+    {
+        (*it)->setX((*it)->x()*10);
+        (*it)->setY((*it)->y()*10);
+    }
+
+    destinationPoint = *path.last();
+    pathFromAlgorithm = true;
 }
 
 void Bot::attack()
@@ -223,5 +359,3 @@ void Bot::hide()
 {
 
 }
-
-

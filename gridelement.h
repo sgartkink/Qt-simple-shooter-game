@@ -2,24 +2,23 @@
 #define GRIDELEMENT_H
 
 #include <QPoint>
+#include <QGraphicsScene>
+#include <QGraphicsTextItem>
 
-class GridElement : public QPoint
+class GridElement : public QPointF
 {
 public:
     GridElement(int x_, int y_);
 
     bool isTaken() { return taken; }
-    int getParentX() { return parentX; }
-    int getParentY() { return parentY; }
+    int getPosition() { return position; }
 
-    void setParentX(int x) { parentX = x; }
-    void setParentY(int y) { parentY = y; }
+    void setPosition(int p) { position = p; }
     void toggleTaken() { taken = !taken; }
 
 private:
     bool taken = false;
-    int parentX = -1;
-    int parentY = -1;
+    int position = -1;
 };
 
 #endif // GRIDELEMENT_H

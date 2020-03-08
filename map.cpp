@@ -1,4 +1,5 @@
 #include "map.h"
+#include <QtDebug>
 
 Map::Map(QGraphicsScene * scene)
     : scene(scene)
@@ -33,13 +34,12 @@ Map::Map(QGraphicsScene * scene)
         i++;
     }
 
-    addBuilding(QPoint(41,31));
-    addBuilding(QPoint(40,27));
+    addBuilding(QPoint(40,28));
+    addBuilding(QPoint(40,32));
     addBuilding(QPoint(6,56));
-    addBuilding(QPoint(34,7));
+    addBuilding(QPoint(47,28));
     addBuilding(QPoint(23,0));
     addBuilding(QPoint(56,54));
-    addBuilding(QPoint(45,45));
     addBuilding(QPoint(52,32));
     addBuilding(QPoint(67,9));
     addBuilding(QPoint(82,79));
@@ -57,34 +57,37 @@ Map::Map(QGraphicsScene * scene)
     addChest(QPoint(15,18));
 }
 
-QVector<QPoint> neighbours(GridElement center)
+QVector<QPointF> neighbours(GridElement * center)
 {
-    QVector<QPoint> n;
-    if (center.x() - 1 >= 0)
-        n.append(QPoint(center.x() - 1, center.y()));
-    if (center.x() + 1 <= 248)
-        n.append(QPoint(center.x() + 1, center.y()));
-    if (center.y() - 1 >= 0)
-        n.append(QPoint(center.x(), center.y() - 1));
-    if (center.y() + 1 <= 248)
-        n.append(QPoint(center.x(), center.y() + 1));
+    QVector<QPointF> n;
+    if (center->x() - 1 >= 0)
+        n.append(QPointF(center->x() - 1, center->y()));
+    if (center->x() + 1 <= 248)
+        n.append(QPointF(center->x() + 1, center->y()));
+    if (center->y() - 1 >= 0)
+        n.append(QPointF(center->x(), center->y() - 1));
+    if (center->y() + 1 <= 248)
+        n.append(QPointF(center->x(), center->y() + 1));
 
     return n;
 }
 
-void Map::addBuilding(QPoint p)
+void Map::addBuilding(QPointF p)
 {
     Building * building = new Building();
     building->setPos(p.x() * 10, p.y() * 10);
-//    vector[p.x()][p.y()].toggleTaken();
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            vector[p.x()+i][p.y() + j]->toggleTaken();
+
     scene->addItem(building);
 }
 
-void Map::addChest(QPoint p)
+void Map::addChest(QPointF p)
 {
     Chest * chest = new Chest();
     chest->setPos(p.x() * 10, p.y() * 10);
-//    vector[p.x()][p.y()].toggleTaken();
+    vector[p.x()][p.y()]->toggleTaken();
     scene->addItem(chest);
 }
 

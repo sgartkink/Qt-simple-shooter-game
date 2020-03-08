@@ -35,21 +35,28 @@ private:
     Hero * targetAttack = nullptr;
     Map * map;
 
+    QVector<GridElement *> currentChecking;
+    QVector<GridElement *> checkLater;
+    QVector<GridElement *> checked;
+    QVector<GridElement *> path;
+
     bool shouldDirectionUp = false;
     bool shouldDirectionDown = false;
     bool shouldDirectionRight = false;
     bool shouldDirectionLeft = false;
     bool goingOpenChest = false;
+    bool pathFromAlgorithm = false;
+    bool starta = true;
 
-//    QVector<GridElement> aStar(GridElement player, GridElement dest);
-//    static bool isDestination(int x, int y, QPoint dest) {
-//        if (x == dest.x() && y == dest.y()) {
+//    QVector<GridElement *> aStar(GridElement * player, GridElement * dest);
+//    static bool isDestination(int x, int y, QPoint * dest) {
+//        if (x == dest->x() && y == dest->y()) {
 //            return true;
 //        }
 //        return false;
 //    }
 //    bool isValid(QPoint p) { return map->checkIfPointIsTaken(p); }
-//    QVector<GridElement> makePath(GridElement dest);
+//    QVector<GridElement *> makePath(GridElement * dest);
 
     void checkNearestArea();
     void randomNewDestinationPoint();
@@ -57,6 +64,7 @@ private:
     void move();
     bool checkCorners(int addToX_corner1, int addToY_corner1, int addToX_corner2, int addToY_corner2);
     void checkIfBotMayGo();
+    void search();
     void attack();
     void hide();
 };
