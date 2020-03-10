@@ -46,17 +46,6 @@ private:
     bool shouldDirectionLeft = false;
     bool goingOpenChest = false;
     bool pathFromAlgorithm = false;
-    bool starta = true;
-
-//    QVector<GridElement *> aStar(GridElement * player, GridElement * dest);
-//    static bool isDestination(int x, int y, QPoint * dest) {
-//        if (x == dest->x() && y == dest->y()) {
-//            return true;
-//        }
-//        return false;
-//    }
-//    bool isValid(QPoint p) { return map->checkIfPointIsTaken(p); }
-//    QVector<GridElement *> makePath(GridElement * dest);
 
     void checkNearestArea();
     void randomNewDestinationPoint();

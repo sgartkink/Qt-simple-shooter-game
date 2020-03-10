@@ -1,5 +1,6 @@
 #include "shooting.h"
 #include "hero.h"
+#include <QtDebug>
 
 Shooting::Shooting(Hero *owner, Gun *gun, QGraphicsScene *mainScene, bool mainPlayer)
     : mainPlayer(mainPlayer), owner(owner), gun(gun), mainScene(mainScene)
@@ -18,6 +19,7 @@ void Shooting::start()
     else
     {
         gun->reload();
+        owner->stopShooting();
 
         if (mainPlayer)
             emit (owner->ammoChangedReloading());
@@ -28,7 +30,7 @@ void Shooting::stop()
 {
     timer.stop();
 }
-
+#include <QtDebug>
 void Shooting::shot()
 {
     lineAngle = owner->lineAngle();
@@ -52,7 +54,8 @@ void Shooting::createBullet()
                                  -5*qSin(qDegreesToRadians(lineAngle)),
                                  lineAngle,
                                  mainScene,
-                                 gun->getDamage());
+                                 gun->getDamage(),
+                                 owner);
     bullet->setPos(owner->x() + 5, owner->y() + 5);
     mainScene->addItem(bullet);
 }
@@ -63,7 +66,8 @@ void Shooting::createBullet(int xy_)
                                  -5*qSin(qDegreesToRadians(lineAngle + QRandomGenerator::global()->bounded(-7,7))),
                                  lineAngle + QRandomGenerator::global()->bounded(-7,7),
                                  mainScene,
-                                 gun->getDamage() + QRandomGenerator::global()->bounded(3));
+                                 gun->getDamage() + QRandomGenerator::global()->bounded(3),
+                                 owner);
     bullet->setPos(owner->x() + 5 + xy_, owner->y() + 5 + xy_);
     mainScene->addItem(bullet);
 }

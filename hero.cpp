@@ -23,7 +23,7 @@ void Hero::attackItem(int dmg)
         armor = 0;
         emit (hpChanged());
         emit (armorChanged());
-        checkIfStillExist();
+//        checkIfStillExist();
     }
 }
 
@@ -113,14 +113,16 @@ void Hero::throwGrenade(int addedVelocity, MapView *mapView)
     grenades--;
     emit (grenadesChanged());
 }
-
+#include <QtDebug>
 void Hero::startShooting()
 {
-    if (!currentGun->isReloading() && !throwingGrenade)
+    if (!currentGun->isReloading() || !throwingGrenade)
     {
         currentlyShooting = true;
         shooting->start();
     }
+    else
+        stopShooting();
 }
 
 void Hero::stopShooting()

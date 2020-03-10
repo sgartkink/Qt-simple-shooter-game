@@ -12,11 +12,13 @@ Bot::Bot(QGraphicsScene *mainScene, Map *map)
 
 void Bot::nextMove()
 {
+    currentState = STATE_MOVE;
     checkNearestArea();
 
     switch (currentState)
     {
     case STATE_MOVE:
+        stopShooting();
         move();
         break;
     case STATE_ATTACK:
@@ -35,18 +37,39 @@ void Bot::checkNearestArea()
 
     QList<QGraphicsItem *> listOfItemsInNearestArea = mainScene->items(pathNearestArea);
     for (auto it = listOfItemsInNearestArea.begin(); it != listOfItemsInNearestArea.end(); it++)
-//        if (Player * p = dynamic_cast<Player*>(*it))
-//        {
-//            if (currentGun->isReloading())
-//                currentState = STATE_HIDE;
-//            else
-//            {
-//                currentState = STATE_ATTACK;
-//                targetAttack = p;
-//            }
-//            break;
-//        }
-        /*else */if (Chest * c = dynamic_cast<Chest*>(*it))
+        if (Player * p = dynamic_cast<Player*>(*it))
+        {
+            if (currentGun->isReloading())
+            {
+                currentState = STATE_HIDE;
+                stopShooting();
+            }
+            else
+            { 
+                targetAttack = p;
+
+                QPolygonF polygon;
+                polygon << QPointF(x() + 5, y() + 5) << QPointF(p->x(), p->y());
+
+                QPainterPath painterPath;
+                painterPath.addPolygon(polygon);
+
+                QList<QGraphicsItem *> list = mainScene->items(painterPath);
+                for (auto it = list.begin(); it != list.end(); it++)
+                {
+                    Building * b = dynamic_cast<Building *>(*it);
+                    Chest * c = dynamic_cast<Chest *>(*it);
+                    if (b || c)
+                    {
+                        currentState = STATE_MOVE;
+                        return;
+                    }
+                }
+                currentState = STATE_ATTACK;
+            }
+            break;
+        }
+        else if (Chest * c = dynamic_cast<Chest*>(*it))
         {
             if (!goingOpenChest)
             {
@@ -352,7 +375,24 @@ void Bot::search()
 void Bot::attack()
 {
     updateLineHeroMouse();
-    startShooting();
+
+    if (currentGun->ammoOwned() == 0 && currentGun->ammoLoaded() == 0)
+    {
+        setCurrentGun(0);
+
+        if (currentGun->ammoOwned() == 0 && currentGun->ammoLoaded() == 0)
+        {
+            setCurrentGun(1);
+
+            if (currentGun->ammoOwned() == 0 && currentGun->ammoLoaded() == 0)
+                setCurrentGun(2);
+        }
+    }
+
+    if (!currentGun->isReloading() && !currentlyShooting)
+        startShooting();
+    else if (!currentGun->isReloading() && currentlyShooting)
+        stopShooting();
 }
 
 void Bot::hide()

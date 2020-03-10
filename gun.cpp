@@ -1,6 +1,6 @@
 ﻿#include "gun.h"
 #include "global_consts.h"
-
+#include <QtDebug>
 Gun::Gun(bool automatic, int fireFrequency)
     : automatic(automatic), fireFrequency(fireFrequency)
 {
