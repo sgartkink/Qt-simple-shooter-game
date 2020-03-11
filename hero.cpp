@@ -113,7 +113,7 @@ void Hero::throwGrenade(int addedVelocity, MapView *mapView)
     grenades--;
     emit (grenadesChanged());
 }
-#include <QtDebug>
+
 void Hero::startShooting()
 {
     if (!currentGun->isReloading() || !throwingGrenade)
@@ -121,8 +121,6 @@ void Hero::startShooting()
         currentlyShooting = true;
         shooting->start();
     }
-    else
-        stopShooting();
 }
 
 void Hero::stopShooting()

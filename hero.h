@@ -44,6 +44,7 @@ public:
     void refillCurrentLoadedAmmo();
     void refillCurrentOwnedAmmo();
     void throwGrenade(int addedVelocity, MapView * mapView);
+    void setCurrentlyShooting(bool c) { currentlyShooting = c; }
 
     void toggleDirectionUp() { directionUp = !directionUp; }
     void toggleDirectionRight() { directionRight = !directionRight; }

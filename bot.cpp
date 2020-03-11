@@ -391,8 +391,6 @@ void Bot::attack()
 
     if (!currentGun->isReloading() && !currentlyShooting)
         startShooting();
-    else if (!currentGun->isReloading() && currentlyShooting)
-        stopShooting();
 }
 
 void Bot::hide()

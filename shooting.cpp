@@ -15,11 +15,13 @@ void Shooting::start()
         shot();
         if (gun->isAutomatic())
             timer.start(gun->getFireFrequency());
+        else
+            owner->setCurrentlyShooting(false);
     }
     else
     {
         gun->reload();
-        owner->stopShooting();
+        QTimer::singleShot(RELOADING_TIME, [this](){ owner->setCurrentlyShooting(false); });
 
         if (mainPlayer)
             emit (owner->ammoChangedReloading());
@@ -30,7 +32,7 @@ void Shooting::stop()
 {
     timer.stop();
 }
-#include <QtDebug>
+
 void Shooting::shot()
 {
     lineAngle = owner->lineAngle();
@@ -42,7 +44,12 @@ void Shooting::shot()
 
     gun->decreaseAmmo();
     if (gun->ammoLoaded() == 0)
+    {
         timer.stop();
+
+        if (!mainPlayer)
+            gun->reload();
+    }
 
     if (mainPlayer)
         emit (owner->ammoChangedNoReloading());
