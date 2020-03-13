@@ -16,18 +16,11 @@ public:
 protected slots:
     virtual void nextMove();
 
-public slots:
-    virtual void updateLineHeroMouse(QPoint mousePoint) {}
+private slots:
+    virtual void updateLineHeroMouse(QPoint mousePoint = QPoint());
 
 private:
-    enum states {
-        STATE_MOVE,
-        STATE_ATTACK,
-        STATE_HIDE
-    };
-
     QPointF destinationPoint;
-    states currentState = STATE_MOVE;
     QPainterPath pathNearestArea;
 
     ItemsOnScene * corner1 = nullptr;
@@ -40,6 +33,8 @@ private:
     QVector<GridElement *> checked;
     QVector<GridElement *> path;
 
+    int viewRange = 300;
+
     bool shouldDirectionUp = false;
     bool shouldDirectionDown = false;
     bool shouldDirectionRight = false;
@@ -47,15 +42,17 @@ private:
     bool goingOpenChest = false;
     bool pathFromAlgorithm = false;
 
+    bool STATE_ATTACK = false;
+    bool STATE_HIDE = false;
+
     void checkNearestArea();
     void randomNewDestinationPoint();
-    void updateLineHeroMouse();
+    void newDestinationPoint(int x1, int y1, int x2, int y2);
     void move();
     bool checkCorners(int addToX_corner1, int addToY_corner1, int addToX_corner2, int addToY_corner2);
     void checkIfBotMayGo();
     void search();
     void attack();
-    void hide();
 };
 
 #endif // BOT_H

@@ -6,34 +6,26 @@ Bot::Bot(QGraphicsScene *mainScene, Map *map)
     : Hero (0, 0, 10, 10, nullptr, mainScene, Qt::green), map(map)
 {
     shooting = new Shooting(this, currentGun, mainScene, false);
-    currentState = STATE_MOVE;
     randomNewDestinationPoint();
 }
 
 void Bot::nextMove()
 {
-    currentState = STATE_MOVE;
     checkNearestArea();
 
-    switch (currentState)
-    {
-    case STATE_MOVE:
-        stopShooting();
-        move();
-        break;
-    case STATE_ATTACK:
+    move();
+
+    if (STATE_ATTACK)
         attack();
-        break;
-    case STATE_HIDE:
-        hide();
-        break;
-    }
+
+    STATE_HIDE = false;
+    STATE_ATTACK = false;
 }
 
 void Bot::checkNearestArea()
 {
     pathNearestArea = QPainterPath();
-    pathNearestArea.addEllipse(pos(), 200, 200);
+    pathNearestArea.addEllipse(pos(), viewRange, viewRange);
 
     QList<QGraphicsItem *> listOfItemsInNearestArea = mainScene->items(pathNearestArea);
     for (auto it = listOfItemsInNearestArea.begin(); it != listOfItemsInNearestArea.end(); it++)
@@ -41,7 +33,7 @@ void Bot::checkNearestArea()
         {
             if (currentGun->isReloading())
             {
-                currentState = STATE_HIDE;
+                STATE_HIDE = true;
                 stopShooting();
             }
             else
@@ -61,11 +53,12 @@ void Bot::checkNearestArea()
                     Chest * c = dynamic_cast<Chest *>(*it);
                     if (b || c)
                     {
-                        currentState = STATE_MOVE;
+                        STATE_ATTACK = false;
                         return;
                     }
                 }
-                currentState = STATE_ATTACK;
+
+                STATE_ATTACK = true;
             }
             break;
         }
@@ -73,7 +66,6 @@ void Bot::checkNearestArea()
         {
             if (!goingOpenChest)
             {
-                currentState = STATE_MOVE;
                 destinationPoint = QPointF(c->pos().x() - 10, c->pos().y() - 5);
                 destinationPoint = c->pos();
                 goingOpenChest = true;
@@ -82,12 +74,12 @@ void Bot::checkNearestArea()
         }
 }
 
-void Bot::updateLineHeroMouse()
+void Bot::updateLineHeroMouse(QPoint mousePoint)
 {
-    if (currentState == STATE_MOVE)
-        lineHeroMouse.setLine(x(), y(), destinationPoint.x(), destinationPoint.y());
-    else if (currentState == STATE_ATTACK)
+    if (STATE_ATTACK)
         lineHeroMouse.setLine(x(), y(), targetAttack->x(), targetAttack->y());
+    else
+        lineHeroMouse.setLine(x(), y(), destinationPoint.x(), destinationPoint.y());
     setRotation(-1 * lineHeroMouse.angle());
 }
 
@@ -101,14 +93,32 @@ void Bot::randomNewDestinationPoint()
     do
     {
         do {
-            destinationPoint = QPointF(qRound(x() + QRandomGenerator::global()->bounded(-300,300))/10,
-                                       qRound(y() + QRandomGenerator::global()->bounded(-300,300))/10);
+            if (!STATE_HIDE)
+                newDestinationPoint(-viewRange, viewRange, -viewRange, viewRange);
+            else
+            {
+
+                if (x() < targetAttack->x() && y() < targetAttack->y())
+                    newDestinationPoint(-viewRange, 0, -viewRange, 0);
+                else if(x() < targetAttack->x() && y() > targetAttack->y())
+                    newDestinationPoint(-viewRange, 0, 0, viewRange);
+                else if (x() > targetAttack->x() && y() < targetAttack->y())
+                    newDestinationPoint(0, viewRange, -viewRange, 0);
+                else
+                    newDestinationPoint(0, viewRange, 0, viewRange);
+            }
         } while(destinationPoint.x() < 0 || destinationPoint.x() > 248 ||
                 destinationPoint.y() < 0 || destinationPoint.y() > 248);
 
     } while(map->checkIfPointIsTaken(destinationPoint));
     destinationPoint.setX(destinationPoint.x()*10);
     destinationPoint.setY(destinationPoint.y()*10);
+}
+
+void Bot::newDestinationPoint(int x1, int y1, int x2, int y2)
+{
+    destinationPoint = QPointF(qRound(x() + QRandomGenerator::global()->bounded(x1,y1))/10,
+                               qRound(y() + QRandomGenerator::global()->bounded(x2,y2))/10);
 }
 
 void Bot::move()
@@ -136,20 +146,12 @@ void Bot::move()
         else if (goingOpenChest)
         {
             QPainterPath findingChestPath;
-            findingChestPath.addRect(x() - 20, y()- 20, 50, 50);
+            findingChestPath.addRect(x() - 20, y() - 20, 50, 50);
             QList<QGraphicsItem *> listOfItemsWithinRange = mainScene->items(findingChestPath);
             for (auto it = listOfItemsWithinRange.begin(); it != listOfItemsWithinRange.end(); it++)
                 if (Chest * c = dynamic_cast<Chest*>(*it))
                 {
                     c->open(this);
-                    directionUp = false;
-                    shouldDirectionUp = false;
-                    directionDown = false;
-                    shouldDirectionDown = false;
-                    directionLeft = false;
-                    shouldDirectionLeft = false;
-                    directionRight = false;
-                    shouldDirectionRight = false;
                     goingOpenChest = false;
                     randomNewDestinationPoint();
                     break;
@@ -391,9 +393,4 @@ void Bot::attack()
 
     if (!currentGun->isReloading() && !currentlyShooting)
         startShooting();
-}
-
-void Bot::hide()
-{
-
 }

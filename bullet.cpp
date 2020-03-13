@@ -26,37 +26,26 @@ void Bullet::move()
     ItemsOnScene * corner2 = dynamic_cast<ItemsOnScene*>(mainScene->itemAt(pos().x(), pos().y() + 5, QTransform()));
     ItemsOnScene * corner3 = dynamic_cast<ItemsOnScene*>(mainScene->itemAt(pos().x() + 5, pos().y() + 5, QTransform()));
 
-    Building * corner10 = dynamic_cast<Building*>(corner0);
-    Building * corner11 = dynamic_cast<Building*>(corner1);
-    Building * corner12 = dynamic_cast<Building*>(corner2);
-    Building * corner13 = dynamic_cast<Building*>(corner3);
-
-    if (corner0 || corner1 || corner2 || corner3)
+    if (corner0 && corner0 != owner)
     {
-        if ((dynamic_cast<Bot*>(corner0) || dynamic_cast<Player*>(corner0)) && corner0 != owner)
-        {
-            corner0->attackItem(damage);
-            delete this;
-        }
-        else if ((dynamic_cast<Bot*>(corner1) || dynamic_cast<Player*>(corner1)) && corner1 != owner)
-        {
-            corner1->attackItem(damage);
-            delete this;
-        }
-        else if ((dynamic_cast<Bot*>(corner2) || dynamic_cast<Player*>(corner2)) && corner2 != owner)
-        {
-            corner2->attackItem(damage);
-            delete this;
-        }
-        else if ((dynamic_cast<Bot*>(corner3) || dynamic_cast<Player*>(corner3)) && corner3 != owner)
-        {
-            corner3->attackItem(damage);
-            delete this;
-        }
-    }
-
-    if (corner10 || corner11 || corner12 || corner13)
+        corner0->attackItem(damage);
         delete this;
+    }
+    else if (corner1 && corner1 != owner)
+    {
+        corner1->attackItem(damage);
+        delete this;
+    }
+    else if (corner2 && corner2 != owner)
+    {
+        corner2->attackItem(damage);
+        delete this;
+    }
+    else if (corner3 && corner3 != owner)
+    {
+        corner3->attackItem(damage);
+        delete this;
+    }
 
     if (x() < 0 || x() > 2000 || y() < 0 || y() > 2000)
         delete this;
