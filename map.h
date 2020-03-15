@@ -17,8 +17,8 @@ public:
 
     GridElement * getGridElement(int x, int y) { return vector[x][y]; }
     QVector<QPoint> neighbours(GridElement * center);
-    bool checkIfPointIsTaken(QPointF center) { return vector[center.x()][center.y()]->isTaken() == true ? true : false; }
-    void togglePoint(QPointF p) { vector[p.x()][p.y()]->toggleTaken(); }
+    bool checkIfPointIsTaken(QPoint center) { return vector[center.x()][center.y()]->isTaken() == true ? true : false; }
+    void togglePoint(QPoint p) { vector[p.x()][p.y()]->toggleTaken(); }
 
     void addChest(QPointF p);
 

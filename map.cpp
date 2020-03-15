@@ -78,7 +78,7 @@ void Map::addBuilding(QPointF p)
     building->setPos(p.x() * 10, p.y() * 10);
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
-            vector[p.x()+i][p.y() + j]->toggleTaken();
+            vector[p.x() + i][p.y() + j]->toggleTaken();
 
     scene->addItem(building);
 }

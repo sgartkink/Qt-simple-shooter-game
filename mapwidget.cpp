@@ -147,7 +147,7 @@ void MapWidget::stopThrowingGrenade()
 void MapWidget::checkChestsInArea()
 {
     QPainterPath path;
-    path.addRect(player->x()-20, player->y()- 20, 50,50);
+    path.addEllipse(player->pos(), 25, 25);
 
     QList<QGraphicsItem *> listOfItemsWithinRange = scene->items(path);
     for (auto it = listOfItemsWithinRange.begin(); it != listOfItemsWithinRange.end(); it++)

@@ -48,7 +48,9 @@ SOURCES += \
     powergrenadethrowing.cpp \
     shooting.cpp \
     shakescreen.cpp \
-    gridelement.cpp
+    gridelement.cpp \
+    bfs_algorithm.cpp \
+    itemsinqpainterpath.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -74,7 +76,9 @@ HEADERS += \
     powergrenadethrowing.h \
     shooting.h \
     shakescreen.h \
-    gridelement.h
+    gridelement.h \
+    bfs_algorithm.h \
+    itemsinqpainterpath.h
 
 FORMS +=
 

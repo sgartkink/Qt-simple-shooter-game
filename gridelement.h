@@ -5,7 +5,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsTextItem>
 
-class GridElement : public QPointF
+class GridElement : public QPoint
 {
 public:
     GridElement(int x_, int y_);
