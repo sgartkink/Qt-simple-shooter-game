@@ -4,7 +4,6 @@
 MapView::MapView(QGraphicsScene *scene, QWidget *parent)
     : QGraphicsView(scene, parent)
 {
-    map = new Map(scene);
     setSceneRect(0,0,1024,680);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -33,9 +32,4 @@ void MapView::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == 1)
         emit (mouseReleased());
-}
-
-MapView::~MapView()
-{
-    delete map;
 }

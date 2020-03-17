@@ -29,7 +29,8 @@ private:
     QTimer timer;
     qreal lineAngle;
 
-    void createBullet(int xy_ = 0);
+    void createBullet();
+    void createBullet(int xy_);
 
 private slots:
     void shot();

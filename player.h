@@ -1,7 +1,6 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <QGraphicsScene>
 #include <QGraphicsView>
 
 #include "hero.h"
@@ -13,10 +12,10 @@ public:
     Player(QGraphicsScene * mainScene, QGraphicsView * mainView);
 
 public slots:
-    virtual void updateLineHeroMouse(QPoint mousePoint);
+    void updateLineHeroMouse(QPoint mousePoint);
 
 protected slots:
-    virtual void moveHero();
+    virtual void nextMove();
 
 private:
     const QGraphicsView * mainView;

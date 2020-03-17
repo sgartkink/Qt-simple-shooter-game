@@ -2,6 +2,7 @@
 #define BULLET_H
 
 //#include <QPropertyAnimation>
+class Hero;
 #include <QObject>
 #include <QGraphicsRectItem>
 #include <QTimer>
@@ -12,7 +13,7 @@ class Bullet : public QObject, public QGraphicsRectItem
 //    Q_PROPERTY(QPointF pos READ pos WRITE setPos)
 
 public:
-    Bullet(double dx, double dy, double angle, QGraphicsScene * mainScene, int damage);
+    Bullet(double dx, double dy, double angle, QGraphicsScene * mainScene, int damage, Hero * owner);
 
 private:
     const QGraphicsScene * mainScene;
@@ -20,6 +21,7 @@ private:
     const double dy;
     const int damage;
 
+    Hero * owner;
     QTimer moveTimer;
 
 private slots:

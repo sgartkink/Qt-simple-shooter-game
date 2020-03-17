@@ -17,6 +17,7 @@ public:
     virtual void attackItem(int dmg) {;}
 
     void open(Hero * opener, QGraphicsScene * scene, double howFarToMoveLabelX, double howFarToMoveLabelY);
+    void open(Hero * opener);
 
 private:
     int content = QRandomGenerator::global()->bounded(5);

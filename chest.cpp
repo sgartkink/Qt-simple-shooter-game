@@ -52,3 +52,29 @@ void Chest::open(Hero *opener, QGraphicsScene *scene, double howFarToMoveLabelX,
 
     QTimer::singleShot(3000, [this, label](){ delete label; delete this; });
 }
+
+void Chest::open(Hero *opener)
+{
+    switch (content)
+    {
+    case 0:
+        opener->addGrenades(1);
+        break;
+    case 1:
+        opener->refillCurrentOwnedAmmo();
+        break;
+    case 2:
+        opener->refillCurrentLoadedAmmo();
+        break;
+    case 3:
+        opener->gun()->addAmmo(20);
+        break;
+    case 4:
+        opener->addHP(5);
+        break;
+    case 5:
+        opener->addArmor(5);
+        break;
+    }
+    delete this;
+}

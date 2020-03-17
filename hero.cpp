@@ -9,8 +9,7 @@ Hero::Hero(qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent, Q
     currentGunENUM = RIFLE;
     height = 10;
 
-    connect(&moveTimer, SIGNAL(timeout()), this, SLOT(moveHero()));
-    moveTimer.start(20);
+    connect(&moveTimer, SIGNAL(timeout()), this, SLOT(nextMove()));
 }
 
 void Hero::attackItem(int dmg)
@@ -24,7 +23,7 @@ void Hero::attackItem(int dmg)
         armor = 0;
         emit (hpChanged());
         emit (armorChanged());
-        checkIfStillExist();
+//        checkIfStillExist();
     }
 }
 
@@ -117,7 +116,7 @@ void Hero::throwGrenade(int addedVelocity, MapView *mapView)
 
 void Hero::startShooting()
 {
-    if (!currentGun->isReloading() && !throwingGrenade)
+    if (!currentGun->isReloading() || !throwingGrenade)
     {
         currentlyShooting = true;
         shooting->start();

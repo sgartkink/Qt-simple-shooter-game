@@ -12,11 +12,11 @@ void Player::updateLineHeroMouse(QPoint mousePoint)
     savedMousePoint = mousePoint;
     mappedPoint = mainView->mapToScene(mousePoint);
 
-    lineHeroMouse.setLine(x(), y(), mappedPoint.x(), mappedPoint.y());
+    lineHeroMouse.setLine(x() + size/2, y() + size/2, mappedPoint.x(), mappedPoint.y());
     setRotation(-1 * lineHeroMouse.angle());
 }
 
-void Player::moveHero()
+void Player::nextMove()
 {
     if (directionUp)
         changePosAndUpdateLine(0, -2);
