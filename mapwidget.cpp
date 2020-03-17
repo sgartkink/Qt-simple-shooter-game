@@ -159,8 +159,8 @@ void MapWidget::createChest()
 {
     QPoint p;
     do {
-        p = QPoint(QRandomGenerator::global()->bounded(248), QRandomGenerator::global()->bounded(248));
-    } while(map->checkIfPointIsTaken(p));
+        p = QPoint(QRandomGenerator::global()->bounded(247), QRandomGenerator::global()->bounded(248));
+    } while(map->checkIfPointIsTaken(p) || map->checkIfPointIsTaken(QPoint(p.x()+1, p.y())));
 
     map->addChest(p);
 }

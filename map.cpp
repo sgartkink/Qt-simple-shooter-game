@@ -45,7 +45,6 @@ Map::Map(QGraphicsScene * scene)
     addBuilding(QPoint(82,79));
     addBuilding(QPoint(98,85));
     addBuilding(QPoint(125,12));
-    addBuilding(QPoint(98,85));
     addBuilding(QPoint(100,100));
     addBuilding(QPoint(63,98));
     addBuilding(QPoint(2,60));
@@ -88,6 +87,7 @@ void Map::addChest(QPointF p)
     Chest * chest = new Chest();
     chest->setPos(p.x() * 10, p.y() * 10);
     vector[p.x()][p.y()]->toggleTaken();
+    vector[p.x()+1][p.y()]->toggleTaken();
     scene->addItem(chest);
 }
 

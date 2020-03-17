@@ -16,7 +16,7 @@ void Shooting::start()
         if (gun->isAutomatic())
             timer.start(gun->getFireFrequency());
         else
-            owner->setCurrentlyShooting(false);
+            QTimer::singleShot(200, [this](){ owner->setCurrentlyShooting(false); });
     }
     else
     {

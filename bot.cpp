@@ -18,6 +18,8 @@ void Bot::nextMove()
 
     if (STATE_ATTACK)
         attack();
+    else if (currentlyShooting)
+        stopShooting();
 
     STATE_HIDE = false;
     STATE_ATTACK = false;
@@ -107,8 +109,10 @@ void Bot::move()
     }
 
     if (!pathFromAlgorithm && numberOfAvailableDirections == 0)
+        findPath();
+    else if (pathFromAlgorithm && goingOpenChest && numberOfAvailableDirections == 0)
     {
-        qDebug() << numberOfAvailableDirections << pos() << destinationPoint;
+        destinationPoint.setX(destinationPoint.x() + 11);
         findPath();
     }
 
@@ -139,6 +143,8 @@ void Bot::botIsCloseToDestinationPoint()
     {
         resetDirections();
 
+        path.last()->setX(path.last()->x()/10);
+        path.last()->setY(path.last()->y()/10);
         path.removeLast();
         if (path.length() != 0)
             destinationPoint = *path.last();
