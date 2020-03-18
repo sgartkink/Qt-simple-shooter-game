@@ -19,11 +19,11 @@ Map::Map(QGraphicsScene * scene)
     scene->addItem(line3);
     scene->addItem(line4);
 
-    vector.resize(248);
+    vector.resize(249);
     int i = 0;
     for (auto it = vector.begin(); it != vector.end(); ++it)
     {
-        (*it).resize(248);
+        (*it).resize(249);
 
         int j = 0;
         for (auto it2 = (*it).begin(); it2 != (*it).end(); ++it2)

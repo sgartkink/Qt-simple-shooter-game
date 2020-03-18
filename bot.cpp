@@ -205,6 +205,12 @@ void Bot::newDestinationPointBasingOnHideState()
 
 void Bot::newDestinationPointBasingOnTargetPos()
 {
+    if ((x() < 10 && y() < 10) || (x() > 2480 && y() < 10) || (x() < 10 && y() > 2480) || (x() > 2480 && y() > 2480))
+    {
+        STATE_HIDE = false;
+        randomNewDestinationPoint();
+    }
+
     if (x() < targetAttack->x() && y() < targetAttack->y())
         newDestinationPoint(-viewRange, 0, -viewRange, 0);
     else if(x() < targetAttack->x() && y() > targetAttack->y())
