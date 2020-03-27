@@ -35,6 +35,11 @@ private:
     QLCDNumber qlcdArmor;
     QLabel textCurrentGun;
     QLabel currentGun;
+    QLabel textLoadedAmmo;
+    QLabel textOwnedAmmo;
+    QLabel textHP;
+    QLabel textGrenades;
+    QLabel textArmor;
 
     void reloadingAnimation();
 };
