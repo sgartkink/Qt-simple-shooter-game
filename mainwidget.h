@@ -14,6 +14,7 @@ public:
     explicit MainWidget(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~MainWidget();
 
+    MapWidget * getMapWidget() { return mapWidget; }
     PowerGrenadeThrowing * getPowerGrenadeThrowing() { return powerGrenadeThrowing; }
 
 private:

@@ -9,12 +9,40 @@ MainWindow::MainWindow(QWidget *parent) :
     setFixedSize(1024,720);
     setWindowTitle("Shooter");
 
-    setCentralWidget(mainWidget);
+    stackedWidget->addWidget(mainMenu);
+    stackedWidget->addWidget(mainWidget);
+    stackedWidget->addWidget(optionsWidget);
+    stackedWidget->setCurrentWidget(mainMenu);
+
+    setCentralWidget(stackedWidget);
     mainWidget->setMouseTracking(true);
+}
+
+void MainWindow::startProgram()
+{
+    stackedWidget->setCurrentWidget(mainWidget);
+    mainWidget->getMapWidget()->start();
+}
+
+void MainWindow::showOptions()
+{
+    stackedWidget->setCurrentWidget(optionsWidget);
+}
+
+void MainWindow::backToMenu()
+{
+    stackedWidget->setCurrentWidget(mainMenu);
+}
+
+void MainWindow::stopProgram()
+{
+    qApp->quit();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete mainMenu;
     delete mainWidget;
+    delete optionsWidget;
 }

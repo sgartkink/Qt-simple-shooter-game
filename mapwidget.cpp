@@ -37,13 +37,16 @@ MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, MainWidget *parent, Qt::W
     scene->addItem(player);
     player->setPos(200,240);
 
-    Bot * bot = new Bot(scene, map);
-    bot->setPos(450,300);
-    scene->addItem(bot);
-
     Chest * chest = new Chest;
     scene->addItem(chest);
     chest->setPos(320, 240);
+}
+
+void MapWidget::start()
+{
+    Bot * bot = new Bot(scene, map);
+    bot->setPos(450,300);
+    scene->addItem(bot);
 
     QTimer::singleShot(500, [this, bot](){ player->start(); bot->start(); });
 }

@@ -8,7 +8,6 @@ MainWidget::MainWidget(QWidget *parent, Qt::WindowFlags f)
     mapWidget = new MapWidget(playerBarWidget, this);
 
     powerGrenadeThrowing = new PowerGrenadeThrowing(this);
-//    powerGrenadeThrowing->show();
     powerGrenadeThrowing->move(20,10);
     powerGrenadeThrowing->setMinimumWidth(300);
 

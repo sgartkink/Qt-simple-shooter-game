@@ -50,7 +50,9 @@ SOURCES += \
     shakescreen.cpp \
     gridelement.cpp \
     bfs_algorithm.cpp \
-    itemsinqpainterpath.cpp
+    itemsinqpainterpath.cpp \
+    mainmenu.cpp \
+    optionswidget.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -78,7 +80,9 @@ HEADERS += \
     shakescreen.h \
     gridelement.h \
     bfs_algorithm.h \
-    itemsinqpainterpath.h
+    itemsinqpainterpath.h \
+    mainmenu.h \
+    optionswidget.h
 
 FORMS +=
 

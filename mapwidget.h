@@ -25,6 +25,7 @@ public:
                        MainWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~MapWidget();
 
+    void start();
     void setPowerGrenadeThrowing(PowerGrenadeThrowing * p) { powerGrenadeThrowing = p; }
 
 private:
