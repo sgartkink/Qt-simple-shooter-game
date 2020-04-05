@@ -16,6 +16,7 @@ class MainWidget;
 #include "chest.h"
 #include "powergrenadethrowing.h"
 #include "map.h"
+#include "countdowntostart.h"
 
 class MapWidget : public QWidget
 {
@@ -41,6 +42,8 @@ private:
 
     QTimer timerChestCreating;
     QTimer throwingGrenadeTimer;
+
+    bool gameStarted = false;
 
     double xPos = 0;
     double yPos = 0;

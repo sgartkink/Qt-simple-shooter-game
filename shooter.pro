@@ -52,7 +52,8 @@ SOURCES += \
     bfs_algorithm.cpp \
     itemsinqpainterpath.cpp \
     mainmenu.cpp \
-    optionswidget.cpp
+    optionswidget.cpp \
+    countdowntostart.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -82,7 +83,8 @@ HEADERS += \
     bfs_algorithm.h \
     itemsinqpainterpath.h \
     mainmenu.h \
-    optionswidget.h
+    optionswidget.h \
+    countdowntostart.h
 
 FORMS +=
 

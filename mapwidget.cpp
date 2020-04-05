@@ -18,7 +18,9 @@ MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, MainWidget *parent, Qt::W
     emit (player->ammoChangedNoReloading());
     connect(player, &Player::hpChanged, [playerBarWidget, this](){ playerBarWidget->updatePlayerHP(player->getHP()); });
     emit (player->hpChanged());
-    connect(player, &Player::grenadesChanged, [playerBarWidget, this](){ playerBarWidget->updateGrenades(player->getGrenades()); });
+    connect(player, &Player::grenadesChanged, [playerBarWidget, this](){
+        playerBarWidget->updateGrenades(player->getGrenades());
+    });
     emit (player->grenadesChanged());
     connect(player, &Player::armorChanged, [playerBarWidget, this](){ playerBarWidget->updateArmor(player->getArmor()); });
     emit (player->armorChanged());
@@ -26,13 +28,9 @@ MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, MainWidget *parent, Qt::W
     emit (player->gunChanged());
 
     connect(mapView, SIGNAL(sendCord(QPoint)), player, SLOT(updateLineHeroMouse(QPoint)));
-    connect(mapView, SIGNAL(mousePressed()), player, SLOT(startShooting()));
-    connect(mapView, SIGNAL(mouseReleased()), player, SLOT(stopShooting()));
     connect(player, SIGNAL(posChanged()), this, SLOT(changeSceneRect()));
-    connect(&timerChestCreating, SIGNAL(timeout()), this, SLOT(createChest()));
-    timerChestCreating.start(30000);
-
     connect(&throwingGrenadeTimer, SIGNAL(timeout()), this, SLOT(stopThrowingGrenade()));
+    connect(&timerChestCreating, SIGNAL(timeout()), this, SLOT(createChest()));
 
     scene->addItem(player);
     player->setPos(200,240);
@@ -48,7 +46,17 @@ void MapWidget::start()
     bot->setPos(450,300);
     scene->addItem(bot);
 
-    QTimer::singleShot(500, [this, bot](){ player->start(); bot->start(); });
+    CountdownToStart * countdownToStart = new CountdownToStart(scene, mapView->width(), mapView->height());
+
+    connect(countdownToStart, &QObject::destroyed, [this, bot](){
+        connect(mapView, SIGNAL(mousePressed()), player, SLOT(startShooting()));
+        connect(mapView, SIGNAL(mouseReleased()), player, SLOT(stopShooting()));
+        timerChestCreating.start(30000);
+        player->start();
+        bot->start();
+        gameStarted = true;
+        disconnect(this);
+    });
 }
 
 void MapWidget::changeSceneRect()
@@ -64,7 +72,7 @@ void MapWidget::changeSceneRect()
 
 void MapWidget::keyPressEvent(QKeyEvent *event)
 {
-    if (!event->isAutoRepeat())
+    if (!event->isAutoRepeat() && gameStarted)
         switch (event->key())
         {
         case Qt::Key_W:
@@ -110,7 +118,7 @@ void MapWidget::keyPressEvent(QKeyEvent *event)
 
 void MapWidget::keyReleaseEvent(QKeyEvent *event)
 {
-    if (!event->isAutoRepeat())
+    if (!event->isAutoRepeat() && gameStarted)
         switch (event->key())
         {
         case Qt::Key_W:
