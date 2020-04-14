@@ -44,6 +44,7 @@ private:
     QTimer throwingGrenadeTimer;
 
     bool gameStarted = false;
+    bool keyStarted = false;
 
     double xPos = 0;
     double yPos = 0;

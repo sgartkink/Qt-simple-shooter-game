@@ -30,13 +30,13 @@ void Player::nextMove()
 
 void Player::changePosAndUpdateLine(int x_, int y_)
 {
-    if (x_ == -2 && x() > 0 && x() <= 2048)
+    if (x_ == -2 && x() >= 0)
         checkCorners(-2, 0, -2, size, -2, 0);
-    else if (x_ == 2 && x() > 0 && x() <= 2048)
+    else if (x_ == 2 && x() <= 2048)
         checkCorners(size+2, 0, size+2, size, 2, 0);
-    else if (y_ == -2 && y() > 0 && y() <= 2048)
+    else if (y_ == -2 && y() >= 0)
         checkCorners(0, -2, size, -2, 0, -2);
-    else if (y_ == 2 && y() > 0 && y() <= 2048)
+    else if (y_ == 2 && y() <= 2048)
         checkCorners(0, size+2, size, size+2, 0, 2);
 }
 
@@ -54,12 +54,6 @@ void Player::checkCorners(int addToX_corner1, int addToY_corner1, int addToX_cor
 
 void Player::newMove(int x_, int y_)
 {
-//    QPropertyAnimation * animation = new QPropertyAnimation(this, "pos");
-//    animation->setDuration(20);
-//    animation->setStartValue(pos());
-//    animation->setEndValue(QPointF(pos().x() + x, pos().y() + y));
-//    animation->start();
-
     setPos(x() + x_, y() + y_);
     updateLineHeroMouse(savedMousePoint);
 

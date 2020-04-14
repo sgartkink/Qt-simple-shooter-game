@@ -14,11 +14,6 @@ Bullet::Bullet(double dx, double dy, double angle, QGraphicsScene *mainScene, in
 
 void Bullet::move()
 {
-//    QPropertyAnimation * animation = new QPropertyAnimation(this, "pos");
-//    animation->setDuration(20);
-//    animation->setStartValue(pos());
-//    animation->setEndValue(QPointF(pos().x() + dx, pos().y() + dy));
-//    animation->start();
     setPos(x() + dx, y() + dy);
 
     ItemsOnScene * corner0 = dynamic_cast<ItemsOnScene*>(mainScene->itemAt(pos(), QTransform()));

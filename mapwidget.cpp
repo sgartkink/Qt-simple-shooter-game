@@ -73,6 +73,7 @@ void MapWidget::changeSceneRect()
 void MapWidget::keyPressEvent(QKeyEvent *event)
 {
     if (!event->isAutoRepeat() && gameStarted)
+    {
         switch (event->key())
         {
         case Qt::Key_W:
@@ -114,11 +115,13 @@ void MapWidget::keyPressEvent(QKeyEvent *event)
             emit (static_cast<void>(player->gunChanged()), player->ammoChangedNoReloading());
             break;
         }
+        keyStarted = true;
+    }
 }
 
 void MapWidget::keyReleaseEvent(QKeyEvent *event)
 {
-    if (!event->isAutoRepeat() && gameStarted)
+    if (!event->isAutoRepeat() && keyStarted)
         switch (event->key())
         {
         case Qt::Key_W:

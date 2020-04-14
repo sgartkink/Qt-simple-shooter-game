@@ -1,7 +1,6 @@
 #ifndef BULLET_H
 #define BULLET_H
 
-//#include <QPropertyAnimation>
 class Hero;
 #include <QObject>
 #include <QGraphicsRectItem>
@@ -10,7 +9,6 @@ class Hero;
 class Bullet : public QObject, public QGraphicsRectItem
 {
     Q_OBJECT
-//    Q_PROPERTY(QPointF pos READ pos WRITE setPos)
 
 public:
     Bullet(double dx, double dy, double angle, QGraphicsScene * mainScene, int damage, Hero * owner);
