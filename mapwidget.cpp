@@ -46,6 +46,9 @@ void MapWidget::start()
     bot->setPos(450,300);
     scene->addItem(bot);
 
+    leaderboard->addNewHero(player->getHeroStats());
+    leaderboard->addNewHero(bot->getHeroStats());
+
     CountdownToStart * countdownToStart = new CountdownToStart(scene, mapView->width(), mapView->height());
 
     connect(countdownToStart, &QObject::destroyed, [this, bot](){
@@ -114,6 +117,9 @@ void MapWidget::keyPressEvent(QKeyEvent *event)
             player->setCurrentGun(SHOTGUN);
             emit (static_cast<void>(player->gunChanged()), player->ammoChangedNoReloading());
             break;
+        case Qt::Key_Tab:
+            leaderboard->setVisible(1);
+            break;
         }
         keyStarted = true;
     }
@@ -139,6 +145,9 @@ void MapWidget::keyReleaseEvent(QKeyEvent *event)
         case Qt::Key_Q:
             if (player->getGrenades() > 0 && player->isThrowingGrenade() && !player->isCurrentlyShooting())
                 stopThrowingGrenade();
+            break;
+        case Qt::Key_Tab:
+            leaderboard->setVisible(0);
             break;
         }
 }

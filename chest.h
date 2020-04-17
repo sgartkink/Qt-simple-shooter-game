@@ -14,7 +14,8 @@ class Chest : public ItemsOnScene
 public:
     Chest();
 
-    virtual void attackItem(int dmg) {;}
+    virtual void attackItem([[maybe_unused]] Bullet * b) {}
+    virtual void attackItem([[maybe_unused]] int dmg) {}
 
     void open(Hero * opener, QGraphicsScene * scene, double howFarToMoveLabelX, double howFarToMoveLabelY);
     void open(Hero * opener);

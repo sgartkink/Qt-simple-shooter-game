@@ -23,22 +23,26 @@ void Bullet::move()
 
     if (corner0 && corner0 != owner)
     {
-        corner0->attackItem(damage);
+        if (dynamic_cast<Hero *>(corner0))
+            corner0->attackItem(this);
         delete this;
     }
     else if (corner1 && corner1 != owner)
     {
-        corner1->attackItem(damage);
+        if (dynamic_cast<Hero *>(corner1))
+            corner1->attackItem(this);
         delete this;
     }
     else if (corner2 && corner2 != owner)
     {
-        corner2->attackItem(damage);
+        if (dynamic_cast<Hero *>(corner2))
+            corner2->attackItem(this);
         delete this;
     }
     else if (corner3 && corner3 != owner)
     {
-        corner3->attackItem(damage);
+        if (dynamic_cast<Hero *>(corner3))
+            corner3->attackItem(this);
         delete this;
     }
 

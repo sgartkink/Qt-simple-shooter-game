@@ -9,7 +9,8 @@ public:
     Building();
     virtual ~Building();
 
-    virtual void attackItem(int dmg) {;}
+    virtual void attackItem([[maybe_unused]] Bullet * b) {}
+    virtual void attackItem([[maybe_unused]] int dmg) {}
 };
 
 #endif // BUILDING_H

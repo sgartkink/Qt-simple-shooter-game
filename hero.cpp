@@ -1,5 +1,5 @@
 #include "hero.h"
-
+#include <QtDebug>
 Hero::Hero(qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent, QGraphicsScene * mainScene, Qt::GlobalColor color)
     : ItemsOnScene(x, y, width, height, parent, color), mainScene(mainScene)
 {
@@ -12,9 +12,20 @@ Hero::Hero(qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent, Q
     connect(&moveTimer, SIGNAL(timeout()), this, SLOT(nextMove()));
 }
 
+void Hero::attackItem(Bullet *b)
+{
+    armor -= b->getDamage();
+    heroAttacked(b);
+}
+
 void Hero::attackItem(int dmg)
 {
     armor -= dmg;
+    heroAttacked();
+}
+
+void Hero::heroAttacked(Bullet *b)
+{
     emit (armorChanged());
 
     if (armor < 0)
@@ -23,14 +34,27 @@ void Hero::attackItem(int dmg)
         armor = 0;
         emit (hpChanged());
         emit (armorChanged());
-//        checkIfStillExist();
+        checkIfStillExist(b);
     }
 }
 
-void Hero::checkIfStillExist()
+void Hero::checkIfStillExist(Bullet *b)
 {
     if (hp <= 0)
-        delete this;
+        death(b);
+}
+
+void Hero::death(Bullet *b)
+{
+    heroStats.increaseDeath();
+
+    if (b)
+        b->getOwner()->addKill();
+}
+
+void Hero::addKill()
+{
+    heroStats.increaseKills();
 }
 
 void Hero::setCurrentGun(int gun_)

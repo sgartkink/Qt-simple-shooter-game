@@ -5,7 +5,6 @@
 #include <QTimer>
 #include <QtMath>
 
-class MapView;
 #include "shooting.h"
 #include "global_consts.h"
 #include "itemsonscene.h"
@@ -14,6 +13,7 @@ class MapView;
 #include "rifle.h"
 #include "shotgun.h"
 #include "grenade.h"
+#include "herostats.h"
 
 class Hero : public QObject, public ItemsOnScene
 {
@@ -26,6 +26,7 @@ public:
     ~Hero();
 
     Shooting * getShooting() { return shooting; }
+    HeroStats * getHeroStats() { return &heroStats; }
     qreal lineAngle() { return lineHeroMouse.angle(); }
     Gun * gun() { return currentGun; }
     guns gunENUM(){ return currentGunENUM; }
@@ -35,7 +36,10 @@ public:
     bool isThrowingGrenade() { return throwingGrenade; }
     bool isCurrentlyShooting() { return currentlyShooting; }
 
+    virtual void attackItem(Bullet * b);
     virtual void attackItem(int dmg);
+    void heroAttacked(Bullet * b = nullptr);
+    void addKill();
     void setCurrentGun(int gun_);
     void addGrenades(int grenades_);
     void addHP(int hp_);
@@ -60,6 +64,7 @@ public slots:
 
 protected:
     const int size = 10;
+    HeroStats heroStats {this};
 
     int hp = 10;
     int armor = 10;
@@ -94,7 +99,8 @@ private:
     QTimer moveTimer;
     QPen pen;
 
-    void checkIfStillExist();
+    void checkIfStillExist(Bullet * b = nullptr);
+    void death(Bullet * b = nullptr);
     void changeCurrentGun(Gun &newGun, guns newGunENUM);
     void addValue(int &valueChanged, int &valueAdded, const int valueMax);
 

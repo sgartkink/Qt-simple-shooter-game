@@ -7,6 +7,7 @@
 #include "mapwidget.h"
 #include "playerbarwidget.h"
 #include "powergrenadethrowing.h"
+#include "leaderboard.h"
 
 class MainWidget : public QWidget
 {
@@ -20,8 +21,9 @@ public:
 private:
     QVBoxLayout * qvboxLayout = new QVBoxLayout(this);
     PlayerBarWidget * playerBarWidget = new PlayerBarWidget(this);
+    Leaderboard * leaderboard = nullptr;
     PowerGrenadeThrowing * powerGrenadeThrowing = nullptr;
-    MapWidget * mapWidget = nullptr;
+    MapWidget * mapWidget = new MapWidget(playerBarWidget, this);
 };
 
 #endif // MAINWIDGET_H

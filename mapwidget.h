@@ -17,6 +17,7 @@ class MainWidget;
 #include "powergrenadethrowing.h"
 #include "map.h"
 #include "countdowntostart.h"
+#include "leaderboard.h"
 
 class MapWidget : public QWidget
 {
@@ -28,6 +29,7 @@ public:
 
     void start();
     void setPowerGrenadeThrowing(PowerGrenadeThrowing * p) { powerGrenadeThrowing = p; }
+    void setLeaderboard(Leaderboard * l) { leaderboard = l; }
 
 private:
     const int mainItemSize = 10;
@@ -38,6 +40,7 @@ private:
     Player * player = new Player(scene, mapView);
     PowerGrenadeThrowing * powerGrenadeThrowing = nullptr;
     PlayerBarWidget * playerBarWidget = nullptr;
+    Leaderboard * leaderboard = nullptr;
     Map * map = new Map(scene);
 
     QTimer timerChestCreating;

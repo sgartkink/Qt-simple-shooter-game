@@ -13,6 +13,9 @@ class Bullet : public QObject, public QGraphicsRectItem
 public:
     Bullet(double dx, double dy, double angle, QGraphicsScene * mainScene, int damage, Hero * owner);
 
+    int getDamage() { return damage; }
+    Hero * getOwner() { return owner; }
+
 private:
     const QGraphicsScene * mainScene;
     const double dx;

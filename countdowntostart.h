@@ -16,7 +16,7 @@ public:
 private:
     QGraphicsScene * scene;
     QTimer timer;
-    int secLeft = 3;
+    int secLeft = 1;
 
     QLabel * lText = new QLabel("Game starts in:");
     QLabel * lSecLeft = new QLabel();

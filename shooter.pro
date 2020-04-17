@@ -23,6 +23,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 CONFIG += c++11
+CONFIG += c++1z
 
 SOURCES += \
         main.cpp \
@@ -53,7 +54,10 @@ SOURCES += \
     itemsinqpainterpath.cpp \
     mainmenu.cpp \
     optionswidget.cpp \
-    countdowntostart.cpp
+    countdowntostart.cpp \
+    leaderboard.cpp \
+    herostats.cpp \
+    leaderboardslot.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -84,7 +88,10 @@ HEADERS += \
     itemsinqpainterpath.h \
     mainmenu.h \
     optionswidget.h \
-    countdowntostart.h
+    countdowntostart.h \
+    leaderboard.h \
+    herostats.h \
+    leaderboardslot.h
 
 FORMS +=
 

@@ -8,6 +8,7 @@ Bot::Bot(QGraphicsScene *mainScene, Map *map)
     shooting = new Shooting(this, currentGun, mainScene, false);
     bfs_Algorithm = BFS_Algorithm(map);
     randomNewDestinationPoint();
+    heroStats.setName("bot");
 }
 
 void Bot::nextMove()

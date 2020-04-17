@@ -5,6 +5,7 @@ Player::Player(QGraphicsScene *mainScene, QGraphicsView *mainView)
     : Hero(0, 0, 10, 10, nullptr, mainScene, Qt::blue), mainView(mainView)
 {
     shooting = new Shooting(this, currentGun, mainScene, true);
+    heroStats.setName("player");
 }
 
 void Player::updateLineHeroMouse(QPoint mousePoint)

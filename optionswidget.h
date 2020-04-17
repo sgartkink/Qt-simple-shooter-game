@@ -10,18 +10,18 @@ class OptionsWidget : public QWidget
 {
 public:
     explicit OptionsWidget(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
-    ~OptionsWidget();
 
 private:
     QVBoxLayout *qvBoxLayout = new QVBoxLayout(this);
-    QLabel * lUp = new QLabel("Up: W");
-    QLabel * lDown = new QLabel("Down: S");
-    QLabel * lRight = new QLabel("Right: D");
-    QLabel * lLeft = new QLabel("Left: A");
-    QLabel * lReload = new QLabel("Reload: R");
-    QLabel * lGrenade = new QLabel("Start throwing grenade: Q (hold to throw stronger)");
-    QLabel * lChest = new QLabel("Open chest: E");
-    QLabel * lGuns = new QLabel("1 - PISTOL, 2 - RIFLE, 3 - SHOTGUN");
+    QLabel lUp {"Up: W"};
+    QLabel lDown {"Down: S"};
+    QLabel lRight {"Right: D"};
+    QLabel lLeft {"Left: A"};
+    QLabel lReload {"Reload: R"};
+    QLabel lGrenade {"Start throwing grenade: Q (hold to throw stronger)"};
+    QLabel lChest {"Open chest: E"};
+    QLabel lGuns {"1 - PISTOL, 2 - RIFLE, 3 - SHOTGUN"};
+    QLabel lLeaderboard {"Show leaderboard: TAB"};
 
     QPushButton * bBack = new QPushButton("Back");
 };
