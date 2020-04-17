@@ -21,9 +21,9 @@ public:
 private:
     QVBoxLayout * qvboxLayout = new QVBoxLayout(this);
     PlayerBarWidget * playerBarWidget = new PlayerBarWidget(this);
+    MapWidget * mapWidget = new MapWidget(playerBarWidget, this);
     Leaderboard * leaderboard = nullptr;
     PowerGrenadeThrowing * powerGrenadeThrowing = nullptr;
-    MapWidget * mapWidget = new MapWidget(playerBarWidget, this);
 };
 
 #endif // MAINWIDGET_H

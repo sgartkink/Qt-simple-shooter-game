@@ -21,7 +21,7 @@ private:
     QLabel lGrenade {"Start throwing grenade: Q (hold to throw stronger)"};
     QLabel lChest {"Open chest: E"};
     QLabel lGuns {"1 - PISTOL, 2 - RIFLE, 3 - SHOTGUN"};
-    QLabel lLeaderboard {"Show leaderboard: TAB"};
+    QLabel lLeaderboard {"Show leaderboard: X"};
 
     QPushButton * bBack = new QPushButton("Back");
 };

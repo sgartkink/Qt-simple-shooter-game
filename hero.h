@@ -51,10 +51,14 @@ public:
     void throwGrenade(int addedVelocity, MapView * mapView);
     void setCurrentlyShooting(bool c) { currentlyShooting = c; }
 
-    void toggleDirectionUp() { directionUp = !directionUp; }
-    void toggleDirectionRight() { directionRight = !directionRight; }
-    void toggleDirectionDown() { directionDown = !directionDown; }
-    void toggleDirectionLeft() { directionLeft = !directionLeft; }
+    void setDirectionUp(bool d) { directionUp = d; }
+    void setDirectionRight(bool d) { directionRight = d; }
+    void setDirectionDown(bool d) { directionDown = d; }
+    void setDirectionLeft(bool d) { directionLeft = d; }
+//    void toggleDirectionUp() { directionUp = !directionUp; }
+//    void toggleDirectionRight() { directionRight = !directionRight; }
+//    void toggleDirectionDown() { directionDown = !directionDown; }
+//    void toggleDirectionLeft() { directionLeft = !directionLeft; }
     void toggleThrowingGrenade() { throwingGrenade = !throwingGrenade; }
     void toggleCurrentlyShooting() { currentlyShooting = !currentlyShooting; }
 

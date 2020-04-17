@@ -88,35 +88,20 @@ void MapWidget::changeSceneRect()
 
 void MapWidget::keyPressEvent(QKeyEvent *event)
 {
-    if (!event->isAutoRepeat() && gameStarted)
-    {
+    if (!event->isAutoRepeat())
         switch (event->key())
         {
         case Qt::Key_W:
-            player->toggleDirectionUp();
+            player->setDirectionUp(true);
             break;
         case Qt::Key_S:
-            player->toggleDirectionDown();
+            player->setDirectionDown(true);
             break;
         case Qt::Key_A:
-            player->toggleDirectionLeft();
+            player->setDirectionLeft(true);
             break;
         case Qt::Key_D:
-            player->toggleDirectionRight();
-            break;
-        case Qt::Key_Q:
-            if (player->getGrenades() > 0 && !player->isThrowingGrenade() && !player->isCurrentlyShooting())
-                startThrowingGrenade();
-            break;
-        case Qt::Key_E:
-            checkChestsInArea();
-            break;
-        case Qt::Key_R:
-            if (!player->isCurrentlyShooting() && !player->gun()->isFull())
-            {
-                player->gun()->reload();
-                emit (player->ammoChangedReloading());
-            }
+            player->setDirectionRight(true);
             break;
         case Qt::Key_1:
             player->setCurrentGun(PISTOL);
@@ -130,38 +115,55 @@ void MapWidget::keyPressEvent(QKeyEvent *event)
             player->setCurrentGun(SHOTGUN);
             emit (static_cast<void>(player->gunChanged()), player->ammoChangedNoReloading());
             break;
-        case Qt::Key_Tab:
+        case Qt::Key_X:
             leaderboard->setVisible(1);
             break;
+        default:
+            if (gameStarted)
+                switch (event->key())
+                {
+                case Qt::Key_Q:
+                    if (player->getGrenades() > 0 && !player->isThrowingGrenade() && !player->isCurrentlyShooting())
+                        startThrowingGrenade();
+                    break;
+                case Qt::Key_E:
+                    checkChestsInArea();
+                    break;
+                case Qt::Key_R:
+                    if (!player->isCurrentlyShooting() && !player->gun()->isFull())
+                    {
+                        player->gun()->reload();
+                        emit (player->ammoChangedReloading());
+                    }
+                    break;
+                }
         }
-        keyStarted = true;
-    }
 }
 
 void MapWidget::keyReleaseEvent(QKeyEvent *event)
 {
-    if (!event->isAutoRepeat() && keyStarted)
+    if (!event->isAutoRepeat())
         switch (event->key())
         {
         case Qt::Key_W:
-            player->toggleDirectionUp();
+            player->setDirectionUp(false);
             break;
         case Qt::Key_D:
-            player->toggleDirectionRight();
+            player->setDirectionRight(false);
             break;
         case Qt::Key_S:
-            player->toggleDirectionDown();
+            player->setDirectionDown(false);
             break;
         case Qt::Key_A:
-            player->toggleDirectionLeft();
+            player->setDirectionLeft(false);
             break;
-        case Qt::Key_Q:
-            if (player->getGrenades() > 0 && player->isThrowingGrenade() && !player->isCurrentlyShooting())
-                stopThrowingGrenade();
-            break;
-        case Qt::Key_Tab:
+        case Qt::Key_X:
             leaderboard->setVisible(0);
             break;
+        default:
+            if (gameStarted)
+                if (player->getGrenades() > 0 && player->isThrowingGrenade() && !player->isCurrentlyShooting())
+                    stopThrowingGrenade();
         }
 }
 
