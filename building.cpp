@@ -1,7 +1,7 @@
 #include "building.h"
 
 Building::Building()
-    : ItemsOnScene(0, 0, 40, 40, nullptr, Qt::red)
+    : ItemsOnScene(Qt::red, 0, 0, 40, 40)
 {
     height = 50;
 }

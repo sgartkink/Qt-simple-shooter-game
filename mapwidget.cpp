@@ -42,7 +42,10 @@ MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, MainWidget *parent, Qt::W
 
 void MapWidget::start()
 {
-    Bot * bot = new Bot(scene, map);
+    mapView_halfWidth = mapView->width()/2;
+    mapView_halfHeight = mapView->height()/2;
+
+    Bot * bot = new Bot(this);
     bot->setPos(450,300);
     scene->addItem(bot);
 
@@ -62,13 +65,23 @@ void MapWidget::start()
     });
 }
 
+QPoint MapWidget::randNewFreePos()
+{
+    QPoint p;
+    do {
+        p = QPoint(QRandomGenerator::global()->bounded(MAP_SIZE_X_10), QRandomGenerator::global()->bounded(MAP_SIZE_Y_10));
+    } while(map->checkIfPointIsTaken(p) || map->checkIfPointIsTaken(QPoint(p.x()+1, p.y())));
+
+    return p;
+}
+
 void MapWidget::changeSceneRect()
 {
-    if (player->pos().x() >= mapView->width()/2 && player->pos().x() <= 820)
-        xPos = player->pos().x() - mapView->width()/2;
+    if (player->pos().x() >= mapView_halfWidth && player->pos().x() <= MAP_SIZE_X_FULL - mapView_halfWidth)
+        xPos = player->pos().x() - mapView_halfWidth;
 
-    if (player->pos().y() >= mapView->height()/2 && player->pos().y() <= 820)
-        yPos = player->pos().y() - mapView->height()/2;
+    if (player->pos().y() >= mapView_halfHeight && player->pos().y() <= MAP_SIZE_Y_FULL - mapView_halfHeight)
+        yPos = player->pos().y() - mapView_halfHeight;
 
     mapView->setSceneRect(xPos, yPos, mapView->width(), mapView->height());
 }
@@ -180,12 +193,7 @@ void MapWidget::checkChestsInArea()
 
 void MapWidget::createChest()
 {
-    QPoint p;
-    do {
-        p = QPoint(QRandomGenerator::global()->bounded(247), QRandomGenerator::global()->bounded(248));
-    } while(map->checkIfPointIsTaken(p) || map->checkIfPointIsTaken(QPoint(p.x()+1, p.y())));
-
-    map->addChest(p);
+    map->addChest(randNewFreePos());
 }
 
 MapWidget::~MapWidget()

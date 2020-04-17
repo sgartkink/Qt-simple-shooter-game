@@ -2,6 +2,7 @@
 #include "itemsonscene.h"
 #include "player.h"
 #include "bot.h"
+#include "global_consts.h"
 
 Bullet::Bullet(double dx, double dy, double angle, QGraphicsScene *mainScene, int damage, Hero *owner)
     : QGraphicsRectItem(0, 0, 4, 2), mainScene(mainScene), dx(dx), dy(dy), damage(damage), owner(owner)
@@ -46,6 +47,6 @@ void Bullet::move()
         delete this;
     }
 
-    if (x() < 0 || x() > 2000 || y() < 0 || y() > 2000)
+    if (x() < 0 || x() > MAP_SIZE_X_FULL || y() < 0 || y() > MAP_SIZE_Y_FULL)
         delete this;
 }

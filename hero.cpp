@@ -1,7 +1,8 @@
 #include "hero.h"
+#include "mapwidget.h"
 #include <QtDebug>
-Hero::Hero(qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent, QGraphicsScene * mainScene, Qt::GlobalColor color)
-    : ItemsOnScene(x, y, width, height, parent, color), mainScene(mainScene)
+Hero::Hero(MapWidget *mapWidget, Qt::GlobalColor color, qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent)
+    : ItemsOnScene(color, x, y, width, height, parent), mapWidget(mapWidget), scene(mapWidget->getScene())
 {
     setTransformOriginPoint(size/2, size/2);
 
@@ -47,9 +48,30 @@ void Hero::checkIfStillExist(Bullet *b)
 void Hero::death(Bullet *b)
 {
     heroStats.increaseDeath();
+    resetHero();
+    randNewPos();
 
     if (b)
         b->getOwner()->addKill();
+}
+
+void Hero::resetHero()
+{
+    hp = 10;
+    armor = 10;
+    grenades = 3;
+}
+
+void Hero::randNewPos()
+{
+    QPoint p = mapWidget->randNewFreePos();
+    setPos(p.x() * 10, p.y() * 10);
+
+    emit posChanged();
+    emit hpChanged();
+    emit grenadesChanged();
+    emit armorChanged();
+    emit ammoChangedNoReloading();
 }
 
 void Hero::addKill()
@@ -130,10 +152,10 @@ void Hero::throwGrenade(int addedVelocity, MapView *mapView)
                                     -5*qSin(qDegreesToRadians(lineHeroMouse.angle())),
                                     lineHeroMouse.angle(),
                                     addedVelocity,
-                                    mainScene,
+                                    scene,
                                     mapView);
     grenade->setPos(x() + 5, y() + 5);
-    mainScene->addItem(grenade);
+    scene->addItem(grenade);
     grenades--;
     emit (grenadesChanged());
 }

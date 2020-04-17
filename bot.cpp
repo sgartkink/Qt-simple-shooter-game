@@ -2,11 +2,13 @@
 #include <QtDebug>
 #include "player.h"
 #include "chest.h"
-Bot::Bot(QGraphicsScene *mainScene, Map *map)
-    : Hero (0, 0, 10, 10, nullptr, mainScene, Qt::green), map(map)
+#include "mapwidget.h"
+#include "global_consts.h"
+Bot::Bot(MapWidget *mapWidget)
+    : Hero(mapWidget, Qt::green, 0, 0, 10, 10)
 {
-    shooting = new Shooting(this, currentGun, mainScene, false);
-    bfs_Algorithm = BFS_Algorithm(map);
+    shooting = new Shooting(this, currentGun, scene, false);
+    bfs_Algorithm = BFS_Algorithm(mapWidget->getMap());
     randomNewDestinationPoint();
     heroStats.setName("bot");
 }
@@ -32,7 +34,7 @@ void Bot::checkNearestArea()
     QPainterPath painterPathNearestArea = QPainterPath();
     painterPathNearestArea.addEllipse(pos(), viewRange, viewRange);
 
-    QList<QGraphicsItem *> listOfItemsInNearestArea = mainScene->items(painterPathNearestArea);
+    QList<QGraphicsItem *> listOfItemsInNearestArea = scene->items(painterPathNearestArea);
     for (auto it = listOfItemsInNearestArea.begin(); it != listOfItemsInNearestArea.end(); it++)
     {
         if (Player * p = dynamic_cast<Player*>(*it))
@@ -75,7 +77,7 @@ bool Bot::checkIfItemsBetweenBotAndTarget()
     QPolygonF polygon;
     polygon << QPointF(x() + 5, y() + 5) << QPointF(targetAttack->x() + 5, targetAttack->y() + 5);
 
-    QList<QGraphicsItem *> list = mainScene->items(polygon);
+    QList<QGraphicsItem *> list = scene->items(polygon);
     for (auto it = list.begin(); it != list.end(); it++)
     {
         Building * b = dynamic_cast<Building *>(*it);
@@ -161,7 +163,7 @@ void Bot::botIsCloseToDestinationPoint()
         QPainterPath findingChestPainterPath;
         findingChestPainterPath.addRect(x() - 20, y() - 20, 50, 50);
 
-        QList<QGraphicsItem *> listOfItemsWithinRange = mainScene->items(findingChestPainterPath);
+        QList<QGraphicsItem *> listOfItemsWithinRange = scene->items(findingChestPainterPath);
         for (auto it = listOfItemsWithinRange.begin(); it != listOfItemsWithinRange.end(); it++)
             if (Chest * c = dynamic_cast<Chest*>(*it))
             {
@@ -191,9 +193,9 @@ void Bot::randNewDestPointUntilItMeetsRequirements()
     {
         do {
             newDestinationPointBasingOnHideState();
-        } while(destinationPoint.x() < 0 || destinationPoint.x() > 248 ||
-                destinationPoint.y() < 0 || destinationPoint.y() > 248);
-    } while(map->checkIfPointIsTaken(destinationPoint));
+        } while(destinationPoint.x() < 0 || destinationPoint.x() > MAP_SIZE_X_10 ||
+                destinationPoint.y() < 0 || destinationPoint.y() > MAP_SIZE_Y_10);
+    } while(mapWidget->getMap()->checkIfPointIsTaken(destinationPoint));
 }
 
 void Bot::newDestinationPointBasingOnHideState()
@@ -206,7 +208,8 @@ void Bot::newDestinationPointBasingOnHideState()
 
 void Bot::newDestinationPointBasingOnTargetPos()
 {
-    if ((x() < 10 && y() < 10) || (x() > 2480 && y() < 10) || (x() < 10 && y() > 2480) || (x() > 2480 && y() > 2480))
+    if ((x() < 10 && y() < 10) || (x() > MAP_SIZE_X_FULL && y() < 10)
+            || (x() < 10 && y() > MAP_SIZE_Y_FULL) || (x() > MAP_SIZE_X_FULL && y() > MAP_SIZE_Y_FULL))
     {
         STATE_HIDE = false;
         randomNewDestinationPoint();
@@ -247,8 +250,8 @@ void Bot::setDirectionBasingOnAlgorithmAndCorners(bool *direction, int addToX_co
 
 bool Bot::checkIfCornersAvailable(int addToX_corner1, int addToY_corner1, int addToX_corner2, int addToY_corner2)
 {
-    corner1 = dynamic_cast<ItemsOnScene*>(mainScene->itemAt(x() + addToX_corner1, y() + addToY_corner1, QTransform()));
-    corner2 = dynamic_cast<ItemsOnScene*>(mainScene->itemAt(x() + addToX_corner2, y() + addToY_corner2, QTransform()));
+    corner1 = dynamic_cast<ItemsOnScene*>(scene->itemAt(x() + addToX_corner1, y() + addToY_corner1, QTransform()));
+    corner2 = dynamic_cast<ItemsOnScene*>(scene->itemAt(x() + addToX_corner2, y() + addToY_corner2, QTransform()));
 
     if (!corner1 && !corner2)
         return true;

@@ -4,14 +4,13 @@
 #include <QRandomGenerator>
 
 #include "hero.h"
-#include "map.h"
 #include "gridelement.h"
 #include "bfs_algorithm.h"
 
 class Bot : public Hero
 {
 public:
-    Bot(QGraphicsScene * mainScene, Map * map);
+    Bot(MapWidget * mapWidget);
     virtual ~Bot() {}
 
 protected slots:
@@ -27,7 +26,6 @@ private:
     ItemsOnScene * corner1 = nullptr;
     ItemsOnScene * corner2 = nullptr;
     Hero * targetAttack = nullptr;
-    Map * map;
 
     QVector<GridElement *> path;
 

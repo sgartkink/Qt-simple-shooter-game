@@ -9,7 +9,7 @@ class Player : public Hero
 {
 
 public:
-    Player(QGraphicsScene * mainScene, QGraphicsView * mainView);
+    Player(QGraphicsView * mapView, MapWidget * mapWidget);
 
 public slots:
     void updateLineHeroMouse(QPoint mousePoint);
@@ -18,7 +18,7 @@ protected slots:
     virtual void nextMove();
 
 private:
-    const QGraphicsView * mainView;
+    const QGraphicsView * mapView;
     ItemsOnScene * corner1 = nullptr;
     ItemsOnScene * corner2 = nullptr;
 

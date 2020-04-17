@@ -1,4 +1,5 @@
 #include "map.h"
+#include "global_consts.h"
 #include <QtDebug>
 
 Map::Map(QGraphicsScene * scene)
@@ -6,24 +7,24 @@ Map::Map(QGraphicsScene * scene)
 {
     QPen pen;
     pen.setWidth(3);
-    line1 = new QGraphicsLineItem(0,0,1320,0);
+    line1 = new QGraphicsLineItem(0, 0, MAP_SIZE_X_FULL, 0);
     line1->setPen(pen);
-    line2 = new QGraphicsLineItem(1320,0,1320,1320);
+    line2 = new QGraphicsLineItem(MAP_SIZE_X_FULL, 0, MAP_SIZE_X_FULL, MAP_SIZE_Y_FULL);
     line2->setPen(pen);
-    line3 = new QGraphicsLineItem(1320,1320,0,1320);
+    line3 = new QGraphicsLineItem(MAP_SIZE_X_FULL, MAP_SIZE_Y_FULL, 0, MAP_SIZE_Y_FULL);
     line3->setPen(pen);
-    line4 = new QGraphicsLineItem(0,1320,0,0);
+    line4 = new QGraphicsLineItem(0, MAP_SIZE_Y_FULL, 0, 0);
     line4->setPen(pen);
     scene->addItem(line1);
     scene->addItem(line2);
     scene->addItem(line3);
     scene->addItem(line4);
 
-    vector.resize(249);
+    vector.resize(MAP_SIZE_X_10+1);
     int i = 0;
     for (auto it = vector.begin(); it != vector.end(); ++it)
     {
-        (*it).resize(249);
+        (*it).resize(MAP_SIZE_Y_10+1);
 
         int j = 0;
         for (auto it2 = (*it).begin(); it2 != (*it).end(); ++it2)
@@ -61,11 +62,11 @@ QVector<QPointF> neighbours(GridElement * center)
     QVector<QPointF> n;
     if (center->x() - 1 >= 0)
         n.append(QPointF(center->x() - 1, center->y()));
-    if (center->x() + 1 <= 248)
+    if (center->x() + 1 <= MAP_SIZE_X_10)
         n.append(QPointF(center->x() + 1, center->y()));
     if (center->y() - 1 >= 0)
         n.append(QPointF(center->x(), center->y() - 1));
-    if (center->y() + 1 <= 248)
+    if (center->y() + 1 <= MAP_SIZE_Y_10)
         n.append(QPointF(center->x(), center->y() + 1));
 
     return n;

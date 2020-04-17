@@ -1,7 +1,7 @@
 #include "chest.h"
 
 Chest::Chest()
-    : ItemsOnScene(0, 0, 20, 10, nullptr, Qt::yellow)
+    : ItemsOnScene(Qt::yellow, 0, 0, 20, 10)
 {
     height = 5;
 }

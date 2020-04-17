@@ -1,6 +1,7 @@
 #ifndef HERO_H
 #define HERO_H
 
+class MapWidget;
 #include <QObject>
 #include <QTimer>
 #include <QtMath>
@@ -21,8 +22,8 @@ class Hero : public QObject, public ItemsOnScene
     Q_PROPERTY(QPointF pos READ pos WRITE setPos)
 
 public:
-    explicit Hero(qreal x, qreal y, qreal width, qreal height, QGraphicsItem * parent = nullptr,
-                  QGraphicsScene * mainScene = nullptr, Qt::GlobalColor color = Qt::transparent);
+    explicit Hero(MapWidget * mapWidget, Qt::GlobalColor color, qreal x, qreal y, qreal width, qreal height,
+                  QGraphicsItem * parent = nullptr);
     ~Hero();
 
     Shooting * getShooting() { return shooting; }
@@ -70,9 +71,10 @@ protected:
     int armor = 10;
     int grenades = 3;
 
-    QGraphicsScene * mainScene;
     Gun * currentGun;
     Shooting * shooting;
+    MapWidget * mapWidget;
+    QGraphicsScene * scene;
 
     guns currentGunENUM;
     Pistol pistol;
@@ -101,6 +103,8 @@ private:
 
     void checkIfStillExist(Bullet * b = nullptr);
     void death(Bullet * b = nullptr);
+    void resetHero();
+    void randNewPos();
     void changeCurrentGun(Gun &newGun, guns newGunENUM);
     void addValue(int &valueChanged, int &valueAdded, const int valueMax);
 

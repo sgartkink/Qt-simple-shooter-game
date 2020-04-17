@@ -31,17 +31,22 @@ public:
     void setPowerGrenadeThrowing(PowerGrenadeThrowing * p) { powerGrenadeThrowing = p; }
     void setLeaderboard(Leaderboard * l) { leaderboard = l; }
 
+    QGraphicsScene * getScene() { return scene; }
+    Map * getMap() { return map; }
+
+    QPoint randNewFreePos();
+
 private:
     const int mainItemSize = 10;
 
     QGraphicsScene * scene = new QGraphicsScene();
     MapView * mapView = new MapView(scene, this);
     QHBoxLayout * qhboxLayout = new QHBoxLayout(this);
-    Player * player = new Player(scene, mapView);
+    Map * map = new Map(scene);
+    Player * player = new Player(mapView, this);
     PowerGrenadeThrowing * powerGrenadeThrowing = nullptr;
     PlayerBarWidget * playerBarWidget = nullptr;
     Leaderboard * leaderboard = nullptr;
-    Map * map = new Map(scene);
 
     QTimer timerChestCreating;
     QTimer throwingGrenadeTimer;
@@ -51,6 +56,9 @@ private:
 
     double xPos = 0;
     double yPos = 0;
+
+    int mapView_halfWidth;
+    int mapView_halfHeight;
 
     virtual void keyPressEvent(QKeyEvent *event);
     virtual void keyReleaseEvent(QKeyEvent *event);

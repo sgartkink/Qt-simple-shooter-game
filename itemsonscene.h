@@ -9,8 +9,7 @@
 class ItemsOnScene : public QGraphicsRectItem
 {
 public:
-    ItemsOnScene(qreal x, qreal y, qreal width, qreal height, QGraphicsItem * parent = nullptr,
-                 Qt::GlobalColor color = Qt::transparent);
+    ItemsOnScene(Qt::GlobalColor color, qreal x, qreal y, qreal width, qreal height, QGraphicsItem * parent = nullptr);
     virtual ~ItemsOnScene();
 
     virtual void attackItem(Bullet * b) = 0;
