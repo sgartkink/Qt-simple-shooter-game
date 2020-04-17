@@ -1,6 +1,7 @@
 #include "mapwidget.h"
 #include "global_consts.h"
 #include "mainwidget.h"
+#include <QtDebug>
 
 MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, MainWidget *parent, Qt::WindowFlags f)
     : QWidget(parent, f),
@@ -79,9 +80,17 @@ void MapWidget::changeSceneRect()
 {
     if (player->pos().x() >= mapView_halfWidth && player->pos().x() <= MAP_SIZE_X_FULL - mapView_halfWidth)
         xPos = player->pos().x() - mapView_halfWidth;
+    else if (player->pos().x() < mapView_halfWidth)
+        xPos = 0;
+    else
+        xPos = MAP_SIZE_X_FULL - mapView->width();
 
     if (player->pos().y() >= mapView_halfHeight && player->pos().y() <= MAP_SIZE_Y_FULL - mapView_halfHeight)
         yPos = player->pos().y() - mapView_halfHeight;
+    else if (player->pos().y() < mapView_halfHeight)
+        yPos = 0;
+    else
+        yPos = MAP_SIZE_Y_FULL - mapView->height();
 
     mapView->setSceneRect(xPos, yPos, mapView->width(), mapView->height());
 }
