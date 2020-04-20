@@ -51,13 +51,13 @@ SOURCES += \
     shakescreen.cpp \
     gridelement.cpp \
     bfs_algorithm.cpp \
-    itemsinqpainterpath.cpp \
     mainmenu.cpp \
     optionswidget.cpp \
     countdowntostart.cpp \
     leaderboard.cpp \
     herostats.cpp \
-    leaderboardslot.cpp
+    leaderboardslot.cpp \
+    messageattopofscreen.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -85,13 +85,13 @@ HEADERS += \
     shakescreen.h \
     gridelement.h \
     bfs_algorithm.h \
-    itemsinqpainterpath.h \
     mainmenu.h \
     optionswidget.h \
     countdowntostart.h \
     leaderboard.h \
     herostats.h \
-    leaderboardslot.h
+    leaderboardslot.h \
+    messageattopofscreen.h
 
 FORMS +=
 

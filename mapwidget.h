@@ -18,6 +18,7 @@ class MainWidget;
 #include "map.h"
 #include "countdowntostart.h"
 #include "leaderboard.h"
+#include "messageattopofscreen.h"
 
 class MapWidget : public QWidget
 {
@@ -30,6 +31,7 @@ public:
     void start();
     void setPowerGrenadeThrowing(PowerGrenadeThrowing * p) { powerGrenadeThrowing = p; }
     void setLeaderboard(Leaderboard * l) { leaderboard = l; }
+    void setMessageAtTopOfScreen(MessageAtTopOfScreen * m) { messageAtTopOfScreen = m; }
 
     QGraphicsScene * getScene() { return scene; }
     Map * getMap() { return map; }
@@ -47,6 +49,7 @@ private:
     PowerGrenadeThrowing * powerGrenadeThrowing = nullptr;
     PlayerBarWidget * playerBarWidget = nullptr;
     Leaderboard * leaderboard = nullptr;
+    MessageAtTopOfScreen * messageAtTopOfScreen = nullptr;
 
     QTimer timerChestCreating;
     QTimer throwingGrenadeTimer;

@@ -3,6 +3,7 @@
 #include "player.h"
 #include <QtMath>
 #include "mapview.h"
+#include "global_consts.h"
 
 Grenade::Grenade(double dx_, double dy_, double angle, double addedVelocity, QGraphicsScene *mainScene, MapView *mapView)
     : QGraphicsRectItem(0, 0, 4, 4), mainScene(mainScene), mapView(mapView)
@@ -114,7 +115,7 @@ void Grenade::move()
     else
         setNewRotation();
 
-    if (x() < 0 || x() > 1000 || y() < 0 || y() > 1000)
+    if (x() < 0 || x() > MAP_SIZE_X_FULL || y() < 0 || y() > MAP_SIZE_Y_FULL)
         stopMoving();
 }
 

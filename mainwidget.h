@@ -8,6 +8,7 @@
 #include "playerbarwidget.h"
 #include "powergrenadethrowing.h"
 #include "leaderboard.h"
+#include "messageattopofscreen.h"
 
 class MainWidget : public QWidget
 {
@@ -22,6 +23,7 @@ private:
     QVBoxLayout * qvboxLayout = new QVBoxLayout(this);
     PlayerBarWidget * playerBarWidget = new PlayerBarWidget(this);
     MapWidget * mapWidget = new MapWidget(playerBarWidget, this);
+    MessageAtTopOfScreen * messageAtTopOfScreen = nullptr;
     Leaderboard * leaderboard = nullptr;
     PowerGrenadeThrowing * powerGrenadeThrowing = nullptr;
 };
