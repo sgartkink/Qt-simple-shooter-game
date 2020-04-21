@@ -58,6 +58,8 @@ private:
     void findPath();
     void resetDirections();
     void attack();
+
+    virtual void death(Bullet * b = nullptr);
 };
 
 #endif // BOT_H

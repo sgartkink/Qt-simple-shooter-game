@@ -66,6 +66,7 @@ public slots:
 
 protected:
     const int size = 10;
+    const int TIME_RETURN_TO_LIFE = 3000;
     HeroStats heroStats {this};
 
     int hp = 10;
@@ -91,6 +92,10 @@ protected:
     bool throwingGrenade = false;
     bool currentlyShooting = false;
 
+    void resetHero();
+    void randNewPos();
+    virtual void death(Bullet * b = nullptr) = 0;
+
 protected slots:
     virtual void updateLineHeroMouse(QPoint mousePoint) = 0;
     virtual void nextMove() = 0;
@@ -99,16 +104,12 @@ private:
     const int MAX_HP = 15;
     const int MAX_ARMOR = 15;
     const int MAX_GRENADES = 3;
-    const int TIME_RETURN_TO_LIFE = 3000;
     const int TIME_MOVE = 20;
     const Qt::GlobalColor heroColor;
     bool alive = false;
     QTimer moveTimer;
-
     void checkIfStillExist(Bullet * b = nullptr);
-    void death(Bullet * b = nullptr);
-    void resetHero();
-    void randNewPos();
+
     void changeCurrentGun(Gun &newGun, guns newGunENUM);
     void addValue(int &valueChanged, int &valueAdded, const int valueMax);
 

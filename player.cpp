@@ -61,3 +61,20 @@ void Player::newMove(int x_, int y_)
 
     emit (posChanged());
 }
+
+void Player::death(Bullet *b)
+{
+    heroStats.increaseDeath();
+    resetHero();
+    randNewPos();
+    changeColor(Qt::white);
+
+    if (b)
+        b->getOwner()->addKill();
+
+    QTimer::singleShot(TIME_RETURN_TO_LIFE, [this]()
+    {
+        this->start();
+    });
+    mapWidget->showCountdown("Back in:", TIME_RETURN_TO_LIFE/1000);
+}

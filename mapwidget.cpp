@@ -72,7 +72,8 @@ QPoint MapWidget::randNewFreePos()
 
 void MapWidget::showCountdown(const QString &text, const int &s)
 {
-    countdown->start(text, s);
+    if (countdown)
+        countdown->start(text, s);
 }
 
 void MapWidget::changeSceneRect()
