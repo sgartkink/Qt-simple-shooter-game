@@ -11,10 +11,14 @@ MessageAtTopOfScreen::MessageAtTopOfScreen(QWidget *parent, Qt::WindowFlags f)
 
     label.setAlignment(Qt::AlignHCenter);
 
-    animation = new QPropertyAnimation(this, "windowOpacity");
+    QGraphicsOpacityEffect * effect = new QGraphicsOpacityEffect(this);
+    setGraphicsEffect(effect);
+    animation = new QPropertyAnimation(effect, "opacity");
     animation->setDuration(2000);
     animation->setStartValue(1);
     animation->setEndValue(0);
+
+    connect(animation, &QPropertyAnimation::finished, [this](){ setVisible(false); });
 }
 
 void MessageAtTopOfScreen::showMessage(QString text)
@@ -23,6 +27,4 @@ void MessageAtTopOfScreen::showMessage(QString text)
     animation->stop();
     label.setText(text);
     animation->start();
-
-    QTimer::singleShot(2000, [this](){ this->setVisible(false); });
 }

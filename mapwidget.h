@@ -16,7 +16,7 @@ class MainWidget;
 #include "chest.h"
 #include "powergrenadethrowing.h"
 #include "map.h"
-#include "countdowntostart.h"
+#include "countdown.h"
 #include "leaderboard.h"
 #include "messageattopofscreen.h"
 
@@ -32,11 +32,13 @@ public:
     void setPowerGrenadeThrowing(PowerGrenadeThrowing * p) { powerGrenadeThrowing = p; }
     void setLeaderboard(Leaderboard * l) { leaderboard = l; }
     void setMessageAtTopOfScreen(MessageAtTopOfScreen * m) { messageAtTopOfScreen = m; }
+    void setCountdown(Countdown * c) { countdown = c; }
 
     QGraphicsScene * getScene() { return scene; }
     Map * getMap() { return map; }
 
     QPoint randNewFreePos();
+    void showCountdown(const QString &text, const int &s);
 
 private:
     const int mainItemSize = 10;
@@ -50,11 +52,10 @@ private:
     PlayerBarWidget * playerBarWidget = nullptr;
     Leaderboard * leaderboard = nullptr;
     MessageAtTopOfScreen * messageAtTopOfScreen = nullptr;
+    Countdown * countdown = nullptr;
 
     QTimer timerChestCreating;
     QTimer throwingGrenadeTimer;
-
-    bool gameStarted = false;
 
     double xPos = 0;
     double yPos = 0;

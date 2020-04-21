@@ -35,10 +35,6 @@ MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, MainWidget *parent, Qt::W
 
     scene->addItem(player);
     player->setPos(200,240);
-
-    Chest * chest = new Chest;
-    scene->addItem(chest);
-    chest->setPos(320, 240);
 }
 
 void MapWidget::start()
@@ -53,16 +49,14 @@ void MapWidget::start()
     leaderboard->addNewHero(player->getHeroStats());
     leaderboard->addNewHero(bot->getHeroStats());
 
-    CountdownToStart * countdownToStart = new CountdownToStart(scene, mapView->width(), mapView->height());
+    countdown->start("Game starts in:", 3);
 
-    connect(countdownToStart, &QObject::destroyed, [this, bot](){
+    QTimer::singleShot(3000, [this, bot](){
         connect(mapView, SIGNAL(mousePressed()), player, SLOT(startShooting()));
         connect(mapView, SIGNAL(mouseReleased()), player, SLOT(stopShooting()));
         timerChestCreating.start(30000);
         player->start();
         bot->start();
-        gameStarted = true;
-        disconnect(this);
     });
 }
 
@@ -74,6 +68,11 @@ QPoint MapWidget::randNewFreePos()
     } while(map->checkIfPointIsTaken(p) || map->checkIfPointIsTaken(QPoint(p.x()+1, p.y())));
 
     return p;
+}
+
+void MapWidget::showCountdown(const QString &text, const int &s)
+{
+    countdown->start(text, s);
 }
 
 void MapWidget::changeSceneRect()
@@ -128,7 +127,7 @@ void MapWidget::keyPressEvent(QKeyEvent *event)
             leaderboard->setVisible(1);
             break;
         default:
-            if (gameStarted)
+            if (player->isAlive())
                 switch (event->key())
                 {
                 case Qt::Key_Q:
@@ -170,7 +169,7 @@ void MapWidget::keyReleaseEvent(QKeyEvent *event)
             leaderboard->setVisible(0);
             break;
         default:
-            if (gameStarted)
+            if (player->isAlive())
                 if (player->getGrenades() > 0 && player->isThrowingGrenade() && !player->isCurrentlyShooting())
                     stopThrowingGrenade();
         }

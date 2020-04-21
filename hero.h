@@ -36,9 +36,11 @@ public:
     int getArmor() { return armor; }
     bool isThrowingGrenade() { return throwingGrenade; }
     bool isCurrentlyShooting() { return currentlyShooting; }
+    bool isAlive() { return alive; }
 
     virtual void attackItem(Bullet * b);
     virtual void attackItem(int dmg);
+    void start();
     void heroAttacked(Bullet * b = nullptr);
     void addKill();
     void setCurrentGun(int gun_);
@@ -49,21 +51,16 @@ public:
     void refillCurrentLoadedAmmo();
     void refillCurrentOwnedAmmo();
     void throwGrenade(int addedVelocity, MapView * mapView);
-    void setCurrentlyShooting(bool c) { currentlyShooting = c; }
 
+    void setCurrentlyShooting(bool c) { currentlyShooting = c; }
     void setDirectionUp(bool d) { directionUp = d; }
     void setDirectionRight(bool d) { directionRight = d; }
     void setDirectionDown(bool d) { directionDown = d; }
     void setDirectionLeft(bool d) { directionLeft = d; }
-//    void toggleDirectionUp() { directionUp = !directionUp; }
-//    void toggleDirectionRight() { directionRight = !directionRight; }
-//    void toggleDirectionDown() { directionDown = !directionDown; }
-//    void toggleDirectionLeft() { directionLeft = !directionLeft; }
     void toggleThrowingGrenade() { throwingGrenade = !throwingGrenade; }
     void toggleCurrentlyShooting() { currentlyShooting = !currentlyShooting; }
 
 public slots:
-    void start() { moveTimer.start(20); }
     void startShooting();
     void stopShooting();
 
@@ -102,8 +99,11 @@ private:
     const int MAX_HP = 15;
     const int MAX_ARMOR = 15;
     const int MAX_GRENADES = 3;
+    const int TIME_RETURN_TO_LIFE = 3000;
+    const int TIME_MOVE = 20;
+    const Qt::GlobalColor heroColor;
+    bool alive = false;
     QTimer moveTimer;
-    QPen pen;
 
     void checkIfStillExist(Bullet * b = nullptr);
     void death(Bullet * b = nullptr);

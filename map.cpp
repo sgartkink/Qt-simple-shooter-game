@@ -41,7 +41,6 @@ Map::Map(QGraphicsScene * scene)
     addBuilding(QPoint(47,28));
     addBuilding(QPoint(23,0));
     addBuilding(QPoint(56,54));
-    addBuilding(QPoint(52,32));
     addBuilding(QPoint(67,9));
     addBuilding(QPoint(82,79));
     addBuilding(QPoint(98,85));
@@ -53,8 +52,6 @@ Map::Map(QGraphicsScene * scene)
     addBuilding(QPoint(52,115));
     addBuilding(QPoint(74,96));
     addBuilding(QPoint(89,95));
-
-    addChest(QPoint(15,18));
 }
 
 QVector<QPointF> neighbours(GridElement * center)

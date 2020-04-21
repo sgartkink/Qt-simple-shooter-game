@@ -2,7 +2,7 @@
 #include "mapwidget.h"
 #include <QtDebug>
 Hero::Hero(MapWidget *mapWidget, Qt::GlobalColor color, qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent)
-    : ItemsOnScene(color, x, y, width, height, parent), mapWidget(mapWidget), scene(mapWidget->getScene())
+    : ItemsOnScene(color, x, y, width, height, parent), mapWidget(mapWidget), scene(mapWidget->getScene()), heroColor(color)
 {
     setTransformOriginPoint(size/2, size/2);
 
@@ -10,19 +10,34 @@ Hero::Hero(MapWidget *mapWidget, Qt::GlobalColor color, qreal x, qreal y, qreal 
     currentGunENUM = RIFLE;
     height = 10;
 
+    changeColor(Qt::white);
+
     connect(&moveTimer, SIGNAL(timeout()), this, SLOT(nextMove()));
 }
 
 void Hero::attackItem(Bullet *b)
 {
-    armor -= b->getDamage();
-    heroAttacked(b);
+    if (alive)
+    {
+        armor -= b->getDamage();
+        heroAttacked(b);
+    }
 }
 
 void Hero::attackItem(int dmg)
 {
-    armor -= dmg;
-    heroAttacked();
+    if (alive)
+    {
+        armor -= dmg;
+        heroAttacked();
+    }
+}
+
+void Hero::start()
+{
+    changeColor(heroColor);
+    moveTimer.start(TIME_MOVE);
+    alive = true;
 }
 
 void Hero::heroAttacked(Bullet *b)
@@ -50,9 +65,16 @@ void Hero::death(Bullet *b)
     heroStats.increaseDeath();
     resetHero();
     randNewPos();
+    changeColor(Qt::white);
 
     if (b)
         b->getOwner()->addKill();
+
+    QTimer::singleShot(TIME_RETURN_TO_LIFE, [this]()
+    {
+        this->start();
+    });
+    mapWidget->showCountdown("Back in:", TIME_RETURN_TO_LIFE/1000);
 }
 
 void Hero::resetHero()
@@ -60,6 +82,8 @@ void Hero::resetHero()
     hp = 10;
     armor = 10;
     grenades = 3;
+    alive = false;
+    moveTimer.stop();
 }
 
 void Hero::randNewPos()
@@ -148,12 +172,7 @@ void Hero::refillCurrentOwnedAmmo()
 
 void Hero::throwGrenade(int addedVelocity, MapView *mapView)
 {
-    Grenade * grenade = new Grenade(5*qCos(qDegreesToRadians(lineHeroMouse.angle())),
-                                    -5*qSin(qDegreesToRadians(lineHeroMouse.angle())),
-                                    lineHeroMouse.angle(),
-                                    addedVelocity,
-                                    scene,
-                                    mapView);
+    Grenade * grenade = new Grenade(lineHeroMouse, addedVelocity, scene, mapView);
     grenade->setPos(x() + 5, y() + 5);
     scene->addItem(grenade);
     grenades--;
@@ -162,7 +181,7 @@ void Hero::throwGrenade(int addedVelocity, MapView *mapView)
 
 void Hero::startShooting()
 {
-    if (!currentGun->isReloading() || !throwingGrenade)
+    if (!currentGun->isReloading() && !throwingGrenade && alive)
     {
         currentlyShooting = true;
         shooting->start();

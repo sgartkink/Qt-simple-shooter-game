@@ -4,6 +4,7 @@
 #include <QProgressBar>
 #include <QPropertyAnimation>
 #include <QTimer>
+#include <QGraphicsOpacityEffect>
 
 class PowerGrenadeThrowing : public QProgressBar
 {

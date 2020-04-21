@@ -9,6 +9,7 @@
 #include "powergrenadethrowing.h"
 #include "leaderboard.h"
 #include "messageattopofscreen.h"
+#include "countdown.h"
 
 class MainWidget : public QWidget
 {
@@ -26,6 +27,7 @@ private:
     MessageAtTopOfScreen * messageAtTopOfScreen = nullptr;
     Leaderboard * leaderboard = nullptr;
     PowerGrenadeThrowing * powerGrenadeThrowing = nullptr;
+    Countdown * countdown = nullptr;
 };
 
 #endif // MAINWIDGET_H

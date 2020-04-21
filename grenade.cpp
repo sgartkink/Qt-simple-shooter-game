@@ -5,16 +5,16 @@
 #include "mapview.h"
 #include "global_consts.h"
 
-Grenade::Grenade(double dx_, double dy_, double angle, double addedVelocity, QGraphicsScene *mainScene, MapView *mapView)
+Grenade::Grenade(const QLineF & line, double addedVelocity, QGraphicsScene *mainScene, MapView *mapView)
     : QGraphicsRectItem(0, 0, 4, 4), mainScene(mainScene), mapView(mapView)
 {
     setTransformOriginPoint(2,2);
-    setRotation(angle);
+    setRotation(line.angle());
     dateTimeStart = QDateTime::currentDateTime();
 
     velocity += addedVelocity;
-    dx = dx_*velocity/500;
-    dy = dy_*velocity/500;
+    dx = 5*qCos(qDegreesToRadians(line.angle()))*velocity/500;
+    dy = -5*qSin(qDegreesToRadians(line.angle()))*velocity/500;
 
     connect(&moveTimer, SIGNAL(timeout()), this, SLOT(move()));
     moveTimer.start(10);
@@ -30,14 +30,6 @@ void Grenade::move()
     currentVelocity = velocity * qSin(sqrt(3)/2) - 9.81*secondsDiff;
     currentHeight = 10 + currentVelocity * secondsDiff * qSin(sqrt(3)/2)  - 9.81*secondsDiff*secondsDiff/2;
 
-//    if (currentHeight > 0 && currentHeight < 10)
-//        setNewSize(4);
-//    else if (currentHeight > 10 && currentHeight < 20)
-//        setNewSize(5);
-//    else if (currentHeight > 20 && currentHeight < 30)
-//        setNewSize(6);
-//    else if (currentHeight > 30)
-//        setNewSize(7);
     if (currentHeight < 0)
         stopMoving();
 
@@ -117,12 +109,6 @@ void Grenade::move()
 
     if (x() < 0 || x() > MAP_SIZE_X_FULL || y() < 0 || y() > MAP_SIZE_Y_FULL)
         stopMoving();
-}
-
-void Grenade::setNewSize(int size_)
-{
-    size = size_;
-    setRect(0,0,size,size);
 }
 
 bool Grenade::checkCorner(ItemsOnScene *corner)

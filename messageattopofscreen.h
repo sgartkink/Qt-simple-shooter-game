@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QPropertyAnimation>
 #include <QTimer>
+#include <QGraphicsOpacityEffect>
 
 class MessageAtTopOfScreen : public QWidget
 {

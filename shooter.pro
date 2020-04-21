@@ -53,11 +53,11 @@ SOURCES += \
     bfs_algorithm.cpp \
     mainmenu.cpp \
     optionswidget.cpp \
-    countdowntostart.cpp \
     leaderboard.cpp \
     herostats.cpp \
     leaderboardslot.cpp \
-    messageattopofscreen.cpp
+    messageattopofscreen.cpp \
+    countdown.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -87,11 +87,11 @@ HEADERS += \
     bfs_algorithm.h \
     mainmenu.h \
     optionswidget.h \
-    countdowntostart.h \
     leaderboard.h \
     herostats.h \
     leaderboardslot.h \
-    messageattopofscreen.h
+    messageattopofscreen.h \
+    countdown.h
 
 FORMS +=
 

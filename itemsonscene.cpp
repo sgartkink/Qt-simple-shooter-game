@@ -10,3 +10,9 @@ ItemsOnScene::~ItemsOnScene()
 {
 
 }
+
+void ItemsOnScene::changeColor(Qt::GlobalColor color)
+{
+    pen.setColor(color);
+    setPen(pen);
+}

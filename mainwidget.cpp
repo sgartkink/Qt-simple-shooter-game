@@ -5,6 +5,11 @@ MainWidget::MainWidget(QWidget *parent, Qt::WindowFlags f)
 {
     playerBarWidget->setMinimumHeight(100);
 
+    countdown = new Countdown(this);
+    countdown->move(0, 256);
+    countdown->setMinimumHeight(50);
+    countdown->setMinimumWidth(1024);
+
     messageAtTopOfScreen = new MessageAtTopOfScreen(this);
     messageAtTopOfScreen->move(0, 20);
     messageAtTopOfScreen->setMinimumWidth(1024);
@@ -19,6 +24,7 @@ MainWidget::MainWidget(QWidget *parent, Qt::WindowFlags f)
     mapWidget->setPowerGrenadeThrowing(powerGrenadeThrowing);
     mapWidget->setLeaderboard(leaderboard);
     mapWidget->setMessageAtTopOfScreen(messageAtTopOfScreen);
+    mapWidget->setCountdown(countdown);
 
     setLayout(qvboxLayout);
     qvboxLayout->addWidget(mapWidget);

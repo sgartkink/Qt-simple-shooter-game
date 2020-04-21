@@ -19,6 +19,8 @@ public:
 protected:
     double height;
 
+    void changeColor(Qt::GlobalColor color);
+
 private:
     QPen pen;
 };

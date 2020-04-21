@@ -17,8 +17,7 @@ class Grenade : public QObject, public QGraphicsRectItem
 {
     Q_OBJECT
 public:
-    Grenade(double dx_, double dy_, double angle, double addedVelocity, QGraphicsScene *mainScene = nullptr,
-            MapView * mapView = nullptr);
+    Grenade(const QLineF & line, double addedVelocity, QGraphicsScene *mainScene, MapView * mapView = nullptr);
 
 private:
     const double radius = 40;
@@ -31,8 +30,8 @@ private:
 
     GrenadeEllipseItem * ellipse = new GrenadeEllipseItem();
     QGraphicsItem * previousHitItem = nullptr;
+    QGraphicsScene * mainScene = nullptr;
     MapView * mapView = nullptr;
-    QGraphicsScene * mainScene;
     QList<QGraphicsItem *> corner0;
     QList<QGraphicsItem *> corner1;
     QList<QGraphicsItem *> corner2;
