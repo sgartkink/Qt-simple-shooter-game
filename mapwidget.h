@@ -40,6 +40,9 @@ public:
     QPoint randNewFreePos();
     void showCountdown(const QString &text, const int &s);
 
+public slots:
+    void stopThrowingGrenade();
+
 private:
     const int mainItemSize = 10;
 
@@ -72,7 +75,6 @@ private:
 private slots:
     void changeSceneRect();
     void createChest();
-    void stopThrowingGrenade();
 };
 
 #endif // MAPWIDGET_H

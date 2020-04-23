@@ -312,6 +312,7 @@ void Bot::attack()
 void Bot::death(Bullet *b)
 {
     heroStats.increaseDeath();
+    resetGuns();
     resetHero();
     randNewPos();
     changeColor(Qt::white);

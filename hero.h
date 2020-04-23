@@ -5,6 +5,7 @@ class MapWidget;
 #include <QObject>
 #include <QTimer>
 #include <QtMath>
+#include <QVector>
 
 #include "shooting.h"
 #include "global_consts.h"
@@ -84,6 +85,7 @@ protected:
     Shotgun shotgun;
     QLineF lineHeroMouse;
     QTimer shootingTimer;
+    QVector<Gun *> heroGuns {&pistol, &rifle, &shotgun};
 
     bool directionUp = false;
     bool directionRight = false;
@@ -95,6 +97,7 @@ protected:
     void resetHero();
     void randNewPos();
     virtual void death(Bullet * b = nullptr) = 0;
+    void resetGuns();
 
 protected slots:
     virtual void updateLineHeroMouse(QPoint mousePoint) = 0;

@@ -64,6 +64,9 @@ void Player::newMove(int x_, int y_)
 
 void Player::death(Bullet *b)
 {
+    if (throwingGrenade)
+        mapWidget->stopThrowingGrenade();
+    resetGuns();
     heroStats.increaseDeath();
     resetHero();
     randNewPos();

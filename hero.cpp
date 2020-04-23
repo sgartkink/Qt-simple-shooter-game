@@ -141,6 +141,12 @@ void Hero::addValue(int &valueChanged, int &valueAdded, const int valueMax)
         valueChanged += valueAdded;
 }
 
+void Hero::resetGuns()
+{
+    for (Gun * g : heroGuns)
+        g->reset();
+}
+
 void Hero::refillCurrentLoadedAmmo()
 {
     currentGun->refillCurrentOwnedAmmo();

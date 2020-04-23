@@ -24,6 +24,7 @@ public:
     void refillCurrentLoadedAmmo() { currentLoadedAmmo = capacityAmmo; }
     void refillCurrentOwnedAmmo() { currentOwnedAmmo = maxAmmo; }
     void addAmmo(int ammo);
+    void reset();
 
 protected:
     int damage;

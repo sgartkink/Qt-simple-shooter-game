@@ -25,6 +25,12 @@ void Gun::addAmmo(int ammo)
         currentLoadedAmmo += ammo;
 }
 
+void Gun::reset()
+{
+    currentLoadedAmmo = capacityAmmo;
+    currentOwnedAmmo = maxAmmo;
+}
+
 void Gun::reloaded()
 {
     if (currentOwnedAmmo > 0 && currentLoadedAmmo < capacityAmmo)
