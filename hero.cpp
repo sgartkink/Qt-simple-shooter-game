@@ -15,21 +15,12 @@ Hero::Hero(MapWidget *mapWidget, Qt::GlobalColor color, qreal x, qreal y, qreal 
     connect(&moveTimer, SIGNAL(timeout()), this, SLOT(nextMove()));
 }
 
-void Hero::attackItem(Bullet *b)
+void Hero::attackItem(int damage, Hero *owner)
 {
     if (alive)
     {
-        armor -= b->getDamage();
-        heroAttacked(b);
-    }
-}
-
-void Hero::attackItem(int dmg)
-{
-    if (alive)
-    {
-        armor -= dmg;
-        heroAttacked();
+        armor -= damage;
+        heroAttacked(owner);
     }
 }
 
@@ -40,7 +31,7 @@ void Hero::start()
     alive = true;
 }
 
-void Hero::heroAttacked(Bullet *b)
+void Hero::heroAttacked(Hero *owner)
 {
     emit (armorChanged());
 
@@ -50,14 +41,19 @@ void Hero::heroAttacked(Bullet *b)
         armor = 0;
         emit (hpChanged());
         emit (armorChanged());
-        checkIfStillExist(b);
+        checkIfStillExist(owner);
     }
 }
 
-void Hero::checkIfStillExist(Bullet *b)
+void Hero::checkIfStillExist(Hero *owner)
 {
     if (hp <= 0)
-        death(b);
+    {
+        death();
+
+        if (owner)
+            owner->addKill();
+    }
 }
 
 void Hero::resetHero()
@@ -67,6 +63,16 @@ void Hero::resetHero()
     grenades = 3;
     alive = false;
     moveTimer.stop();
+    stopShooting();
+    resetGuns();
+    heroStats.increaseDeath();
+    randNewPos();
+    changeColor(Qt::white);
+
+    QTimer::singleShot(TIME_RETURN_TO_LIFE, [this]()
+    {
+        this->start();
+    });
 }
 
 void Hero::randNewPos()
@@ -161,7 +167,7 @@ void Hero::refillCurrentOwnedAmmo()
 
 void Hero::throwGrenade(int addedVelocity, MapView *mapView)
 {
-    Grenade * grenade = new Grenade(lineHeroMouse, addedVelocity, scene, mapView);
+    Grenade * grenade = new Grenade(this, addedVelocity, mapView);
     grenade->setPos(x() + 5, y() + 5);
     scene->addItem(grenade);
     grenades--;

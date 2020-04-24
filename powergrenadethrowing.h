@@ -18,6 +18,7 @@ public:
 private:
     QPropertyAnimation * animationValue = nullptr;
     QPropertyAnimation * animationOpacity = nullptr;
+    QGraphicsOpacityEffect * effect = new QGraphicsOpacityEffect(this);
 };
 
 #endif // POWERGRENADETHROWING_H

@@ -8,7 +8,6 @@
 #include <QObject>
 #include <QTimer>
 
-class Player;
 class MapView;
 #include "itemsonscene.h"
 #include "grenadeellipseitem.h"
@@ -17,7 +16,7 @@ class Grenade : public QObject, public QGraphicsRectItem
 {
     Q_OBJECT
 public:
-    Grenade(const QLineF & line, double addedVelocity, QGraphicsScene *mainScene, MapView * mapView = nullptr);
+    Grenade(Hero * owner, double addedVelocity, MapView * mapView = nullptr);
 
 private:
     const double radius = 40;
@@ -28,6 +27,7 @@ private:
     int size = 4;
     bool mayMove = true;
 
+    Hero * owner;
     GrenadeEllipseItem * ellipse = new GrenadeEllipseItem();
     QGraphicsItem * previousHitItem = nullptr;
     QGraphicsScene * mainScene = nullptr;

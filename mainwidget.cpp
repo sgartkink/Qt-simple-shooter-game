@@ -19,7 +19,9 @@ MainWidget::MainWidget(QWidget *parent, Qt::WindowFlags f)
     powerGrenadeThrowing->setMinimumWidth(300);
 
     leaderboard = new Leaderboard(this);
-    leaderboard->move(50,0);
+    leaderboard->move(0,0);
+    leaderboard->setMinimumWidth(1024);
+    leaderboard->setMinimumHeight(600);
 
     mapWidget->setPowerGrenadeThrowing(powerGrenadeThrowing);
     mapWidget->setLeaderboard(leaderboard);

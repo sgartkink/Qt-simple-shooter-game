@@ -309,19 +309,7 @@ void Bot::attack()
         startShooting();
 }
 
-void Bot::death(Bullet *b)
+void Bot::death()
 {
-    heroStats.increaseDeath();
-    resetGuns();
     resetHero();
-    randNewPos();
-    changeColor(Qt::white);
-
-    if (b)
-        b->getOwner()->addKill();
-
-    QTimer::singleShot(TIME_RETURN_TO_LIFE, [this]()
-    {
-        this->start();
-    });
 }

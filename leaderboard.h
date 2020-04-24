@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QVector>
 #include <QObject>
+#include <QGraphicsOpacityEffect>
 
 #include "herostats.h"
 #include "leaderboardslot.h"
@@ -25,6 +26,7 @@ public slots:
 
 private:
     QGridLayout * gridLayout = new QGridLayout(this);
+    QGraphicsOpacityEffect * effect = new QGraphicsOpacityEffect(this);
     QVector<HeroStats *> heroes;
     QVector<LeaderboardSlot *> leaderboardSlots;
 

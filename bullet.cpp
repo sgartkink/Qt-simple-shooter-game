@@ -4,11 +4,13 @@
 #include "bot.h"
 #include "global_consts.h"
 
-Bullet::Bullet(double dx, double dy, double angle, QGraphicsScene *mainScene, int damage, Hero *owner)
-    : QGraphicsRectItem(0, 0, 4, 2), mainScene(mainScene), dx(dx), dy(dy), damage(damage), owner(owner)
+Bullet::Bullet(Hero *owner, int damage, double dx, double dy)
+    : QGraphicsRectItem(0, 0, 4, 2), mainScene(owner->getScene()), dx(dx), dy(dy), damage(damage), owner(owner)
 {
+    dx = 5*qCos(qDegreesToRadians(owner->lineAngle()));
+    dy = -5*qSin(qDegreesToRadians(owner->lineAngle()));
     setTransformOriginPoint(2, 1);
-    setRotation(-1 * angle);
+    setRotation(-1 * owner->lineAngle());
     connect(&moveTimer, SIGNAL(timeout()), this, SLOT(move()));
     moveTimer.start(10);
 }
@@ -25,25 +27,25 @@ void Bullet::move()
     if (corner0 && corner0 != owner)
     {
         if (dynamic_cast<Hero *>(corner0))
-            corner0->attackItem(this);
+            corner0->attackItem(damage, owner);
         delete this;
     }
     else if (corner1 && corner1 != owner)
     {
         if (dynamic_cast<Hero *>(corner1))
-            corner1->attackItem(this);
+            corner1->attackItem(damage, owner);
         delete this;
     }
     else if (corner2 && corner2 != owner)
     {
         if (dynamic_cast<Hero *>(corner2))
-            corner2->attackItem(this);
+            corner2->attackItem(damage, owner);
         delete this;
     }
     else if (corner3 && corner3 != owner)
     {
         if (dynamic_cast<Hero *>(corner3))
-            corner3->attackItem(this);
+            corner3->attackItem(damage, owner);
         delete this;
     }
 

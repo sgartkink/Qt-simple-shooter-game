@@ -5,16 +5,16 @@
 #include "mapview.h"
 #include "global_consts.h"
 
-Grenade::Grenade(const QLineF & line, double addedVelocity, QGraphicsScene *mainScene, MapView *mapView)
-    : QGraphicsRectItem(0, 0, 4, 4), mainScene(mainScene), mapView(mapView)
+Grenade::Grenade(Hero *owner, double addedVelocity, MapView *mapView)
+    : QGraphicsRectItem(0, 0, 4, 4), owner(owner), mainScene(owner->getScene()), mapView(mapView)
 {
     setTransformOriginPoint(2,2);
-    setRotation(line.angle());
+    setRotation(owner->lineAngle());
     dateTimeStart = QDateTime::currentDateTime();
 
     velocity += addedVelocity;
-    dx = 5*qCos(qDegreesToRadians(line.angle()))*velocity/500;
-    dy = -5*qSin(qDegreesToRadians(line.angle()))*velocity/500;
+    dx = 5*qCos(qDegreesToRadians(owner->lineAngle()))*velocity/500;
+    dy = -5*qSin(qDegreesToRadians(owner->lineAngle()))*velocity/500;
 
     connect(&moveTimer, SIGNAL(timeout()), this, SLOT(move()));
     moveTimer.start(10);
@@ -157,7 +157,7 @@ void Grenade::explode()
     QList<QGraphicsItem *> listOfItemsWithinExplosionRange = mainScene->items(path);
     for (auto it = listOfItemsWithinExplosionRange.begin(); it != listOfItemsWithinExplosionRange.end(); it++)
         if (Hero * h = dynamic_cast<Hero*>(*it))
-            h->attackItem(damage);
+            h->attackItem(damage, owner);
 
     mapView->startShakeScreen();
     QTimer::singleShot(300, [this](){ delete ellipse; delete this; });

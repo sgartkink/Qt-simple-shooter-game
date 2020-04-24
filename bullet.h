@@ -11,15 +11,15 @@ class Bullet : public QObject, public QGraphicsRectItem
     Q_OBJECT
 
 public:
-    Bullet(double dx, double dy, double angle, QGraphicsScene * mainScene, int damage, Hero * owner);
+    Bullet(Hero * owner, int damage, double dx, double dy);
 
     int getDamage() { return damage; }
     Hero * getOwner() { return owner; }
 
 private:
     const QGraphicsScene * mainScene;
-    const double dx;
-    const double dy;
+    double dx;
+    double dy;
     const int damage;
 
     Hero * owner;

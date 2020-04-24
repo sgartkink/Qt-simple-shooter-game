@@ -29,6 +29,7 @@ public:
 
     Shooting * getShooting() { return shooting; }
     HeroStats * getHeroStats() { return &heroStats; }
+    QGraphicsScene * getScene() { return scene; }
     qreal lineAngle() { return lineHeroMouse.angle(); }
     Gun * gun() { return currentGun; }
     guns gunENUM(){ return currentGunENUM; }
@@ -39,10 +40,9 @@ public:
     bool isCurrentlyShooting() { return currentlyShooting; }
     bool isAlive() { return alive; }
 
-    virtual void attackItem(Bullet * b);
-    virtual void attackItem(int dmg);
+    virtual void attackItem(int damage = 0, Hero * owner = nullptr);
     void start();
-    void heroAttacked(Bullet * b = nullptr);
+    void heroAttacked(Hero * owner);
     void addKill();
     void setCurrentGun(int gun_);
     void addGrenades(int grenades_);
@@ -96,7 +96,7 @@ protected:
 
     void resetHero();
     void randNewPos();
-    virtual void death(Bullet * b = nullptr) = 0;
+    virtual void death() = 0;
     void resetGuns();
 
 protected slots:
@@ -111,7 +111,7 @@ private:
     const Qt::GlobalColor heroColor;
     bool alive = false;
     QTimer moveTimer;
-    void checkIfStillExist(Bullet * b = nullptr);
+    void checkIfStillExist(Hero *owner = nullptr);
 
     void changeCurrentGun(Gun &newGun, guns newGunENUM);
     void addValue(int &valueChanged, int &valueAdded, const int valueMax);

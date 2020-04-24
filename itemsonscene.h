@@ -12,8 +12,7 @@ public:
     ItemsOnScene(Qt::GlobalColor color, qreal x, qreal y, qreal width, qreal height, QGraphicsItem * parent = nullptr);
     virtual ~ItemsOnScene();
 
-    virtual void attackItem(Bullet * b) = 0;
-    virtual void attackItem(int dmg) = 0;
+    virtual void attackItem(int damage = 0, Hero * owner = nullptr) = 0;
     double getHeight() { return height; }
 
 protected:

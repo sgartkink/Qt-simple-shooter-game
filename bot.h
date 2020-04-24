@@ -59,7 +59,7 @@ private:
     void resetDirections();
     void attack();
 
-    virtual void death(Bullet * b = nullptr);
+    virtual void death();
 };
 
 #endif // BOT_H

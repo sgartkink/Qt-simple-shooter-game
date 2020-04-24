@@ -12,8 +12,7 @@ class Chest : public ItemsOnScene
 public:
     Chest();
 
-    virtual void attackItem([[maybe_unused]] Bullet * b) {}
-    virtual void attackItem([[maybe_unused]] int dmg) {}
+    virtual void attackItem([[maybe_unused]]int damage = 0, [[maybe_unused]]Hero * owner = nullptr) {}
 
     void open(Hero * opener, MessageAtTopOfScreen * messageAtTopOfScreen);
     void open(Hero * opener);

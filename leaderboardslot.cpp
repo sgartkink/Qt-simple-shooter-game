@@ -4,7 +4,6 @@
 LeaderboardSlot::LeaderboardSlot(Leaderboard *lb, HeroStats *hS)
     : gridLayout(lb->getLayout())
 {
-
     int row = gridLayout->rowCount();
 
     QLabel * lPlace = new QLabel(QString::number(row));

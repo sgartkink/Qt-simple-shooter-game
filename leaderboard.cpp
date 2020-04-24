@@ -6,13 +6,11 @@ Leaderboard::Leaderboard(QWidget *parent, Qt::WindowFlags f)
     setVisible(0);
     setAttribute(Qt::WA_TransparentForMouseEvents);
     setGeometry(0, 0, 300, 100);
-//    setAutoFillBackground(false);
-//    setWindowOpacity(1);
-//    QPalette pal = palette();
-//    pal.setColor(QPalette::Window, Qt::white);
-//    setPalette(pal);
+    setGraphicsEffect(effect);
+    effect->setOpacity(0.7);
 
     setLayout(gridLayout);
+    gridLayout->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 
     gridLayout->addWidget(&lNr, 0, 0);
     gridLayout->addWidget(&lPlayer, 0, 1);

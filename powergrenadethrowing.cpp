@@ -12,7 +12,6 @@ PowerGrenadeThrowing::PowerGrenadeThrowing(QWidget *parent)
     animationValue->setStartValue(0);
     animationValue->setEndValue(100);
 
-    QGraphicsOpacityEffect * effect = new QGraphicsOpacityEffect(this);
     setGraphicsEffect(effect);
     animationOpacity = new QPropertyAnimation(effect, "opacity");
     animationOpacity->setDuration(1000);
@@ -25,9 +24,9 @@ PowerGrenadeThrowing::PowerGrenadeThrowing(QWidget *parent)
 void PowerGrenadeThrowing::start()
 {
     animationOpacity->stop();
-    setWindowOpacity(1);
-    animationValue->start();
     setVisible(true);
+    effect->setOpacity(1);
+    animationValue->start();
 }
 
 void PowerGrenadeThrowing::stop()
