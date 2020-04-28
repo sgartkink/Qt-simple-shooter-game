@@ -66,10 +66,7 @@ void Bot::dependingOnReloadingSetState()
             stopShooting();
     }
     else
-    {
         STATE_HIDE = true;
-        stopShooting();
-    }
 }
 
 bool Bot::checkIfItemsBetweenBotAndTarget()
@@ -83,10 +80,7 @@ bool Bot::checkIfItemsBetweenBotAndTarget()
         Building * b = dynamic_cast<Building *>(*it);
         Chest * c = dynamic_cast<Chest *>(*it);
         if (b || c)
-        {
-            STATE_ATTACK = false;
             return true;
-        }
     }
     return false;
 }
@@ -279,7 +273,7 @@ void Bot::resetDirections()
     directionRight = false;
 }
 
-void Bot::updateLineHeroMouse(QPoint mousePoint)
+void Bot::updateLineHeroMouse([[maybe_unused]] QPoint mousePoint)
 {
     if (STATE_ATTACK)
         lineHeroMouse.setLine(x(), y(), targetAttack->x(), targetAttack->y());

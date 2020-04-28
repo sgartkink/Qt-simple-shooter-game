@@ -7,25 +7,20 @@ PlayerBarWidget::PlayerBarWidget(QWidget *parent, Qt::WindowFlags f)
 {
     setLayout(&gridLayout);
 
-    gridLayout.setMargin(0);
-    gridLayout.setSpacing(0);
-    gridLayout.setColumnStretch(0, this->width()/3);
-    gridLayout.setColumnStretch(1, this->width()/3);
-    gridLayout.setColumnStretch(2, this->width()/3);
-
-    gridLayout.addWidget(&textLoadedAmmo, 0, 0);
+    gridLayout.addWidget(&textLoadedAmmo, 0, 0, Qt::AlignRight);
     gridLayout.addWidget(&qlcdLoadedAmmo, 0, 1);
-    gridLayout.addWidget(&textOwnedAmmo, 0, 2);
+    gridLayout.addWidget(&textOwnedAmmo, 0, 2, Qt::AlignRight);
     gridLayout.addWidget(&qlcdOwnedAmmo, 0, 3);
-    gridLayout.addWidget(&textCurrentGun, 0, 4, Qt::AlignHCenter);
-    gridLayout.addWidget(&textHP, 1, 0);
+    gridLayout.addWidget(&textCurrentGun, 0, 4, Qt::AlignCenter);
+    gridLayout.addWidget(&textHP, 1, 0, Qt::AlignRight);
     gridLayout.addWidget(&qlcdPlayerHP, 1, 1);
-    gridLayout.addWidget(&textGrenades, 1, 2);
+    gridLayout.addWidget(&textGrenades, 1, 2, Qt::AlignRight);
     gridLayout.addWidget(&qlcdGrenades, 1, 3);
-    gridLayout.addWidget(&currentGun, 1, 4, 2, 1, Qt::AlignCenter);
-    gridLayout.addWidget(&textArmor, 2, 0);
+    gridLayout.addWidget(&currentGun, 1, 4, 2, 1, Qt::AlignTop | Qt::AlignHCenter);
+    gridLayout.addWidget(&textArmor, 2, 0, Qt::AlignRight);
     gridLayout.addWidget(&qlcdArmor, 2, 1);
-    gridLayout.addWidget(reloadingBar, 2, 2, 1, 3);
+    gridLayout.addWidget(&textReloardingBar, 2, 2, Qt::AlignRight);
+    gridLayout.addWidget(reloadingBar, 2, 3, 1, 2);
 
     textCurrentGun.setText("Current gun:");
     textLoadedAmmo.setText("Loaded ammo:");
@@ -33,6 +28,7 @@ PlayerBarWidget::PlayerBarWidget(QWidget *parent, Qt::WindowFlags f)
     textHP.setText("HP:");
     textGrenades.setText("Grenades:");
     textArmor.setText("Armor:");
+    textReloardingBar.setText("Reloading bar:");
 
     reloadingBar->setMinimum(0);
     reloadingBar->setMaximum(100);

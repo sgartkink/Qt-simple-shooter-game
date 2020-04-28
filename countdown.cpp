@@ -5,8 +5,8 @@ Countdown::Countdown(QWidget *parent, Qt::WindowFlags f)
 {
     setVisible(false);
 
-    lText.setAlignment(Qt::AlignHCenter);
-    lSecLeft.setAlignment(Qt::AlignHCenter);
+    lText.setAlignment(Qt::AlignCenter);
+    lSecLeft.setAlignment(Qt::AlignCenter);
 
     setLayout(qvBoxLayout);
     qvBoxLayout->addWidget(&lText);

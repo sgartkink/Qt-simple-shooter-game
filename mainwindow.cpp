@@ -1,12 +1,13 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "global_consts.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    setFixedSize(1024,720);
+    setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     setWindowTitle("Shooter");
 
     stackedWidget->addWidget(mainMenu);

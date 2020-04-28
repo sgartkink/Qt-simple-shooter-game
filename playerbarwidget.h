@@ -35,6 +35,7 @@ private:
     QLCDNumber qlcdArmor;
     QLabel textCurrentGun;
     QLabel currentGun;
+    QLabel textReloardingBar;
     QLabel textLoadedAmmo;
     QLabel textOwnedAmmo;
     QLabel textHP;
