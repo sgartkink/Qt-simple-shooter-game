@@ -13,7 +13,7 @@ class BFS_Algorithm
 public:
     BFS_Algorithm(Map * map = nullptr);
 
-    QVector<GridElement *> getPath(QPointF source, QPoint destination);
+    QVector<QPoint> getPath(QPointF source, QPoint destination);
 
 private:
     Map * map = nullptr;

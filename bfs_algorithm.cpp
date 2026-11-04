@@ -8,7 +8,7 @@ BFS_Algorithm::BFS_Algorithm(Map *map)
 
 }
 
-QVector<GridElement *> BFS_Algorithm::getPath(QPointF source, QPoint destination)
+QVector<QPoint> BFS_Algorithm::getPath(QPointF source, QPoint destination)
 {
     path.clear();
     currentChecking.append(map->getGridElement(qRound(source.x()/10), qRound(source.y()/10)));
@@ -18,15 +18,13 @@ QVector<GridElement *> BFS_Algorithm::getPath(QPointF source, QPoint destination
         while (distanceFromSource > 0)
             checkNeighbours();
 
-    for (auto it = path.begin(); it != path.end(); ++it)
-    {
-        (*it)->setX((*it)->x()*10);
-        (*it)->setY((*it)->y()*10);
-    }
+    QVector<QPoint> pixelPath;
+    for (GridElement * g : path)
+        pixelPath.append(QPoint(g->x()*10, g->y()*10));
 
     reset();
 
-    return path;
+    return pixelPath;
 }
 
 void BFS_Algorithm::iterateThroughMapUntilDestinationFound(QPoint &destination)

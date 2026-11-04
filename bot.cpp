@@ -140,11 +140,9 @@ void Bot::botIsCloseToDestinationPoint()
     {
         resetDirections();
 
-        path.last()->setX(path.last()->x()/10);
-        path.last()->setY(path.last()->y()/10);
         path.removeLast();
         if (path.length() != 0)
-            destinationPoint = *path.last();
+            destinationPoint = path.last();
         else
         {
             pathFromAlgorithm = false;
@@ -162,6 +160,7 @@ void Bot::botIsCloseToDestinationPoint()
             if (Chest * c = dynamic_cast<Chest*>(*it))
             {
                 c->open(this);
+                mapWidget->getMap()->removeChest(c);
                 goingOpenChest = false;
                 randomNewDestinationPoint();
                 break;
@@ -202,11 +201,15 @@ void Bot::newDestinationPointBasingOnHideState()
 
 void Bot::newDestinationPointBasingOnTargetPos()
 {
-    if ((x() < 10 && y() < 10) || (x() > MAP_SIZE_X_FULL && y() < 10)
-            || (x() < 10 && y() > MAP_SIZE_Y_FULL) || (x() > MAP_SIZE_X_FULL && y() > MAP_SIZE_Y_FULL))
+    const bool nearLeft = x() < 10;
+    const bool nearRight = x() > MAP_SIZE_X_FULL - size - 10;
+    const bool nearTop = y() < 10;
+    const bool nearBottom = y() > MAP_SIZE_Y_FULL - size - 10;
+    if ((nearLeft || nearRight) && (nearTop || nearBottom))
     {
         STATE_HIDE = false;
-        randomNewDestinationPoint();
+        newDestinationPoint(-viewRange, viewRange, -viewRange, viewRange);
+        return;
     }
 
     if (x() < targetAttack->x() && y() < targetAttack->y())
@@ -258,7 +261,7 @@ void Bot::findPath()
 
     if (path.length() != 0)
     {
-        destinationPoint = *path.last();
+        destinationPoint = path.last();
         pathFromAlgorithm = true;
     }
     else

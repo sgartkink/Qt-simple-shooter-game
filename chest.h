@@ -14,8 +14,7 @@ public:
 
     virtual void attackItem([[maybe_unused]]int damage = 0, [[maybe_unused]]Hero * owner = nullptr) {}
 
-    void open(Hero * opener, MessageAtTopOfScreen * messageAtTopOfScreen);
-    void open(Hero * opener);
+    void open(Hero * opener, MessageAtTopOfScreen * messageAtTopOfScreen = nullptr);
 
 private:
     int content = QRandomGenerator::global()->bounded(6);

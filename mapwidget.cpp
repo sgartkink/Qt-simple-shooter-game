@@ -199,7 +199,10 @@ void MapWidget::checkChestsInArea()
     QList<QGraphicsItem *> listOfItemsWithinRange = scene->items(path);
     for (auto it = listOfItemsWithinRange.begin(); it != listOfItemsWithinRange.end(); it++)
         if (Chest * c = dynamic_cast<Chest*>(*it))
+        {
             c->open(player, messageAtTopOfScreen);
+            map->removeChest(c);
+        }
 }
 
 void MapWidget::createChest()

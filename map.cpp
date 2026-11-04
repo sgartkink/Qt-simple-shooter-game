@@ -54,21 +54,6 @@ Map::Map(QGraphicsScene * scene)
     addBuilding(QPoint(89,95));
 }
 
-QVector<QPointF> neighbours(GridElement * center)
-{
-    QVector<QPointF> n;
-    if (center->x() - 1 >= 0)
-        n.append(QPointF(center->x() - 1, center->y()));
-    if (center->x() + 1 <= MAP_SIZE_X_10)
-        n.append(QPointF(center->x() + 1, center->y()));
-    if (center->y() - 1 >= 0)
-        n.append(QPointF(center->x(), center->y() - 1));
-    if (center->y() + 1 <= MAP_SIZE_Y_10)
-        n.append(QPointF(center->x(), center->y() + 1));
-
-    return n;
-}
-
 void Map::addBuilding(QPointF p)
 {
     Building * building = new Building();
@@ -87,6 +72,15 @@ void Map::addChest(QPointF p)
     vector[p.x()][p.y()]->toggleTaken();
     vector[p.x()+1][p.y()]->toggleTaken();
     scene->addItem(chest);
+}
+
+void Map::removeChest(Chest * chest)
+{
+    int x = qRound(chest->x()/10);
+    int y = qRound(chest->y()/10);
+    vector[x][y]->toggleTaken();
+    vector[x+1][y]->toggleTaken();
+    delete chest;
 }
 
 Map::~Map()

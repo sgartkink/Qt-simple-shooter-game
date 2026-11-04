@@ -27,7 +27,7 @@ private:
     ItemsOnScene * corner2 = nullptr;
     Hero * targetAttack = nullptr;
 
-    QVector<GridElement *> path;
+    QVector<QPoint> path;
 
     int viewRange = 300;
     unsigned int numberOfAvailableDirections = 0;
