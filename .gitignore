@@ -30,3 +30,22 @@
 *.exe
 *.out
 *.app
+
+# Build directories
+build/
+build-*/
+
+# qmake / Qt generated files (in-source builds)
+Makefile*
+.qmake.stash
+moc_*.cpp
+moc_predefs.h
+ui_*.h
+qrc_*.cpp
+shooter
+
+# Qt Creator / IDE local state
+*.pro.user
+*.pro.user.*
+.qtcreator/
+compile_commands.json
