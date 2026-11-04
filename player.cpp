@@ -32,13 +32,13 @@ void Player::nextMove()
 
 void Player::changePosAndUpdateLine(int x_, int y_)
 {
-    if (x_ == -2 && x() >= 0)
+    if (x_ == -2 && x() - 2 >= 0)
         checkCorners(-2, 0, -2, size, -2, 0);
-    else if (x_ == 2 && x() <= MAP_SIZE_X_FULL-size)
+    else if (x_ == 2 && x() + 2 <= MAP_SIZE_X_FULL-size)
         checkCorners(size+2, 0, size+2, size, 2, 0);
-    else if (y_ == -2 && y() >= 0)
+    else if (y_ == -2 && y() - 2 >= 0)
         checkCorners(0, -2, size, -2, 0, -2);
-    else if (y_ == 2 && y() <= MAP_SIZE_Y_FULL-size)
+    else if (y_ == 2 && y() + 2 <= MAP_SIZE_Y_FULL-size)
         checkCorners(0, size+2, size, size+2, 0, 2);
 }
 

@@ -18,7 +18,7 @@ public:
     void open(Hero * opener);
 
 private:
-    int content = QRandomGenerator::global()->bounded(5);
+    int content = QRandomGenerator::global()->bounded(6);
 };
 
 #endif // CHEST_H

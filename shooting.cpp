@@ -65,10 +65,9 @@ void Shooting::createBullet()
 
 void Shooting::createBullet(int xy_)
 {
+    qreal angle = qDegreesToRadians(lineAngle + QRandomGenerator::global()->bounded(-7,7));
     Bullet * bullet = new Bullet(owner, gun->getDamage() + QRandomGenerator::global()->bounded(3),
-                                 5*qCos(qDegreesToRadians(lineAngle + QRandomGenerator::global()->bounded(-7,7))),
-                                 -5*qSin(qDegreesToRadians(lineAngle + QRandomGenerator::global()->bounded(-7,7)))
-                                 );
+                                 5*qCos(angle), -5*qSin(angle));
     bullet->setPos(owner->x() + 5 + xy_, owner->y() + 5 + xy_);
     mainScene->addItem(bullet);
 }

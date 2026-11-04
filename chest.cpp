@@ -23,7 +23,7 @@ void Chest::open(Hero *opener,  MessageAtTopOfScreen * messageAtTopOfScreen)
         messageAtTopOfScreen->showMessage("You received: refill current loaded ammo");
         break;
     case 3:
-        opener->gun()->addAmmo(20);
+        opener->addAmmo(20);
         messageAtTopOfScreen->showMessage("You received: ammo(20)");
         break;
     case 4:
@@ -52,7 +52,7 @@ void Chest::open(Hero *opener)
         opener->refillCurrentLoadedAmmo();
         break;
     case 3:
-        opener->gun()->addAmmo(20);
+        opener->addAmmo(20);
         break;
     case 4:
         opener->addHP(5);

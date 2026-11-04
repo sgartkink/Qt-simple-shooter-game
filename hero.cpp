@@ -155,13 +155,13 @@ void Hero::resetGuns()
 
 void Hero::refillCurrentLoadedAmmo()
 {
-    currentGun->refillCurrentOwnedAmmo();
+    currentGun->refillCurrentLoadedAmmo();
     emit (ammoChangedNoReloading());
 }
 
 void Hero::refillCurrentOwnedAmmo()
 {
-    currentGun->refillCurrentLoadedAmmo();
+    currentGun->refillCurrentOwnedAmmo();
     emit (ammoChangedNoReloading());
 }
 
