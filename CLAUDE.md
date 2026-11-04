@@ -1,7 +1,18 @@
 # CLAUDE.md
 
 Top-down 2D shooter written in C++17 with Qt5 Widgets + `QGraphicsScene`. One human `Player` vs one AI `Bot`, chests with loot, three guns, grenades, leaderboard.
-Flat directory, one class per lowercase `.h/.cpp` pair. Some comments and the TODO list at the bottom of `main.cpp` are in Polish.
+One class per lowercase `.h/.cpp` pair, kept side by side in folders by game area. Some comments and the TODO list at the bottom of `main.cpp` are in Polish.
+
+## Layout
+
+- `main.cpp`, `shooter.pro`: project root
+- `core/`: `global_consts.h`
+- `ui/`: windows, menus, HUD and overlays (`MainWindow`, `MainMenu`, `MainWidget`, `OptionsWidget`, `PlayerBarWidget`, `Leaderboard`, `LeaderboardSlot`, `Countdown`, `MessageAtTopOfScreen`, `PowerGrenadeThrowing`)
+- `world/`: map and scene items (`Map`, `MapWidget`, `MapView`, `GridElement`, `ItemsOnScene`, `Building`, `Chest`, `ShakeScreen`)
+- `characters/`: heroes and AI (`Hero`, `Player`, `Bot`, `HeroStats`, `BFS_Algorithm`)
+- `weapons/`: guns and projectiles (`Gun`, `Pistol`, `Rifle`, `Shotgun`, `Shooting`, `Bullet`, `Grenade`, `GrenadeEllipseItem`)
+
+Project includes are written relative to the root (`#include "characters/hero.h"`). `INCLUDEPATH += $$PWD` in `shooter.pro` makes that work. Don't use bare names or `../` paths.
 
 ## Build / run
 
@@ -13,7 +24,7 @@ mkdir -p build && cd build && qmake ../shooter.pro && make -j && ./shooter
 
 - Builds with both Qt 5.15 (system `qmake`) and Qt 6.11 (`~/Qt/6.11.2/gcc_64/bin/qmake`, the kit Qt Creator uses). Include Qt headers explicitly: Qt 5 is stricter about transitive includes (e.g. `qApp` needs `<QApplication>`).
 - There is no Designer form. `MainWindow` is built in code, so keep `FORMS +=` empty unless a `.ui` file is actually committed.
-- New class → add both files to `SOURCES` and `HEADERS` in `shooter.pro`.
+- New class → put both files in the matching folder and add them with their folder path to `SOURCES` / `HEADERS` in `shooter.pro`.
 - No tests, no CI.
 - `compile_commands.json`, `*.pro.user` and `.qtcreator/` are local IDE state. They're gitignored and untracked, so don't commit them. The local `compile_commands.json` is stale (it points at `/home/szymon/c++ projects/shooter`).
 - Build into `build/` (gitignored), never in-source.

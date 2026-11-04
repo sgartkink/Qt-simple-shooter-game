@@ -1,0 +1,37 @@
+#ifndef MAP_H
+#define MAP_H
+
+#include <QGraphicsScene>
+#include <QGraphicsLineItem>
+#include <QVector>
+
+#include "world/gridelement.h"
+#include "world/building.h"
+#include "world/chest.h"
+
+class Map
+{
+public:
+    explicit Map(QGraphicsScene * scene = nullptr);
+    ~Map();
+
+    GridElement * getGridElement(int x, int y) { return vector[x][y]; }
+    bool checkIfPointIsTaken(QPoint center) { return vector[center.x()][center.y()]->isTaken() == true ? true : false; }
+    void togglePoint(QPoint p) { vector[p.x()][p.y()]->toggleTaken(); }
+
+    void addChest(QPointF p);
+    void removeChest(Chest * chest);
+
+private:
+    QGraphicsScene * scene;
+    QGraphicsLineItem * line1;
+    QGraphicsLineItem * line2;
+    QGraphicsLineItem * line3;
+    QGraphicsLineItem * line4;
+
+    QVector<QVector<GridElement *>> vector;
+
+    void addBuilding(QPointF p);
+};
+
+#endif // MAP_H
