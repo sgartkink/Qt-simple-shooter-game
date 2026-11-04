@@ -1,4 +1,5 @@
 #include "bfs_algorithm.h"
+#include "global_consts.h"
 #include <QtDebug>
 
 BFS_Algorithm::BFS_Algorithm(Map *map)
@@ -13,8 +14,9 @@ QVector<GridElement *> BFS_Algorithm::getPath(QPointF source, QPoint destination
     currentChecking.append(map->getGridElement(qRound(source.x()/10), qRound(source.y()/10)));
 
     iterateThroughMapUntilDestinationFound(destination);
-    while (distanceFromSource != 0)
-        checkNeighbours();
+    if (!path.isEmpty())
+        while (distanceFromSource > 0)
+            checkNeighbours();
 
     for (auto it = path.begin(); it != path.end(); ++it)
     {
@@ -41,11 +43,11 @@ void BFS_Algorithm::iterateThroughMapUntilDestinationFound(QPoint &destination)
 
             if ((*it)->x() - 1 >= 0)
                 checkLater.append(map->getGridElement((*it)->x() - 1, (*it)->y()));
-            if ((*it)->x() + 1 <= 248)
+            if ((*it)->x() + 1 <= MAP_SIZE_X_10)
                 checkLater.append(map->getGridElement((*it)->x() + 1, (*it)->y()));
             if ((*it)->y() - 1 >= 0)
                 checkLater.append(map->getGridElement((*it)->x(), (*it)->y() - 1));
-            if ((*it)->y() + 1 <= 248)
+            if ((*it)->y() + 1 <= MAP_SIZE_Y_10)
                 checkLater.append(map->getGridElement((*it)->x(), (*it)->y() + 1));
         }
 
@@ -90,13 +92,13 @@ void BFS_Algorithm::checkNeighbours()
     if (path.last()->x() - 1 >= 0)
         neighbour(-1, 0);
 
-    if (path.last()->x() + 1 <= 248)
+    if (path.last()->x() + 1 <= MAP_SIZE_X_10)
         neighbour(1, 0);
 
     if (path.last()->y() - 1 >= 0)
         neighbour(0, -1);
 
-    if (path.last()->y() + 1 <= 248)
+    if (path.last()->y() + 1 <= MAP_SIZE_Y_10)
         neighbour(0, 1);
 }
 
