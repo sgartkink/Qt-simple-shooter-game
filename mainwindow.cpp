@@ -1,12 +1,11 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 #include "global_consts.h"
 
+#include <QApplication>
+
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    QMainWindow(parent)
 {
-    ui->setupUi(this);
     setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     setWindowTitle("Shooter");
 
@@ -42,7 +41,6 @@ void MainWindow::stopProgram()
 
 MainWindow::~MainWindow()
 {
-    delete ui;
     delete mainMenu;
     delete mainWidget;
     delete optionsWidget;

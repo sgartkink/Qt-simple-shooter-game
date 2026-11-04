@@ -8,10 +8,6 @@
 #include "mainmenu.h"
 #include "optionswidget.h"
 
-namespace Ui {
-class MainWindow;
-}
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -27,8 +23,6 @@ public slots:
     void stopProgram();
 
 private:
-    Ui::MainWindow *ui;
-
     QStackedWidget * stackedWidget = new QStackedWidget(this);
     MainMenu * mainMenu = new MainMenu(this);
     MainWidget * mainWidget = new MainWidget(this);
