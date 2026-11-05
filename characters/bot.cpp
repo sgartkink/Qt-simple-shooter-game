@@ -255,12 +255,7 @@ void Bot::setDirectionBasingOnAlgorithmAndCorners(bool *direction, int addToX_co
 
 bool Bot::checkIfCornersAvailable(int addToX_corner1, int addToY_corner1, int addToX_corner2, int addToY_corner2)
 {
-    corner1 = dynamic_cast<ItemsOnScene*>(scene->itemAt(x() + addToX_corner1, y() + addToY_corner1, QTransform()));
-    corner2 = dynamic_cast<ItemsOnScene*>(scene->itemAt(x() + addToX_corner2, y() + addToY_corner2, QTransform()));
-
-    if (!corner1 && !corner2)
-        return true;
-    return false;
+    return !isBlockedAt(x() + addToX_corner1, y() + addToY_corner1) && !isBlockedAt(x() + addToX_corner2, y() + addToY_corner2);
 }
 
 void Bot::findPath()

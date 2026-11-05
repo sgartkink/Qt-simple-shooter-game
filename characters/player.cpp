@@ -44,14 +44,8 @@ void Player::changePosAndUpdateLine(int x_, int y_)
 
 void Player::checkCorners(int addToX_corner1, int addToY_corner1, int addToX_corner2, int addToY_corner2, int x_, int y_)
 {
-    corner1 = dynamic_cast<ItemsOnScene*>(scene->itemAt(x() + addToX_corner1, y() + addToY_corner1, QTransform()));
-    corner2 = dynamic_cast<ItemsOnScene*>(scene->itemAt(x() + addToX_corner2, y() + addToY_corner2, QTransform()));
-
-    if (!corner1 && !corner2)
-    {
+    if (!isBlockedAt(x() + addToX_corner1, y() + addToY_corner1) && !isBlockedAt(x() + addToX_corner2, y() + addToY_corner2))
         newMove(x_,y_);
-        return;
-    }
 }
 
 void Player::newMove(int x_, int y_)

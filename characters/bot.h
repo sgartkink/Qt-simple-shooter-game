@@ -23,8 +23,6 @@ private:
     QPoint destinationPoint;
     BFS_Algorithm bfs_Algorithm;
 
-    ItemsOnScene * corner1 = nullptr;
-    ItemsOnScene * corner2 = nullptr;
     Hero * targetAttack = nullptr;
 
     QVector<QPoint> path;

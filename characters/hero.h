@@ -98,6 +98,7 @@ protected:
     void randNewPos();
     virtual void death() = 0;
     void resetGuns();
+    bool isBlockedAt(qreal x_, qreal y_);
 
 protected slots:
     virtual void updateLineHeroMouse(QPoint mousePoint) = 0;

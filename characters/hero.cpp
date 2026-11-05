@@ -147,6 +147,15 @@ void Hero::addValue(int &valueChanged, int &valueAdded, const int valueMax)
         valueChanged += valueAdded;
 }
 
+bool Hero::isBlockedAt(qreal x_, qreal y_)
+{
+    // check every item at the point, not just the topmost one: an explosion or bullet on top must not hide a wall
+    for (QGraphicsItem * item : scene->items(QPointF(x_, y_)))
+        if (item != this && dynamic_cast<ItemsOnScene *>(item))
+            return true;
+    return false;
+}
+
 void Hero::resetGuns()
 {
     for (Gun * g : heroGuns)
