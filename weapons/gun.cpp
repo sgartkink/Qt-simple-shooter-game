@@ -18,7 +18,7 @@ void Gun::addAmmo(int ammo)
 {
     if (currentLoadedAmmo + ammo > capacityAmmo)
     {
-        currentOwnedAmmo += currentLoadedAmmo + ammo - capacityAmmo;
+        currentOwnedAmmo = qMin(currentOwnedAmmo + currentLoadedAmmo + ammo - capacityAmmo, maxAmmo);
         currentLoadedAmmo = capacityAmmo;
     }
     else
