@@ -111,21 +111,13 @@ void Grenade::move()
         stopMoving();
 }
 
-bool Grenade::checkCorner(ItemsOnScene *corner)
-{
-    if (currentHeight > corner->getHeight())
-        return true;
-    else
-        return false;
-}
-
 void Grenade::setNewRotation()
 {
     qreal newRotation = -1 * rotation();
     if (newRotation < 90)
         newRotation = 180 - (90 - newRotation)*2;
     else if (newRotation < 180)
-        newRotation = 180 - (90 - 180 - newRotation)*2;
+        newRotation = 180 - (90 - (180 - newRotation))*2;
     else if (newRotation < 270)
         newRotation = 180 - (90 - (newRotation - 180))*2;
     else

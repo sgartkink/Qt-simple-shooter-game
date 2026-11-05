@@ -43,7 +43,6 @@ private:
     double dy;
 
     void setNewSize(int size_);
-    bool checkCorner(ItemsOnScene * corner);
     void setNewRotation();
     void stopMoving();
 

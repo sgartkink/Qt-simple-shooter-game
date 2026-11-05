@@ -1,5 +1,6 @@
 #include "ui/leaderboard.h"
 #include <QtDebug>
+#include <algorithm>
 Leaderboard::Leaderboard(QWidget *parent, Qt::WindowFlags f)
     : QWidget(parent, f)
 {
@@ -37,7 +38,7 @@ void Leaderboard::update()
 
 void Leaderboard::sortHeroes()
 {
-    std::sort(heroes.begin(), heroes.end(), [](HeroStats * lhs, HeroStats * rhs)
+    std::stable_sort(heroes.begin(), heroes.end(), [](HeroStats * lhs, HeroStats * rhs)
     {
         return lhs->getKills() > rhs->getKills();
     });

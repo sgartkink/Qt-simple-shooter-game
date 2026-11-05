@@ -7,8 +7,6 @@
 Bullet::Bullet(Hero *owner, int damage, double dx, double dy)
     : QGraphicsRectItem(0, 0, 4, 2), mainScene(owner->getScene()), dx(dx), dy(dy), damage(damage), owner(owner)
 {
-    dx = 5*qCos(qDegreesToRadians(owner->lineAngle()));
-    dy = -5*qSin(qDegreesToRadians(owner->lineAngle()));
     setTransformOriginPoint(2, 1);
     setRotation(-1 * owner->lineAngle());
     connect(&moveTimer, SIGNAL(timeout()), this, SLOT(move()));
