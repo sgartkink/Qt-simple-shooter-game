@@ -17,36 +17,15 @@ void Bullet::move()
 {
     setPos(x() + dx, y() + dy);
 
-    ItemsOnScene * corner0 = dynamic_cast<ItemsOnScene*>(mainScene->itemAt(pos(), QTransform()));
-    ItemsOnScene * corner1 = dynamic_cast<ItemsOnScene*>(mainScene->itemAt(pos().x() + 5, pos().y(), QTransform()));
-    ItemsOnScene * corner2 = dynamic_cast<ItemsOnScene*>(mainScene->itemAt(pos().x(), pos().y() + 5, QTransform()));
-    ItemsOnScene * corner3 = dynamic_cast<ItemsOnScene*>(mainScene->itemAt(pos().x() + 5, pos().y() + 5, QTransform()));
+    // the whole rotated bullet against every item it touches, so an explosion or another bullet on top can't hide a target
+    for (QGraphicsItem * item : collidingItems())
+    {
+        ItemsOnScene * target = dynamic_cast<ItemsOnScene *>(item);
+        if (!target || target == owner)
+            continue;
 
-    if (corner0 && corner0 != owner)
-    {
-        if (dynamic_cast<Hero *>(corner0))
-            corner0->attackItem(damage, owner);
-        delete this;
-        return;
-    }
-    else if (corner1 && corner1 != owner)
-    {
-        if (dynamic_cast<Hero *>(corner1))
-            corner1->attackItem(damage, owner);
-        delete this;
-        return;
-    }
-    else if (corner2 && corner2 != owner)
-    {
-        if (dynamic_cast<Hero *>(corner2))
-            corner2->attackItem(damage, owner);
-        delete this;
-        return;
-    }
-    else if (corner3 && corner3 != owner)
-    {
-        if (dynamic_cast<Hero *>(corner3))
-            corner3->attackItem(damage, owner);
+        if (dynamic_cast<Hero *>(target))
+            target->attackItem(damage, owner);
         delete this;
         return;
     }

@@ -48,6 +48,7 @@ mkdir -p build && cd build && qmake ../shooter.pro && make -j && ./shooter
 - Many members are created with in-class `new` initializers and deleted manually in destructors.
 - Hero state changes `emit` signals (`hpChanged`, `ammoChangedNoReloading`, …). Lambdas in the `MapWidget` constructor forward them to `PlayerBarWidget`.
 - Movement is 2 px per 20 ms tick. Collision checks call `Hero::isBlockedAt()` on the two leading corners of the 10 px hero. It checks every item at the point. Don't use `scene->itemAt()` for collision: it only returns the topmost item, so explosions and bullets hide walls.
+- Bullets hit via `collidingItems()` (their whole rotated 4×2 px shape), skipping their owner and anything that isn't `ItemsOnScene`.
 - Coordinates flip between grid units and pixels with ×10 / ÷10, so watch which one a value is in.
 - `GridElement`s are shared map state. Never change their coordinates. `BFS_Algorithm::getPath` returns pixel `QPoint` copies.
 - Chests: `Chest::open()` only hands out loot. The caller must then call `Map::removeChest()`, which frees the grid cells and deletes the chest.
