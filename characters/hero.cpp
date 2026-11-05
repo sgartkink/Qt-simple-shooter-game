@@ -51,7 +51,7 @@ void Hero::checkIfStillExist(Hero *owner)
     {
         death();
 
-        if (owner)
+        if (owner && owner != this)
             owner->addKill();
     }
 }

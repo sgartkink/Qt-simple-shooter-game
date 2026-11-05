@@ -147,27 +147,35 @@ void Bot::botIsCloseToDestinationPoint()
         {
             pathFromAlgorithm = false;
             path.clear();
-            randomNewDestinationPoint();
+            if (goingOpenChest)
+                openChestNearby();
+            else
+                randomNewDestinationPoint();
         }
     }
     else if (goingOpenChest)
-    {
-        QPainterPath findingChestPainterPath;
-        findingChestPainterPath.addRect(x() - 20, y() - 20, 50, 50);
-
-        QList<QGraphicsItem *> listOfItemsWithinRange = scene->items(findingChestPainterPath);
-        for (auto it = listOfItemsWithinRange.begin(); it != listOfItemsWithinRange.end(); it++)
-            if (Chest * c = dynamic_cast<Chest*>(*it))
-            {
-                c->open(this);
-                mapWidget->getMap()->removeChest(c);
-                goingOpenChest = false;
-                randomNewDestinationPoint();
-                break;
-            }
-    }
+        openChestNearby();
     else
         randomNewDestinationPoint();
+}
+
+void Bot::openChestNearby()
+{
+    QPainterPath findingChestPainterPath;
+    findingChestPainterPath.addRect(x() - 20, y() - 20, 50, 50);
+
+    QList<QGraphicsItem *> listOfItemsWithinRange = scene->items(findingChestPainterPath);
+    for (auto it = listOfItemsWithinRange.begin(); it != listOfItemsWithinRange.end(); it++)
+        if (Chest * c = dynamic_cast<Chest*>(*it))
+        {
+            c->open(this);
+            mapWidget->getMap()->removeChest(c);
+            break;
+        }
+
+    // chest may already be taken by someone else, give up on it either way
+    goingOpenChest = false;
+    randomNewDestinationPoint();
 }
 
 void Bot::randomNewDestinationPoint()
@@ -309,4 +317,9 @@ void Bot::attack()
 void Bot::death()
 {
     resetHero();
+
+    path.clear();
+    pathFromAlgorithm = false;
+    goingOpenChest = false;
+    randomNewDestinationPoint();
 }

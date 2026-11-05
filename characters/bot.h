@@ -45,6 +45,7 @@ private:
     void move();
     void checkIfBotIsCloseToDestinationPoint();
     void botIsCloseToDestinationPoint();
+    void openChestNearby();
 
     void randomNewDestinationPoint();
     void randNewDestPointUntilItMeetsRequirements();

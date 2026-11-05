@@ -169,10 +169,11 @@ void MapWidget::keyReleaseEvent(QKeyEvent *event)
         case Qt::Key_X:
             leaderboard->setVisible(0);
             break;
-        default:
+        case Qt::Key_Q:
             if (player->isAlive())
                 if (player->getGrenades() > 0 && player->isThrowingGrenade() && !player->isCurrentlyShooting())
                     stopThrowingGrenade();
+            break;
         }
 }
 
