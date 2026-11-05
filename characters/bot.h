@@ -3,6 +3,8 @@
 
 #include <QRandomGenerator>
 
+class Chest;
+
 #include "characters/hero.h"
 #include "world/gridelement.h"
 #include "characters/bfs_algorithm.h"
@@ -44,6 +46,7 @@ private:
     void checkIfBotIsCloseToDestinationPoint();
     void botIsCloseToDestinationPoint();
     void openChestNearby();
+    QPoint freeCellNextToChest(Chest * chest);
 
     void randomNewDestinationPoint();
     void randNewDestPointUntilItMeetsRequirements();

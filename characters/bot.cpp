@@ -46,8 +46,11 @@ void Bot::checkNearestArea()
         {
             if (!goingOpenChest)
             {
-                destinationPoint = QPoint(c->pos().x() + 10, c->pos().y() + 5);
+                destinationPoint = freeCellNextToChest(c);
                 goingOpenChest = true;
+                // a route planned for the old destination would lead the bot away from the chest
+                path.clear();
+                pathFromAlgorithm = false;
             }
         }
 
@@ -107,11 +110,6 @@ void Bot::move()
 
     if (!pathFromAlgorithm && numberOfAvailableDirections == 0)
         findPath();
-    else if (pathFromAlgorithm && goingOpenChest && numberOfAvailableDirections == 0)
-    {
-        destinationPoint.setX(destinationPoint.x() + 11);
-        findPath();
-    }
 
     if (directionUp)
         setPos(x(), y() - 2);
@@ -130,7 +128,8 @@ void Bot::move()
 void Bot::checkIfBotIsCloseToDestinationPoint()
 {
     if ((qFabs(x() - destinationPoint.x()) <= 2 && qFabs(y() - destinationPoint.y()) <= 2) ||
-            (goingOpenChest && qFabs(x() - destinationPoint.x()) <= 25 && qFabs(y() - destinationPoint.y()) <= 25))
+            // the loose 25 px only for the final stop at the chest, not for waypoints on the way (that cut corners through buildings)
+            (goingOpenChest && path.length() <= 1 && qFabs(x() - destinationPoint.x()) <= 25 && qFabs(y() - destinationPoint.y()) <= 25))
         botIsCloseToDestinationPoint();
 }
 
@@ -157,6 +156,34 @@ void Bot::botIsCloseToDestinationPoint()
         openChestNearby();
     else
         randomNewDestinationPoint();
+}
+
+QPoint Bot::freeCellNextToChest(Chest * chest)
+{
+    // the chest's own cells are taken, so pathfinding can't reach them: aim for the nearest free cell beside it
+    const int cx = qRound(chest->x()/10);
+    const int cy = qRound(chest->y()/10);
+    const QPoint candidates[] = { {cx - 1, cy}, {cx + 2, cy}, {cx, cy - 1}, {cx + 1, cy - 1}, {cx, cy + 1}, {cx + 1, cy + 1} };
+
+    QPoint best(-1, -1);
+    qreal bestDistance = 0;
+    for (const QPoint & c : candidates)
+    {
+        if (c.x() < 0 || c.x() > MAP_SIZE_X_10 || c.y() < 0 || c.y() > MAP_SIZE_Y_10
+                || mapWidget->getMap()->checkIfPointIsTaken(c))
+            continue;
+
+        qreal distance = QLineF(pos(), c*10).length();
+        if (best.x() < 0 || distance < bestDistance)
+        {
+            best = c;
+            bestDistance = distance;
+        }
+    }
+
+    if (best.x() < 0)
+        return QPoint(chest->x() + 10, chest->y() + 5);
+    return best*10;
 }
 
 void Bot::openChestNearby()
