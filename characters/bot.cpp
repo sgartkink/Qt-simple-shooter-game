@@ -16,6 +16,7 @@ Bot::Bot(MapWidget *mapWidget)
 void Bot::nextMove()
 {
     checkNearestArea();
+    updateMemory();
 
     move();
 
@@ -31,20 +32,26 @@ void Bot::nextMove()
 
 void Bot::checkNearestArea()
 {
-    QPainterPath painterPathNearestArea = QPainterPath();
-    painterPathNearestArea.addEllipse(pos(), viewRange, viewRange);
+    // the same view as the player: a screen-sized area around the bot, of which FieldOfView decides what's in sight
+    const QSizeF view = mapWidget->viewSize();
+    const QPointF eye = mapToScene(rect().center());
+    const QRectF area(eye - QPointF(view.width()/2, view.height()/2), view);
 
-    QList<QGraphicsItem *> listOfItemsInNearestArea = scene->items(painterPathNearestArea);
+    QList<QGraphicsItem *> listOfItemsInNearestArea = scene->items(area);
     for (auto it = listOfItemsInNearestArea.begin(); it != listOfItemsInNearestArea.end(); it++)
     {
         if (Player * p = dynamic_cast<Player*>(*it))
         {
-            targetAttack = p;
-            dependingOnReloadingSetState();
+            if (canSee(p))
+            {
+                targetAttack = p;
+                dependingOnReloadingSetState();
+            }
         }
         if (Chest * c = dynamic_cast<Chest*>(*it))
         {
-            if (!goingOpenChest)
+            // while searching for the target, chests can wait
+            if (!goingOpenChest && !headingToLastSeen && lookAroundTicks == 0 && canSee(c))
             {
                 destinationPoint = freeCellNextToChest(c);
                 goingOpenChest = true;
@@ -57,6 +64,46 @@ void Bot::checkNearestArea()
         if (goingOpenChest && targetAttack)
             break;
     }
+}
+
+bool Bot::canSee(QGraphicsItem *item)
+{
+    // noticed if its centre or any corner is in sight
+    const QPointF eye = mapToScene(rect().center());
+    const QRectF r = item->sceneBoundingRect().adjusted(1, 1, -1, -1);
+    for (QPointF point : {r.center(), r.topLeft(), r.topRight(), r.bottomLeft(), r.bottomRight()})
+        if (mapWidget->getFieldOfView().canSee(eye, lineHeroMouse.angle(), point))
+            return true;
+    return false;
+}
+
+void Bot::updateMemory()
+{
+    if (targetAttack)
+    {
+        // in sight: remember where, and stop any search
+        lastSeenTarget = targetAttack->mapToScene(targetAttack->rect().center());
+        chasing = true;
+        headingToLastSeen = false;
+        lookAroundTicks = 0;
+    }
+    else if (chasing && !headingToLastSeen && lookAroundTicks == 0)
+    {
+        // just lost sight: go and check the spot where the target was last seen
+        destinationPoint = (lastSeenTarget - QPointF(size/2, size/2)).toPoint();
+        headingToLastSeen = true;
+        goingOpenChest = false;
+        path.clear();
+        pathFromAlgorithm = false;
+    }
+}
+
+void Bot::startLookingAround()
+{
+    headingToLastSeen = false;
+    lookAroundTicks = LOOK_AROUND_TICKS;
+    lookAroundAngle = lineHeroMouse.angle();
+    resetDirections();
 }
 
 void Bot::dependingOnReloadingSetState()
@@ -90,6 +137,20 @@ bool Bot::checkIfItemsBetweenBotAndTarget()
 
 void Bot::move()
 {
+    if (lookAroundTicks > 0)
+    {
+        // standing where the target was last seen, turning a full circle before giving up
+        lookAroundTicks--;
+        lookAroundAngle += 360.0 / LOOK_AROUND_TICKS;
+        if (lookAroundTicks == 0)
+        {
+            chasing = false;
+            randomNewDestinationPoint();
+        }
+        updateLineHeroMouse();
+        return;
+    }
+
     checkIfBotIsCloseToDestinationPoint();
 
     if (qFabs(x() - destinationPoint.x()) >= 2)
@@ -146,12 +207,16 @@ void Bot::botIsCloseToDestinationPoint()
         {
             pathFromAlgorithm = false;
             path.clear();
-            if (goingOpenChest)
+            if (headingToLastSeen)
+                startLookingAround();
+            else if (goingOpenChest)
                 openChestNearby();
             else
                 randomNewDestinationPoint();
         }
     }
+    else if (headingToLastSeen)
+        startLookingAround();
     else if (goingOpenChest)
         openChestNearby();
     else
@@ -308,7 +373,9 @@ void Bot::resetDirections()
 
 void Bot::updateLineHeroMouse([[maybe_unused]] QPoint mousePoint)
 {
-    if (STATE_ATTACK)
+    if (lookAroundTicks > 0)
+        lineHeroMouse.setLine(x(), y(), x() + 100*qCos(qDegreesToRadians(lookAroundAngle)), y() - 100*qSin(qDegreesToRadians(lookAroundAngle)));
+    else if (STATE_ATTACK)
         lineHeroMouse.setLine(x(), y(), targetAttack->x(), targetAttack->y());
     else
         lineHeroMouse.setLine(x(), y(), destinationPoint.x(), destinationPoint.y());
@@ -343,5 +410,8 @@ void Bot::death()
     path.clear();
     pathFromAlgorithm = false;
     goingOpenChest = false;
+    chasing = false;
+    headingToLastSeen = false;
+    lookAroundTicks = 0;
     randomNewDestinationPoint();
 }

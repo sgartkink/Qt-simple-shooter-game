@@ -37,6 +37,8 @@ public:
 
     QGraphicsScene * getScene() { return scene; }
     Map * getMap() { return map; }
+    const FieldOfView & getFieldOfView() const { return fieldOfView; }
+    QSize viewSize() const { return mapView->viewport()->size(); }
 
     QPoint randNewFreePos();
     void showCountdown(const QString &text, const int &s);

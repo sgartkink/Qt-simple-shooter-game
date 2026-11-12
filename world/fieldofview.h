@@ -21,10 +21,14 @@ public:
     explicit FieldOfView(QGraphicsScene * scene);
 
     QVector<VisiblePiece> visibleArea(QPointF origin, qreal aimAngle) const;
+    // whether an eye aiming at aimAngle notices the target: within NOTICE_ANGLE of the aim or NEAR_RADIUS of the eye,
+    // with no building in between
+    bool canSee(QPointF eye, qreal aimAngle, QPointF target) const;
 
 private:
     const qreal VIEW_ANGLE = 30;
     const qreal PERIPHERAL_ANGLE = 10;
+    const qreal NOTICE_ANGLE = VIEW_ANGLE/2 + PERIPHERAL_ANGLE/2;   // where the fade is still under 50% dark
     const qreal FADE_STEP = 0.5;          // width of one slice of the fade
     const qreal CONE_RAY_STEP = 0.25;     // every slice edge and the middle's overlap land exactly on a ray
     const qreal VIEW_DISTANCE = 2000;

@@ -38,7 +38,18 @@ private:
     bool STATE_ATTACK = false;
     bool STATE_HIDE = false;
 
+    // memory: after losing sight of the target, go to where it was last seen and look around there
+    bool chasing = false;
+    bool headingToLastSeen = false;
+    QPointF lastSeenTarget;
+    int lookAroundTicks = 0;
+    qreal lookAroundAngle = 0;
+    const int LOOK_AROUND_TICKS = 50;
+
     void checkNearestArea();
+    bool canSee(QGraphicsItem * item);
+    void updateMemory();
+    void startLookingAround();
     void dependingOnReloadingSetState();
     bool checkIfItemsBetweenBotAndTarget();
 

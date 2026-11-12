@@ -51,6 +51,20 @@ QVector<VisiblePiece> FieldOfView::visibleArea(QPointF origin, qreal aimAngle) c
     return visible;
 }
 
+bool FieldOfView::canSee(QPointF eye, qreal aimAngle, QPointF target) const
+{
+    const QLineF line(eye, target);
+    const qreal offset = qAbs(std::fmod(line.angle() - aimAngle + 540, 360) - 180);
+    if (line.length() > NEAR_RADIUS && offset > NOTICE_ANGLE)
+        return false;
+    if (line.length() < 0.001)
+        return true;
+
+    int hitAxis = -1;
+    const QPointF direction = (target - eye) / line.length();
+    return rayDistance(eye, direction, line.length(), hitAxis) >= line.length();
+}
+
 QPolygonF FieldOfView::castRays(QPointF origin, qreal fromAngle, qreal toAngle, qreal maxDistance, qreal step,
                                 QVector<qreal> *rayAngles) const
 {
