@@ -1,6 +1,9 @@
 #include "world/mapview.h"
 #include "world/shakescreen.h"
 
+#include <QImage>
+#include <QPainter>
+
 MapView::MapView(QGraphicsScene *scene, QWidget *parent)
     : QGraphicsView(scene, parent)
 {
@@ -15,6 +18,50 @@ MapView::MapView(QGraphicsScene *scene, QWidget *parent)
 void MapView::startShakeScreen()
 {
     shakeScreen->start();
+}
+
+void MapView::setVisibleArea(const QVector<VisiblePiece> &visible)
+{
+    visibleArea = visible;
+    fogDirty = true;
+    viewport()->update();
+}
+
+void MapView::drawForeground(QPainter *painter, const QRectF &rect)
+{
+    // most repaints (a bullet, the bot, the hero turning) only cover a small area and the view hasn't changed,
+    // so the darkness is built once for the whole screen and only the exposed part is copied
+    // (with a small margin, so rounding never leaves an exposed strip outside the cache)
+    const QRect screen = mapToScene(viewport()->rect()).boundingRect().toAlignedRect().adjusted(-2, -2, 2, 2);
+    if (fogDirty || fogCacheArea != screen)
+        rebuildFog(screen);
+
+    const qreal ratio = fogCache.devicePixelRatio();
+    const QRectF source = rect.translated(-fogCacheArea.topLeft());
+    painter->drawImage(rect, fogCache, QRectF(source.topLeft() * ratio, source.size() * ratio));
+}
+
+void MapView::rebuildFog(const QRect &area)
+{
+    // darkness over the area, with every visible piece erased from it as strongly as its brush says
+    const qreal ratio = devicePixelRatioF();
+    fogCache = QImage(area.size() * ratio, QImage::Format_ARGB32_Premultiplied);
+    fogCache.setDevicePixelRatio(ratio);
+    fogCache.fill(Qt::black);
+    fogCacheArea = area;
+    fogDirty = false;
+
+    QPainter fogPainter(&fogCache);
+    fogPainter.translate(-area.topLeft());
+    fogPainter.setCompositionMode(QPainter::CompositionMode_DestinationOut);
+    fogPainter.setPen(Qt::NoPen);
+    for (const VisiblePiece & piece : visibleArea)
+    {
+        fogPainter.setRenderHint(QPainter::Antialiasing, piece.antialiased);
+        fogPainter.setBrush(piece.reveal);
+        fogPainter.drawPolygon(piece.area);
+    }
+    fogPainter.end();
 }
 
 void MapView::mouseMoveEvent(QMouseEvent *event)

@@ -16,6 +16,7 @@ class MainWidget;
 #include "world/chest.h"
 #include "ui/powergrenadethrowing.h"
 #include "world/map.h"
+#include "world/fieldofview.h"
 #include "ui/countdown.h"
 #include "ui/leaderboard.h"
 #include "ui/messageattopofscreen.h"
@@ -50,6 +51,7 @@ private:
     MapView * mapView = new MapView(scene, this);
     QHBoxLayout * qhboxLayout = new QHBoxLayout(this);
     Map * map = new Map(scene);
+    FieldOfView fieldOfView {scene};
     Player * player = new Player(mapView, this);
     PowerGrenadeThrowing * powerGrenadeThrowing = nullptr;
     PlayerBarWidget * playerBarWidget = nullptr;
@@ -59,6 +61,9 @@ private:
 
     QTimer timerChestCreating;
     QTimer throwingGrenadeTimer;
+    QTimer fieldOfViewTimer;
+    bool fieldOfViewPending = false;
+    const int FIELD_OF_VIEW_FRAME = 16;
 
     double xPos = 0;
     double yPos = 0;
@@ -74,6 +79,8 @@ private:
 
 private slots:
     void changeSceneRect();
+    void updateFieldOfView();
+    void applyFieldOfView();
     void createChest();
 };
 

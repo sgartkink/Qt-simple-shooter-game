@@ -125,6 +125,7 @@ signals:
     void grenadesChanged();
     void armorChanged();
     void gunChanged();
+    void viewChanged();
 };
 
 #endif // HERO_H

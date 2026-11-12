@@ -48,6 +48,7 @@ SOURCES += \
     world/building.cpp \
     world/chest.cpp \
     world/shakescreen.cpp \
+    world/fieldofview.cpp \
     characters/hero.cpp \
     characters/player.cpp \
     characters/bot.cpp \
@@ -82,6 +83,7 @@ HEADERS += \
     world/building.h \
     world/chest.h \
     world/shakescreen.h \
+    world/fieldofview.h \
     characters/hero.h \
     characters/player.h \
     characters/bot.h \

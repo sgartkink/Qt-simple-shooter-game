@@ -30,11 +30,24 @@ MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, MainWidget *parent, Qt::W
 
     connect(mapView, SIGNAL(sendCord(QPoint)), player, SLOT(updateLineHeroMouse(QPoint)));
     connect(player, SIGNAL(posChanged()), this, SLOT(changeSceneRect()));
+    connect(player, SIGNAL(posChanged()), this, SLOT(updateFieldOfView()));
+    connect(player, SIGNAL(viewChanged()), this, SLOT(updateFieldOfView()));
+    fieldOfViewTimer.setSingleShot(true);
+    fieldOfViewTimer.setInterval(FIELD_OF_VIEW_FRAME);
+    connect(&fieldOfViewTimer, &QTimer::timeout, [this]()
+    {
+        if (fieldOfViewPending)
+        {
+            applyFieldOfView();
+            fieldOfViewTimer.start();
+        }
+    });
     connect(&throwingGrenadeTimer, SIGNAL(timeout()), this, SLOT(stopThrowingGrenade()));
     connect(&timerChestCreating, SIGNAL(timeout()), this, SLOT(createChest()));
 
     scene->addItem(player);
     player->setPos(200,240);
+    applyFieldOfView();
 }
 
 void MapWidget::start()
@@ -93,6 +106,25 @@ void MapWidget::changeSceneRect()
         yPos = MAP_SIZE_Y_FULL - mapView->height();
 
     mapView->setSceneRect(xPos, yPos, mapView->width(), mapView->height());
+}
+
+void MapWidget::updateFieldOfView()
+{
+    // at most one refresh per frame: a fast mouse would otherwise redraw the darkness hundreds of times a second.
+    // The first change is drawn at once, later ones within the frame are collected and the latest is drawn when it ends
+    if (fieldOfViewTimer.isActive())
+        fieldOfViewPending = true;
+    else
+    {
+        applyFieldOfView();
+        fieldOfViewTimer.start();
+    }
+}
+
+void MapWidget::applyFieldOfView()
+{
+    fieldOfViewPending = false;
+    mapView->setVisibleArea(fieldOfView.visibleArea(player->mapToScene(player->rect().center()), player->lineAngle()));
 }
 
 void MapWidget::keyPressEvent(QKeyEvent *event)

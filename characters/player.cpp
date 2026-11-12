@@ -16,6 +16,8 @@ void Player::updateLineHeroMouse(QPoint mousePoint)
 
     lineHeroMouse.setLine(x() + size/2, y() + size/2, mappedPoint.x(), mappedPoint.y());
     setRotation(-1 * lineHeroMouse.angle());
+
+    emit viewChanged();
 }
 
 void Player::nextMove()
