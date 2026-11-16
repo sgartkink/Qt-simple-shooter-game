@@ -64,7 +64,7 @@ void MapWidget::start()
 
     countdown->start("Game starts in:", 3);
 
-    QTimer::singleShot(3000, [this, bot](){
+    QTimer::singleShot(3000, this, [this, bot](){
         connect(mapView, SIGNAL(mousePressed()), player, SLOT(startShooting()));
         connect(mapView, SIGNAL(mouseReleased()), player, SLOT(stopShooting()));
         timerChestCreating.start(30000);

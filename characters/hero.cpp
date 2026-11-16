@@ -69,7 +69,7 @@ void Hero::resetHero()
     randNewPos();
     changeColor(Qt::white);
 
-    QTimer::singleShot(TIME_RETURN_TO_LIFE, [this]()
+    QTimer::singleShot(TIME_RETURN_TO_LIFE, this, [this]()
     {
         this->start();
     });

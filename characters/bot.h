@@ -11,6 +11,8 @@ class Chest;
 
 class Bot : public Hero
 {
+    friend class TestBot;
+
 public:
     Bot(MapWidget * mapWidget);
     virtual ~Bot() {}

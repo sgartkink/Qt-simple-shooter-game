@@ -5,14 +5,15 @@ One class per lowercase `.h/.cpp` pair, kept side by side in folders by game are
 
 ## Layout
 
-- `main.cpp`, `shooter.pro`: project root
+- `main.cpp`, `shooter.pro` (the game), `game.pri` (every game source except `main.cpp`; shared by the game and the tests): project root
+- `tests/`: Qt Test suite (`tests.pro`, one `test_*.cpp` per area, shared setup in `helpers.h`)
 - `core/`: `global_consts.h`
 - `ui/`: windows, menus, HUD and overlays (`MainWindow`, `MainMenu`, `MainWidget`, `OptionsWidget`, `PlayerBarWidget`, `Leaderboard`, `LeaderboardSlot`, `Countdown`, `MessageAtTopOfScreen`, `PowerGrenadeThrowing`)
 - `world/`: map, view and scene items (`Map`, `MapWidget`, `MapView`, `FieldOfView`, `GridElement`, `ItemsOnScene`, `Building`, `Chest`, `ShakeScreen`)
 - `characters/`: heroes and AI (`Hero`, `Player`, `Bot`, `HeroStats`, `BFS_Algorithm`)
 - `weapons/`: guns and projectiles (`Gun`, `Pistol`, `Rifle`, `Shotgun`, `Shooting`, `Bullet`, `Grenade`, `GrenadeEllipseItem`)
 
-Project includes are written relative to the root (`#include "characters/hero.h"`). `INCLUDEPATH += $$PWD` in `shooter.pro` makes that work. Don't use bare names or `../` paths.
+Project includes are written relative to the root (`#include "characters/hero.h"`). `INCLUDEPATH += $$PWD` in `game.pri` makes that work. Don't use bare names or `../` paths.
 
 ## Build / run
 
@@ -24,8 +25,20 @@ mkdir -p build && cd build && qmake ../shooter.pro && make -j && ./shooter
 
 - Builds with both Qt 5.15 (system `qmake`) and Qt 6.11 (`~/Qt/6.11.2/gcc_64/bin/qmake`, the kit Qt Creator uses). Include Qt headers explicitly: Qt 5 is stricter about transitive includes (e.g. `qApp` needs `<QApplication>`).
 - There is no Designer form. `MainWindow` is built in code, so keep `FORMS +=` empty unless a `.ui` file is actually committed.
-- New class → put both files in the matching folder and add them with their folder path to `SOURCES` / `HEADERS` in `shooter.pro`.
-- No tests, no CI.
+- New class → put both files in the matching folder and add them as `$$PWD/<folder>/<file>` to `SOURCES` / `HEADERS` in `game.pri`, not `shooter.pro`.
+- No CI yet.
+
+## Tests
+
+```bash
+mkdir -p build/tests && cd build/tests && qmake ../../tests/tests.pro && make -j && make check
+```
+
+- Qt Test, one executable (`tests`), running offscreen unless `QT_QPA_PLATFORM` is set. It takes ~15 s, mostly the 8 s real-game smoke test. Run it after every change, with both Qt versions for anything build-related.
+- For memory errors, build it with `CONFIG+=debug "QMAKE_CXXFLAGS+=-fsanitize=address -fno-omit-frame-pointer" "QMAKE_LFLAGS+=-fsanitize=address"` and run with `ASAN_OPTIONS=detect_leaks=0` (the game leaks on purpose at exit).
+- `World` in `helpers.h` builds a map, the player and the overlays the way the game does, and on teardown deletes bots, bullets and grenades before the map, since those run their own timers.
+- Tests that need internals are friends of the class (`Bot` → `TestBot`, `Bullet` → `TestWeapons`). Add a `friend class` line rather than `#define private public`.
+- New test class: add a `test_*.cpp` ending with `#include "test_*.moc"` and a `runTest*()` function, list it in `tests.pro`, and call it from `tests/main.cpp`.
 - `compile_commands.json`, `*.pro.user` and `.qtcreator/` are local IDE state. They're gitignored and untracked, so don't commit them. The local `compile_commands.json` is stale (it points at `/home/szymon/c++ projects/shooter`).
 - Build into `build/` (gitignored), never in-source.
 
@@ -46,6 +59,7 @@ mkdir -p build && cd build && qmake ../shooter.pro && make -j && ./shooter
 ## Conventions
 
 - Mix of old-style `SIGNAL/SLOT` and lambda `connect`s; follow whatever the surrounding code uses.
+- `QTimer::singleShot` with a lambda always gets a context object (`singleShot(ms, this, [this]{...})`), so Qt cancels it if the object is deleted first.
 - Many members are created with in-class `new` initializers and deleted manually in destructors.
 - Hero state changes `emit` signals (`hpChanged`, `ammoChangedNoReloading`, …). Lambdas in the `MapWidget` constructor forward them to `PlayerBarWidget`.
 - Movement is 2 px per 20 ms tick. Collision checks call `Hero::isBlockedAt()` on the two leading corners of the 10 px hero. It checks every item at the point. Don't use `scene->itemAt()` for collision: it only returns the topmost item, so explosions and bullets hide walls.

@@ -9,6 +9,7 @@ class Hero;
 class Bullet : public QObject, public QGraphicsRectItem
 {
     Q_OBJECT
+    friend class TestWeapons;
 
 public:
     Bullet(Hero * owner, int damage, double dx, double dy);

@@ -11,7 +11,7 @@ void Gun::reload()
 {    
     reloading = true;
     reloaded();
-    QTimer::singleShot(RELOADING_TIME, [this](){ reloading = false; });
+    QTimer::singleShot(RELOADING_TIME, this, [this](){ reloading = false; });
 }
 
 void Gun::addAmmo(int ammo)

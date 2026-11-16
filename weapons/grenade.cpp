@@ -152,5 +152,5 @@ void Grenade::explode()
             h->attackItem(damage, owner);
 
     mapView->startShakeScreen();
-    QTimer::singleShot(300, [this](){ delete ellipse; delete this; });
+    QTimer::singleShot(300, this, [this](){ delete ellipse; delete this; });
 }

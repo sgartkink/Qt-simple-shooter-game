@@ -76,7 +76,7 @@ void PlayerBarWidget::updateAmmoNoReloading(int ammoLoaded, int ammoOwned)
 void PlayerBarWidget::updateAmmoReloading(int ammoLoaded, int ammoOwned)
 {
     reloadingAnimation();
-    QTimer::singleShot(RELOADING_TIME, [this, ammoLoaded, ammoOwned]()
+    QTimer::singleShot(RELOADING_TIME, this, [this, ammoLoaded, ammoOwned]()
         {
             qlcdLoadedAmmo.display(ammoLoaded);
             qlcdOwnedAmmo.display(ammoOwned);
