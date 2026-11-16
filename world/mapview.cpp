@@ -13,6 +13,9 @@ MapView::MapView(QGraphicsScene *scene, QWidget *parent)
     setMouseTracking(true);
 
     shakeScreen = new ShakeScreen(this);
+
+    shotMarkerTimer.setInterval(SHOT_MARKER_FRAME);
+    connect(&shotMarkerTimer, &QTimer::timeout, this, &MapView::updateShotMarker);
 }
 
 void MapView::startShakeScreen()
@@ -39,6 +42,40 @@ void MapView::drawForeground(QPainter *painter, const QRectF &rect)
     const qreal ratio = fogCache.devicePixelRatio();
     const QRectF source = rect.translated(-fogCacheArea.topLeft());
     painter->drawImage(rect, fogCache, QRectF(source.topLeft() * ratio, source.size() * ratio));
+
+    if (markedHero)
+        shotMarker.paint(painter, markedHeroCentre(), shotClock.elapsed());
+}
+
+void MapView::showShot(const QGraphicsItem *hero, QPointF origin)
+{
+    if (!shotMarker.mark(hero->sceneBoundingRect().center(), origin, mapToScene(viewport()->rect()).boundingRect()))
+        return;     // too far away to mark; a marker still fading from an earlier shot carries on
+    markedHero = hero;
+    shotClock.start();
+    shotMarkerTimer.start();
+    updateShotMarker();
+}
+
+void MapView::clearShot()
+{
+    shotMarker.clear();
+    updateShotMarker();
+}
+
+void MapView::updateShotMarker()
+{
+    // the area it was drawn in last time and where it goes now, so it never leaves a trail behind a moving hero
+    QRect now;
+    if (isShotMarkerShown())
+        now = mapFromScene(ShotMarker::area(markedHeroCentre())).boundingRect().adjusted(-1, -1, 1, 1);
+    else
+    {
+        shotMarkerTimer.stop();
+        markedHero = nullptr;
+    }
+    viewport()->update(shotMarkerPainted.united(now));
+    shotMarkerPainted = now;
 }
 
 void MapView::rebuildFog(const QRect &area)

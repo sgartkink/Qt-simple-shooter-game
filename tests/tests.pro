@@ -16,7 +16,8 @@ SOURCES += \
     test_weapons.cpp \
     test_fieldofview.cpp \
     test_bot.cpp \
-    test_game.cpp
+    test_game.cpp \
+    test_shotmarker.cpp
 
 HEADERS += \
     helpers.h

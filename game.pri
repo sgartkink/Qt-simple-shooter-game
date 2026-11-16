@@ -30,6 +30,7 @@ SOURCES += \
     $$PWD/world/chest.cpp \
     $$PWD/world/shakescreen.cpp \
     $$PWD/world/fieldofview.cpp \
+    $$PWD/world/shotmarker.cpp \
     $$PWD/characters/hero.cpp \
     $$PWD/characters/player.cpp \
     $$PWD/characters/bot.cpp \
@@ -65,6 +66,7 @@ HEADERS += \
     $$PWD/world/chest.h \
     $$PWD/world/shakescreen.h \
     $$PWD/world/fieldofview.h \
+    $$PWD/world/shotmarker.h \
     $$PWD/characters/hero.h \
     $$PWD/characters/player.h \
     $$PWD/characters/bot.h \

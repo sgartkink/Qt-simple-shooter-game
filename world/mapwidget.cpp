@@ -32,6 +32,7 @@ MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, MainWidget *parent, Qt::W
     connect(player, SIGNAL(posChanged()), this, SLOT(changeSceneRect()));
     connect(player, SIGNAL(posChanged()), this, SLOT(updateFieldOfView()));
     connect(player, SIGNAL(viewChanged()), this, SLOT(updateFieldOfView()));
+    connect(player, &Player::died, mapView, &MapView::clearShot);
     fieldOfViewTimer.setSingleShot(true);
     fieldOfViewTimer.setInterval(FIELD_OF_VIEW_FRAME);
     connect(&fieldOfViewTimer, &QTimer::timeout, [this]()
@@ -87,6 +88,12 @@ void MapWidget::showCountdown(const QString &text, const int &s)
 {
     if (countdown)
         countdown->start(text, s);
+}
+
+void MapWidget::heroFired(Hero *shooter, QPointF origin)
+{
+    if (shooter != player && player->isAlive())
+        mapView->showShot(player, origin);
 }
 
 void MapWidget::changeSceneRect()

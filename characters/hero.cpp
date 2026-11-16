@@ -24,6 +24,11 @@ void Hero::attackItem(int damage, Hero *owner)
     }
 }
 
+void Hero::announceShot()
+{
+    mapWidget->heroFired(this, sceneBoundingRect().center());
+}
+
 void Hero::start()
 {
     changeColor(heroColor);
@@ -68,6 +73,7 @@ void Hero::resetHero()
     heroStats.increaseDeath();
     randNewPos();
     changeColor(Qt::white);
+    emit (died());
 
     QTimer::singleShot(TIME_RETURN_TO_LIFE, this, [this]()
     {

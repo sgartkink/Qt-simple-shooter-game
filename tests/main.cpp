@@ -6,6 +6,7 @@ int runTestWeapons(int argc, char *argv[]);
 int runTestFieldOfView(int argc, char *argv[]);
 int runTestBot(int argc, char *argv[]);
 int runTestGame(int argc, char *argv[]);
+int runTestShotMarker(int argc, char *argv[]);
 
 int main(int argc, char *argv[])
 {
@@ -15,7 +16,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     int failedClasses = 0;
-    for (auto run : {runTestPathfinding, runTestWeapons, runTestFieldOfView, runTestBot, runTestGame})
+    for (auto run : {runTestPathfinding, runTestWeapons, runTestFieldOfView, runTestBot, runTestGame, runTestShotMarker})
         if (run(argc, argv) != 0)
             failedClasses++;
     return failedClasses;

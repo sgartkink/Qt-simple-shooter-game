@@ -41,6 +41,7 @@ void Shooting::shot()
             createBullet(i);
     else
         createBullet();
+    owner->announceShot();
 
     gun->decreaseAmmo();
     if (gun->ammoLoaded() == 0)

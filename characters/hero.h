@@ -41,6 +41,7 @@ public:
     bool isAlive() { return alive; }
 
     virtual void attackItem(int damage = 0, Hero * owner = nullptr);
+    void announceShot();     // tells the map this hero just fired, from its centre
     void start();
     void heroAttacked(Hero * owner);
     void addKill();
@@ -126,6 +127,7 @@ signals:
     void armorChanged();
     void gunChanged();
     void viewChanged();
+    void died();
 };
 
 #endif // HERO_H
