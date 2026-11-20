@@ -2,7 +2,7 @@
 #include "ui/leaderboard.h"
 #include <QtDebug>
 LeaderboardSlot::LeaderboardSlot(Leaderboard *lb, HeroStats *hS)
-    : gridLayout(lb->getLayout())
+    : QObject(lb), gridLayout(lb->getLayout())
 {
     int row = gridLayout->rowCount();
 

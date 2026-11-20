@@ -18,6 +18,11 @@ MapView::MapView(QGraphicsScene *scene, QWidget *parent)
     connect(&shotMarkerTimer, &QTimer::timeout, this, &MapView::updateShotMarker);
 }
 
+MapView::~MapView()
+{
+    delete shakeScreen;
+}
+
 void MapView::startShakeScreen()
 {
     shakeScreen->start();

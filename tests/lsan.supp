@@ -1,0 +1,3 @@
+# Leaks inside Qt's offscreen platform plugin, not in the game.
+# Use with: LSAN_OPTIONS=suppressions=../../tests/lsan.supp
+leak:libqoffscreen.so

@@ -24,9 +24,9 @@ void Hero::attackItem(int damage, Hero *owner)
     }
 }
 
-void Hero::announceShot()
+void Hero::announceAttack(QPointF origin)
 {
-    mapWidget->heroFired(this, sceneBoundingRect().center());
+    mapWidget->heroAttacked(this, origin);
 }
 
 void Hero::start()

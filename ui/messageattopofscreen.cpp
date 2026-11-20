@@ -13,12 +13,12 @@ MessageAtTopOfScreen::MessageAtTopOfScreen(QWidget *parent, Qt::WindowFlags f)
 
     QGraphicsOpacityEffect * effect = new QGraphicsOpacityEffect(this);
     setGraphicsEffect(effect);
-    animation = new QPropertyAnimation(effect, "opacity");
+    animation = new QPropertyAnimation(effect, "opacity", this);
     animation->setDuration(2000);
     animation->setStartValue(1);
     animation->setEndValue(0);
 
-    connect(animation, &QPropertyAnimation::finished, [this](){ setVisible(false); });
+    connect(animation, &QPropertyAnimation::finished, this, [this](){ setVisible(false); });
 }
 
 void MessageAtTopOfScreen::showMessage(QString text)

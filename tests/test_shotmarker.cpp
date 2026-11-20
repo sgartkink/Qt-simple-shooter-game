@@ -15,6 +15,7 @@ private slots:
     void beingHitAloneMarksNothing();
     void yourOwnShotsAreNotMarked();
     void farShotsAreNotMarked();
+    void enemyGrenadesAreMarkedWhereTheyExplode();
     void everyShotBlinksAgainAndPointsAtTheNewShooter();
     void dyingClearsItAndNothingIsMarkedWhileDead();
     void drawnCloseToTheHeroTowardsTheShooter();
@@ -22,7 +23,7 @@ private slots:
 private:
     static QPointF centre(QGraphicsItem * item) { return item->sceneBoundingRect().center(); }
     static Player * readyPlayer(World & world);
-    static void enemyFiredFrom(World & world, Bot * bot, QPointF origin) { world.mapWidget.heroFired(bot, origin); }
+    static void enemyFiredFrom(World & world, Bot * bot, QPointF origin) { world.mapWidget.heroAttacked(bot, origin); }
 };
 
 Player * TestShotMarker::readyPlayer(World &world)
@@ -118,6 +119,29 @@ void TestShotMarker::farShotsAreNotMarked()
     QVERIFY(!world.view()->isShotMarkerShown());
     enemyFiredFrom(world, bot, me + QPointF(0, -150));
     QVERIFY(world.view()->isShotMarkerShown());
+}
+
+void TestShotMarker::enemyGrenadesAreMarkedWhereTheyExplode()
+{
+    World world;
+    Player * player = readyPlayer(world);
+    Bot * bot = world.addBot(QPointF(1300, 1300));   // far away: the explosion is what counts, not the thrower
+    const QPointF blast = centre(player) + QPointF(-60, 40);
+
+    Grenade * own = new Grenade(player, 0, world.view());
+    own->setPos(blast);
+    world.scene()->addItem(own);
+    QMetaObject::invokeMethod(own, "explode");
+    QVERIFY(!world.view()->isShotMarkerShown());     // your own grenade
+
+    Grenade * grenade = new Grenade(bot, 0, world.view());
+    grenade->setPos(blast);
+    world.scene()->addItem(grenade);
+    QVERIFY(!world.view()->isShotMarkerShown());     // nothing for the throw
+    QMetaObject::invokeMethod(grenade, "explode");
+    QVERIFY(world.view()->isShotMarkerShown());
+    QCOMPARE(world.view()->getShotMarker().getOrigin(), blast);
+    runFor(400);                                     // both explosions finish and delete themselves
 }
 
 void TestShotMarker::everyShotBlinksAgainAndPointsAtTheNewShooter()

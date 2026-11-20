@@ -17,6 +17,7 @@ class MapView : public QGraphicsView
     Q_OBJECT
 public:
     MapView(QGraphicsScene *scene, QWidget *parent = nullptr);
+    ~MapView();
 
     void startShakeScreen();
     void setVisibleArea(const QVector<VisiblePiece> & visible);

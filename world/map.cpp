@@ -85,6 +85,8 @@ void Map::removeChest(Chest * chest)
 
 Map::~Map()
 {
+    for (QVector<GridElement *> & column : vector)
+        qDeleteAll(column);
     delete line1;
     delete line2;
     delete line3;

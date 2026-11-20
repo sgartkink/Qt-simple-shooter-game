@@ -10,11 +10,13 @@ HeroStats::HeroStats(Hero * owner)
 void HeroStats::increaseKills()
 {
     kills++;
-    slot->updateKills();
+    if (slot)       // a hero that isn't on a leaderboard still counts
+        slot->updateKills();
 }
 
 void HeroStats::increaseDeath()
 {
     deaths++;
-    slot->updateDeaths();
+    if (slot)
+        slot->updateDeaths();
 }

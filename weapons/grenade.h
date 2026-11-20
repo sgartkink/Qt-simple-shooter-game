@@ -17,6 +17,7 @@ class Grenade : public QObject, public QGraphicsRectItem
     Q_OBJECT
 public:
     Grenade(Hero * owner, double addedVelocity, MapView * mapView = nullptr);
+    ~Grenade();
 
 private:
     const double radius = 40;

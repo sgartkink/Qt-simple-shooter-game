@@ -41,7 +41,7 @@ public:
     QSize viewSize() const { return mapView->viewport()->size(); }
 
     QPoint randNewFreePos();
-    void heroFired(Hero * shooter, QPointF origin);     // marks an enemy's shot around the player
+    void heroAttacked(Hero * attacker, QPointF origin);     // marks an enemy's shot or grenade explosion around the player
     void showCountdown(const QString &text, const int &s);
 
 public slots:
@@ -67,12 +67,6 @@ private:
     QTimer fieldOfViewTimer;
     bool fieldOfViewPending = false;
     const int FIELD_OF_VIEW_FRAME = 16;
-
-    double xPos = 0;
-    double yPos = 0;
-
-    int mapView_halfWidth = 0;
-    int mapView_halfHeight = 0;
 
     virtual void keyPressEvent(QKeyEvent *event);
     virtual void keyReleaseEvent(QKeyEvent *event);

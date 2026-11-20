@@ -34,15 +34,8 @@ inline int chestsIn(QGraphicsScene * scene)
     return chests;
 }
 
-// bullets, grenades and bots run their own timers and point at heroes, so they must go before the map does
-inline void deleteMovingItems(QGraphicsScene * scene)
-{
-    for (QGraphicsItem * item : scene->items())
-        if (dynamic_cast<Bullet *>(item) || dynamic_cast<Grenade *>(item) || dynamic_cast<Bot *>(item))
-            delete item;
-}
-
-// what the game sets up around a map: the player, a leaderboard and the overlays, at the real map size
+// what the game sets up around a map: the player, a leaderboard and the overlays, at the real map size.
+// MapWidget cleans up the bots, bullets and grenades left on its scene.
 struct World
 {
     PlayerBarWidget playerBar;
@@ -64,11 +57,6 @@ struct World
         mapWidget.show();
         QCoreApplication::processEvents();
         leaderboard.addNewHero(player()->getHeroStats());
-    }
-
-    ~World()
-    {
-        deleteMovingItems(scene());
     }
 
     QGraphicsScene * scene() { return mapWidget.getScene(); }

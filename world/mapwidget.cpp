@@ -53,9 +53,6 @@ MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, MainWidget *parent, Qt::W
 
 void MapWidget::start()
 {
-    mapView_halfWidth = mapView->width()/2;
-    mapView_halfHeight = mapView->height()/2;
-
     Bot * bot = new Bot(this);
     bot->setPos(450,300);
     scene->addItem(bot);
@@ -90,29 +87,21 @@ void MapWidget::showCountdown(const QString &text, const int &s)
         countdown->start(text, s);
 }
 
-void MapWidget::heroFired(Hero *shooter, QPointF origin)
+void MapWidget::heroAttacked(Hero *attacker, QPointF origin)
 {
-    if (shooter != player && player->isAlive())
+    if (attacker != player && player->isAlive())
         mapView->showShot(player, origin);
 }
 
 void MapWidget::changeSceneRect()
 {
-    if (player->pos().x() >= mapView_halfWidth && player->pos().x() <= MAP_SIZE_X_FULL - mapView_halfWidth)
-        xPos = player->pos().x() - mapView_halfWidth;
-    else if (player->pos().x() < mapView_halfWidth)
-        xPos = 0;
-    else
-        xPos = MAP_SIZE_X_FULL - mapView->width();
-
-    if (player->pos().y() >= mapView_halfHeight && player->pos().y() <= MAP_SIZE_Y_FULL - mapView_halfHeight)
-        yPos = player->pos().y() - mapView_halfHeight;
-    else if (player->pos().y() < mapView_halfHeight)
-        yPos = 0;
-    else
-        yPos = MAP_SIZE_Y_FULL - mapView->height();
-
-    mapView->setSceneRect(xPos, yPos, mapView->width(), mapView->height());
+    // centred on the player, but never past the map's edge; sized to the viewport (what is actually shown),
+    // measured each time, so it stays right if the window size changes
+    const QSize screen = mapView->viewport()->size();
+    const QPointF centre = player->pos() + QPointF(mainItemSize / 2.0, mainItemSize / 2.0);
+    const qreal x = qBound<qreal>(0, centre.x() - screen.width() / 2.0, MAP_SIZE_X_FULL - screen.width());
+    const qreal y = qBound<qreal>(0, centre.y() - screen.height() / 2.0, MAP_SIZE_Y_FULL - screen.height());
+    mapView->setSceneRect(x, y, screen.width(), screen.height());
 }
 
 void MapWidget::updateFieldOfView()
@@ -252,9 +241,19 @@ void MapWidget::createChest()
 
 MapWidget::~MapWidget()
 {
-    delete map;
+    timerChestCreating.stop();
+    throwingGrenadeTimer.stop();
+    fieldOfViewTimer.stop();
+
+    // bullets, grenades and bots run their own timers and point at heroes, so they go first, then the player and the
+    // map, and the scene last: it deletes whatever is left on it (buildings, chests, the map's edge lines)
+    for (QGraphicsItem * item : scene->items())
+        if (dynamic_cast<Bullet *>(item) || dynamic_cast<Grenade *>(item) || dynamic_cast<Bot *>(item))
+            delete item;
     delete player;
+    delete map;
     delete powerGrenadeThrowing;
     delete qhboxLayout;
     delete mapView;
+    delete scene;
 }

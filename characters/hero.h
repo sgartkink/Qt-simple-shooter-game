@@ -41,7 +41,7 @@ public:
     bool isAlive() { return alive; }
 
     virtual void attackItem(int damage = 0, Hero * owner = nullptr);
-    void announceShot();     // tells the map this hero just fired, from its centre
+    void announceAttack(QPointF origin);     // tells the map this hero just fired, or its grenade went off, at origin
     void start();
     void heroAttacked(Hero * owner);
     void addKill();

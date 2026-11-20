@@ -18,7 +18,7 @@ void ShakeScreen::shake()
 {
     mapView->setSceneRect(mapView->sceneRect().x() + (qSin(vibration)*qCos(vibration))*3,
                           mapView->sceneRect().y() + qCos(vibration)*3,
-                          mapView->width(), mapView->height());
+                          mapView->viewport()->width(), mapView->viewport()->height());
     vibration += 0.5;
 
     if (vibration == 10.0)

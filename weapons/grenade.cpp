@@ -22,6 +22,11 @@ Grenade::Grenade(Hero *owner, double addedVelocity, MapView *mapView)
     QTimer::singleShot(5000, this, SLOT(explode()));
 }
 
+Grenade::~Grenade()
+{
+    delete ellipse;     // the explosion circle, also when the grenade goes before it has exploded
+}
+
 void Grenade::move()
 {
     QDateTime dateTimeCurrent = QDateTime::currentDateTime();
@@ -151,6 +156,7 @@ void Grenade::explode()
         if (Hero * h = dynamic_cast<Hero*>(*it))
             h->attackItem(damage, owner);
 
+    owner->announceAttack(pos());
     mapView->startShakeScreen();
-    QTimer::singleShot(300, this, [this](){ delete ellipse; delete this; });
+    QTimer::singleShot(300, this, [this](){ delete this; });
 }

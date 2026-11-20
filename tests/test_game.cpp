@@ -15,6 +15,8 @@ private slots:
     void wallsBlockThePlayer();
     void wallsStillBlockUnderExplosions();
     void playerStaysInsideTheMap();
+    void cameraFollowsThePlayerButStaysInsideTheMap();
+    void heroesOffTheLeaderboardStillCountKillsAndDeaths();
     void chestPickupIsCentredOnThePlayer();
     void killingYourselfIsNotAKill();
     void onlyReleasingQThrowsTheGrenade();
@@ -80,6 +82,55 @@ void TestGame::playerStaysInsideTheMap()
         QVERIFY(player->y() >= 0 && player->y() <= MAP_SIZE_Y_FULL - 10);
         QVERIFY(player->x() == 0 || player->x() == MAP_SIZE_X_FULL - 10 || player->y() == 0 || player->y() == MAP_SIZE_Y_FULL - 10);
     }
+}
+
+void TestGame::cameraFollowsThePlayerButStaysInsideTheMap()
+{
+    World world;
+    Player * player = world.player();
+    MapView * view = world.view();
+    const QSize screen = view->viewport()->size();
+    const QPointF spots[] = { {0, 0}, {1490, 1490}, {0, 1490}, {1490, 0}, {700, 700}, {1400, 100} };
+    for (QPointF spot : spots)
+    {
+        player->setPos(spot);
+        emit player->posChanged();
+        QCoreApplication::processEvents();
+        const QRectF shown = view->mapToScene(view->viewport()->rect()).boundingRect();
+        const QString where = QString("player at (%1,%2): shows %3,%4 to %5,%6").arg(spot.x()).arg(spot.y())
+                .arg(shown.left()).arg(shown.top()).arg(shown.right()).arg(shown.bottom());
+        QVERIFY2(shown.left() >= 0 && shown.top() >= 0, qPrintable(where));
+        QVERIFY2(shown.right() <= MAP_SIZE_X_FULL && shown.bottom() <= MAP_SIZE_Y_FULL, qPrintable(where));
+        QCOMPARE(view->sceneRect().size(), QSizeF(screen));
+        QVERIFY2(player->sceneBoundingRect().intersects(shown), qPrintable(where));
+    }
+    player->setPos(1490, 1490);                      // in the corner the screen ends exactly at the map's edge
+    emit player->posChanged();
+    QCOMPARE(view->sceneRect().bottomRight(), QPointF(MAP_SIZE_X_FULL, MAP_SIZE_Y_FULL));
+    player->setPos(695, 695);                        // in the open the player is in the middle
+    emit player->posChanged();
+    QCOMPARE(view->sceneRect().center(), QPointF(700, 700));
+}
+
+void TestGame::heroesOffTheLeaderboardStillCountKillsAndDeaths()
+{
+    // the counters updated the hero's leaderboard row without checking it had one, and crashed
+    HeroStats stats(nullptr);
+    stats.increaseKills();
+    stats.increaseDeath();
+    QCOMPARE(stats.getKills(), 1u);
+    QCOMPARE(stats.getDeaths(), 1u);
+
+    World world;
+    Bot * bot = new Bot(&world.mapWidget);           // on the map, not on the leaderboard
+    bot->setPos(700, 700);
+    world.scene()->addItem(bot);
+    bot->start();
+    world.player()->start();
+    bot->attackItem(1000, world.player());
+    QCOMPARE(bot->getHeroStats()->getDeaths(), 1u);
+    world.player()->attackItem(1000, bot);
+    QCOMPARE(bot->getHeroStats()->getKills(), 1u);
 }
 
 void TestGame::chestPickupIsCentredOnThePlayer()
@@ -174,7 +225,6 @@ void TestGame::realGameRunsWithoutErrors()
         player->stopShooting();
     }
     QVERIFY(botWalked > 100);
-    deleteMovingItems(mapWidget->getScene());
 }
 
 int runTestGame(int argc, char *argv[])
