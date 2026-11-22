@@ -8,7 +8,7 @@ Hero::Hero(MapWidget *mapWidget, Qt::GlobalColor color, qreal x, qreal y, qreal 
 
     currentGun = &rifle;
     currentGunENUM = RIFLE;
-    height = 10;
+    ItemsOnScene::height = 10;      // not the constructor's `height` parameter (the rectangle's), which hides it
 
     changeColor(Qt::white);
 
@@ -180,13 +180,14 @@ void Hero::refillCurrentOwnedAmmo()
     emit (ammoChangedNoReloading());
 }
 
-void Hero::throwGrenade(int addedVelocity, MapView *mapView)
+Grenade * Hero::throwGrenade(double addedVelocity, MapView *mapView)
 {
     Grenade * grenade = new Grenade(this, addedVelocity, mapView);
     grenade->setPos(x() + 5, y() + 5);
     scene->addItem(grenade);
     grenades--;
     emit (grenadesChanged());
+    return grenade;
 }
 
 void Hero::startShooting()

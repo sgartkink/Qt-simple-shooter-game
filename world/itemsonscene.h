@@ -16,7 +16,7 @@ public:
     double getHeight() { return height; }
 
 protected:
-    double height;
+    double height = 0;          // how tall it is for grenades: they bounce off it while flying lower
 
     void changeColor(Qt::GlobalColor color);
 

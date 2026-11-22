@@ -18,11 +18,17 @@ private slots:
     void opensTheChestAtTheEndOfARoute();
     void routesToAChestBehindAWallOnce();
     void deathClearsRouteAndMemory();
+    void throwsAGrenadeWhereItLostSightOfThePlayer();
+    void throwsAGrenadeWhileReloading();
+    void grenadeLimits();
+    void grenadeLandsWhereItWasAimed();
+    void waitsForItsOwnGrenadeAndStepsAwayFromIt();
 
 private:
     static bool notices(Bot & bot, Player * player, QPointF at, qreal facing, QPointF target);
     static void face(Bot & bot, qreal degrees);
     static QPointF from(QPointF point, qreal degrees, qreal distance);
+    static void loseSightOfThePlayer(World & world, Bot & bot, QPointF & spot);
 };
 
 void TestBot::face(Bot &bot, qreal degrees)
@@ -230,6 +236,132 @@ void TestBot::deathClearsRouteAndMemory()
     QVERIFY(bot.path.isEmpty() && !bot.pathFromAlgorithm && !bot.goingOpenChest);
     QVERIFY(!bot.chasing && !bot.headingToLastSeen && bot.lookAroundTicks == 0);
     QCOMPARE(player->getHeroStats()->getKills(), 1u);
+}
+
+// the bot with the player 200 px in front of it, in view, then gone: the last seen spot is `spot`
+void TestBot::loseSightOfThePlayer(World & world, Bot & bot, QPointF & spot)
+{
+    Player * player = world.player();
+    bot.destinationPoint = QPoint(700, 700);
+    bot.lineHeroMouse.setLine(bot.x(), bot.y(), bot.x() + 100, bot.y());
+    spot = QPointF(905, 705);
+    player->setPos(spot - QPointF(5, 5));
+    bot.nextMove();
+    bot.stopShooting();
+    player->setPos(100, 1400);
+    bot.nextMove();
+}
+
+void TestBot::throwsAGrenadeWhereItLostSightOfThePlayer()
+{
+    World world;
+    Bot & bot = *world.addBot(QPointF(700, 700));
+    bot.start();
+    QPointF spot;
+    loseSightOfThePlayer(world, bot, spot);
+    QVERIFY(bot.ownGrenade);
+    QCOMPARE(bot.getGrenades(), 2);
+    // thrown at the spot, ~200 px to the right (within a degree: the bot may have stepped 2 px meanwhile)
+    QVERIFY(bot.ownGrenade->dx > 0 && qAbs(bot.ownGrenade->dy / bot.ownGrenade->dx) < 0.02);
+    QVERIFY(bot.headingToLastSeen);                      // and it still goes to look
+}
+
+void TestBot::throwsAGrenadeWhileReloading()
+{
+    World world;
+    Player * player = world.player();
+    Bot & bot = *world.addBot(QPointF(700, 700));
+    bot.start();
+    bot.destinationPoint = QPoint(700, 700);
+    face(bot, 0);
+    bot.gun()->decreaseAmmo();
+    bot.gun()->reload();
+    QVERIFY(bot.gun()->isReloading());
+    player->setPos(QPointF(905, 705) - QPointF(5, 5));
+    bot.nextMove();
+    QVERIFY(bot.ownGrenade);
+    QCOMPARE(bot.getGrenades(), 2);
+}
+
+void TestBot::grenadeLimits()
+{
+    World world;
+    Bot & bot = *world.addBot(QPointF(700, 700));
+    bot.start();
+    const QPointF me = bot.centre();
+    QVERIFY(!bot.throwGrenadeAt(me + QPointF(60, 0)));   // it would be caught in the blast
+    QVERIFY(!bot.throwGrenadeAt(me + QPointF(450, 0)));  // it would go off in the air
+    QVERIFY(bot.throwGrenadeAt(me + QPointF(200, 0)));
+    QVERIFY(!bot.throwGrenadeAt(me + QPointF(0, 200)));  // one at a time
+    delete bot.ownGrenade;
+    QVERIFY(!bot.throwGrenadeAt(me + QPointF(0, 200)));  // and 6 s apart
+    bot.grenadeCooldownTicks = 0;
+    QVERIFY(bot.throwGrenadeAt(me + QPointF(0, 200)));
+    delete bot.ownGrenade;
+    bot.grenadeCooldownTicks = 0;
+    QVERIFY(bot.throwGrenadeAt(me + QPointF(-200, 0)));
+    delete bot.ownGrenade;
+    bot.grenadeCooldownTicks = 0;
+    QCOMPARE(bot.getGrenades(), 0);
+    QVERIFY(!bot.throwGrenadeAt(me + QPointF(200, 0)));  // none left
+}
+
+void TestBot::grenadeLandsWhereItWasAimed()
+{
+    // a real throw in real time on open ground
+    World world;
+    world.player()->setPos(100, 1400);
+    Bot & bot = *world.addBot(QPointF(300, 1200));
+    bot.start();                                         // it may walk off meanwhile; the target stays where it was
+    for (qreal distance : {280.0})
+    {
+        const QPointF target = bot.centre() + QPointF(distance, 0);
+        QVERIFY(bot.throwGrenadeAt(target));
+        QPointer<Grenade> grenade = bot.ownGrenade;
+        QPointF landed;
+        for (int t = 0; t < 300 && grenade; t++)        // the fuse is 5 s
+        {
+            if (grenade->moveTimer.isActive() == false && landed.isNull())
+                landed = grenade->pos();
+            runFor(20);
+        }
+        QVERIFY2(!landed.isNull(), "it never landed");
+        QVERIFY2(QLineF(landed, target).length() < 15,
+                 qPrintable(QString("aimed %1 px, landed %2 px from the target").arg(distance).arg(QLineF(landed, target).length())));
+        QVERIFY(!grenade);                               // and went off
+    }
+}
+
+void TestBot::waitsForItsOwnGrenadeAndStepsAwayFromIt()
+{
+    World world;
+    world.player()->setPos(100, 1400);
+    Bot & bot = *world.addBot(QPointF(700, 700));
+    bot.start();
+    Grenade * grenade = new Grenade(&bot, 0);
+    grenade->moveTimer.stop();
+    world.scene()->addItem(grenade);
+    bot.ownGrenade = grenade;
+
+    grenade->setPos(800, 705);                           // lying where the bot wants to go
+    bot.destinationPoint = QPoint(795, 700);
+    for (int i = 0; i < 20; i++)
+        bot.nextMove();
+    QCOMPARE(bot.pos(), QPointF(700, 700));              // waits
+
+    grenade->setPos(bot.centre() + QPointF(20, 0));      // lying right next to it
+    for (int i = 0; i < 40; i++)
+        bot.nextMove();
+    QVERIFY2(QLineF(bot.centre(), grenade->pos()).length() >= bot.GRENADE_DANGER,
+             qPrintable(QString("still %1 px away").arg(QLineF(bot.centre(), grenade->pos()).length())));
+
+    delete grenade;                                      // gone off: carries on to where it was going
+    bot.destinationPoint = QPoint(795, 700);
+    bot.path.clear();
+    bot.pathFromAlgorithm = false;
+    const QPointF before = bot.pos();
+    bot.nextMove();
+    QVERIFY(bot.pos() != before);
 }
 
 int runTestBot(int argc, char *argv[])

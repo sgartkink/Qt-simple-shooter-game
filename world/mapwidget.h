@@ -37,6 +37,7 @@ public:
 
     QGraphicsScene * getScene() { return scene; }
     Map * getMap() { return map; }
+    MapView * getMapView() { return mapView; }
     const FieldOfView & getFieldOfView() const { return fieldOfView; }
     QSize viewSize() const { return mapView->viewport()->size(); }
 

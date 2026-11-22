@@ -52,7 +52,7 @@ public:
     void addAmmo(int ammo);
     void refillCurrentLoadedAmmo();
     void refillCurrentOwnedAmmo();
-    void throwGrenade(int addedVelocity, MapView * mapView);
+    Grenade * throwGrenade(double addedVelocity, MapView * mapView);
 
     void setCurrentlyShooting(bool c) { currentlyShooting = c; }
     void setDirectionUp(bool d) { directionUp = d; }

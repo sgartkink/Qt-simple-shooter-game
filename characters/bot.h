@@ -1,6 +1,7 @@
 #ifndef BOT_H
 #define BOT_H
 
+#include <QPointer>
 #include <QRandomGenerator>
 
 class Chest;
@@ -48,11 +49,22 @@ private:
     qreal lookAroundAngle = 0;
     const int LOOK_AROUND_TICKS = 50;
 
+    // grenades: thrown where the target was last seen, or at it while reloading
+    QPointer<Grenade> ownGrenade;               // the one in the air or on the ground, until it has gone off
+    int grenadeCooldownTicks = 0;
+    const int GRENADE_COOLDOWN_TICKS = 300;     // 6 s between grenades
+    const qreal GRENADE_MIN_DISTANCE = 100;     // never close enough to catch itself in the blast
+    const qreal GRENADE_MAX_DISTANCE = 390;     // lands before the 5 s fuse runs out (a throw with power ~50)
+    const qreal GRENADE_DANGER = 70;            // stays this far from its own live grenade (blast radius 40)
+
     void checkNearestArea();
     bool canSee(QGraphicsItem * item);
     void updateMemory();
     void startLookingAround();
     void dependingOnReloadingSetState();
+    bool throwGrenadeAt(QPointF target);
+    bool avoidOwnGrenade();
+    QPointF centre() { return mapToScene(rect().center()); }
     bool checkIfItemsBetweenBotAndTarget();
 
     void move();

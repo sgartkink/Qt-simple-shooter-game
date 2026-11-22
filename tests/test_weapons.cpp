@@ -17,6 +17,9 @@ private slots:
     void bulletsHitOnFirstContact();
     void bulletsStopAtWallsUnderExplosions();
     void bulletsIgnoreTheirShooter();
+    void grenadeRangeMatchesThePower();
+    void grenadesBounceOffHeroesFlyingLowerThanThem();
+    void grenadesComingDownOnSomethingBounceBack();
 
 private:
     QRectF fire(World & world, QPointF start, qreal degrees);
@@ -142,6 +145,98 @@ void TestWeapons::bulletsIgnoreTheirShooter()
     world.player()->setPos(900, 900);
     QRectF hit = fire(world, QPointF(905, 905), 0);
     QVERIFY(hit.isNull() || hit.left() > 911);
+}
+
+void TestWeapons::grenadeRangeMatchesThePower()
+{
+    // measured in the game on open ground: power 0 lands 89.6 px away, 10 → 132.5, 25 → 214.5, 50 → 396.9
+    const qreal measured[][2] = { {0, 89.6}, {10, 132.5}, {25, 214.5}, {50, 396.9} };
+    for (auto m : measured)
+        QVERIFY2(qAbs(Grenade::flightDistance(m[0]) - m[1]) < 1.5,
+                 qPrintable(QString("power %1: %2 px").arg(m[0]).arg(Grenade::flightDistance(m[0]))));
+    for (qreal distance : {100.0, 180.0, 250.0, 390.0})
+        QVERIFY(qAbs(Grenade::flightDistance(Grenade::powerFor(distance)) - distance) < 0.1);
+    QCOMPARE(Grenade::powerFor(50), -1.0);                // closer than the weakest throw
+    QCOMPARE(Grenade::powerFor(2000), -1.0);              // further than the strongest
+}
+
+void TestWeapons::grenadesBounceOffHeroesFlyingLowerThanThem()
+{
+    // heroes are 10 high, like buildings (50) and chests (5) for grenades. The weakest throw lands 90 px away:
+    // 40 px out it is ~21 high and flies over a hero; ~79 px out (where it meets a hero standing at 83) it is
+    // ~8 high and bounces back.
+    // Two throws side by side on open ground, in real time; the throwers' own heroes don't stop their grenades.
+    World world;
+    Player * low = world.player();
+    Player high(world.view(), &world.mapWidget);
+    world.scene()->addItem(&high);
+    Player wallAt83(world.view(), &world.mapWidget), wallAt40(world.view(), &world.mapWidget);
+    world.scene()->addItem(&wallAt83);
+    world.scene()->addItem(&wallAt40);
+
+    low->setPos(300, 1100);
+    wallAt83.setPos(388, 1100);
+    high.setPos(300, 1300);
+    wallAt40.setPos(340, 1300);
+    QVERIFY(qAbs(wallAt83.getHeight() - 10) < 1e-9);    // it used to be left unset
+
+    Grenade * grenades[2];
+    Player * throwers[] = { low, &high };
+    for (int i = 0; i < 2; i++)
+    {
+        const QPointF centre = throwers[i]->sceneBoundingRect().center();
+        throwers[i]->updateLineHeroMouse(world.view()->mapFromScene(centre + QPointF(100, 0)));
+        QVERIFY(qAbs(throwers[i]->lineAngle()) < 2 || qAbs(throwers[i]->lineAngle() - 360) < 2);
+        grenades[i] = throwers[i]->throwGrenade(0, world.view());
+    }
+    runFor(2700);                                         // both have landed (2.3 s), none has gone off (5 s)
+    const qreal lowFlight = grenades[0]->x() - 305, highFlight = grenades[1]->x() - 305;
+    QVERIFY2(lowFlight < 78, qPrintable(QString("the low grenade ended %1 px out, past the hero at 83").arg(lowFlight)));
+    QVERIFY2(qAbs(highFlight - Grenade::flightDistance(0)) < 5,
+             qPrintable(QString("the high grenade ended %1 px out, not %2").arg(highFlight).arg(Grenade::flightDistance(0))));
+    delete grenades[0];
+    delete grenades[1];
+    world.scene()->removeItem(&high);
+    world.scene()->removeItem(&wallAt83);
+    world.scene()->removeItem(&wallAt40);
+}
+
+void TestWeapons::grenadesComingDownOnSomethingBounceBack()
+{
+    // they used to drift on through whatever they came down on. Two throws at once, in real time:
+    // - the weakest throw reaches a hero 75 px out while ~12 high (over its head) and sinks below 10 above it
+    // - power 60 passes over the wall at x 400..440 while ~56 high and sinks below 50 above it, ~415; once along the
+    //   middle of a building, once along the seam between the two that make up the wall
+    World world;
+    Player * thrower = world.player();
+    Player hero(world.view(), &world.mapWidget), roofThrower(world.view(), &world.mapWidget), seamThrower(world.view(), &world.mapWidget);
+    world.scene()->addItem(&hero);
+    world.scene()->addItem(&roofThrower);
+    world.scene()->addItem(&seamThrower);
+    thrower->setPos(300, 1200);
+    hero.setPos(380, 1200);
+    roofThrower.setPos(25, 335);                         // along the middle of the building at y 320..360
+    seamThrower.setPos(25, 315);                         // along y 320, where the two buildings meet
+
+    struct Throw { Player * by; double power; qreal itemLeft; } throws[] = { {thrower, 0, 380}, {&roofThrower, 60, 400}, {&seamThrower, 60, 400} };
+    QPointer<Grenade> grenades[3];
+    for (int i = 0; i < 3; i++)
+    {
+        const QPointF centre = throws[i].by->sceneBoundingRect().center();
+        throws[i].by->updateLineHeroMouse(world.view()->mapFromScene(centre + QPointF(100, 0)));
+        grenades[i] = throws[i].by->throwGrenade(throws[i].power, world.view());
+    }
+    runFor(4800);                                         // both down (2.3 s, 4.85 s), none gone off (5 s)
+    for (int i = 0; i < 3; i++)
+    {
+        QVERIFY(grenades[i]);
+        QVERIFY2(grenades[i]->x() + 4 < throws[i].itemLeft,
+                 qPrintable(QString("throw %1 ended at x %2, not back before %3").arg(i).arg(grenades[i]->x()).arg(throws[i].itemLeft)));
+        delete grenades[i];
+    }
+    world.scene()->removeItem(&hero);
+    world.scene()->removeItem(&roofThrower);
+    world.scene()->removeItem(&seamThrower);
 }
 
 int runTestWeapons(int argc, char *argv[])

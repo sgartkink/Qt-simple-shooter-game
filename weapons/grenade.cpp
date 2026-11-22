@@ -27,6 +27,29 @@ Grenade::~Grenade()
     delete ellipse;     // the explosion circle, also when the grenade goes before it has exploded
 }
 
+qreal Grenade::flightDistance(double addedVelocity)
+{
+    // the height in move() is 10 + k^2 v t - (9.81 k + 9.81/2) t^2 with k = sin(sqrt(3)/2); it lands when that is 0
+    const double v = BASE_VELOCITY + addedVelocity;
+    const double k = qSin(sqrt(3)/2);
+    const double a = 9.81 * k + 9.81 / 2;
+    const double t = (k*k*v + sqrt(k*k*k*k*v*v + 4*a*10)) / (2*a);
+    return v * t;
+}
+
+double Grenade::powerFor(qreal distance)
+{
+    if (distance < flightDistance(0) || distance > flightDistance(MAX_POWER))
+        return -1;
+    double low = 0, high = MAX_POWER;           // the distance grows with the power
+    for (int i = 0; i < 40; i++)
+    {
+        const double mid = (low + high) / 2;
+        (flightDistance(mid) < distance ? low : high) = mid;
+    }
+    return (low + high) / 2;
+}
+
 void Grenade::move()
 {
     QDateTime dateTimeCurrent = QDateTime::currentDateTime();
@@ -37,6 +60,9 @@ void Grenade::move()
 
     if (currentHeight < 0)
         stopMoving();
+
+    if (bounceBackIfComingDownOnSomething())
+        return;
 
     QRectF rect1(x()-0.25, y()-0.25, 0.5, 0.5);
     QRectF rect2(x()+size-0.25, y()-0.25, 0.5, 0.5);
@@ -49,8 +75,7 @@ void Grenade::move()
     for (auto it = corner0.begin(); it != corner0.end(); it++)
     {
         ItemsOnScene * item = dynamic_cast<ItemsOnScene *>(*it);
-        if (item && (*it) != dynamic_cast<Player *>(*it)
-                && (*it) != previousHitItem && item->getHeight() > currentHeight)
+        if (item && (*it) != previousHitItem && !cameDownOn.contains(*it) && item->getHeight() > currentHeight)
         {
             mayMove = false;
             previousHitItem = (*it);
@@ -76,8 +101,7 @@ void Grenade::move()
     for (auto it = corner1.begin(); it != corner1.end(); it++)
     {
         ItemsOnScene * item = dynamic_cast<ItemsOnScene *>(*it);
-        if (item && (*it) != dynamic_cast<Player *>(*it)
-                && (*it) != previousHitItem && item->getHeight() > currentHeight)
+        if (item && (*it) != previousHitItem && !cameDownOn.contains(*it) && item->getHeight() > currentHeight)
         {
             mayMove = false;
             previousHitItem = (*it);
@@ -97,8 +121,7 @@ void Grenade::move()
     for (auto it = corner2.begin(); it != corner2.end(); it++)
     {
         ItemsOnScene * item = dynamic_cast<ItemsOnScene *>(*it);
-        if (item && (*it) != dynamic_cast<Player *>(*it)
-                && (*it) != previousHitItem && item->getHeight() > currentHeight)
+        if (item && (*it) != previousHitItem && !cameDownOn.contains(*it) && item->getHeight() > currentHeight)
             if (dx < 0 && dy > 0)
             {
                 dy *= -1;
@@ -111,9 +134,37 @@ void Grenade::move()
         setPos(x() + dx, y() + dy);
     else
         setNewRotation();
+    previousHeight = currentHeight;
 
     if (x() < 0 || x() > MAP_SIZE_X_FULL || y() < 0 || y() > MAP_SIZE_Y_FULL)
         stopMoving();
+}
+
+bool Grenade::bounceBackIfComingDownOnSomething()
+{
+    // flying over something (a roof, a chest, a hero's head) and now sinking below its top: it bounces back the way
+    // it came. Hitting something from the side is left to the corner checks in move().
+    const QRectF now(x(), y(), size, size);
+    const QRectF before = now.translated(-dx, -dy);
+    bool landed = false;
+    for (QGraphicsItem * other : mainScene->items(now))
+    {
+        ItemsOnScene * item = dynamic_cast<ItemsOnScene *>(other);
+        if (!item || other == previousHitItem || cameDownOn.contains(other) || item->getHeight() <= currentHeight
+                || previousHeight < item->getHeight() || !other->sceneBoundingRect().intersects(before))
+            continue;
+        cameDownOn.insert(other);       // all of them at once, so it doesn't bounce again off the one next to it
+        landed = true;
+    }
+    if (!landed)
+        return false;
+
+    dx = -dx;
+    dy = -dy;
+    setRotation(rotation() + 180);
+    setPos(x() + dx, y() + dy);
+    previousHeight = currentHeight;
+    return true;
 }
 
 void Grenade::setNewRotation()
