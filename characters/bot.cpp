@@ -68,8 +68,11 @@ void Bot::checkNearestArea()
             }
         }
 
-        if (goingOpenChest && targetAttack)
-            break;
+        if (Grenade * g = dynamic_cast<Grenade*>(*it))
+        {
+            if (g->getOwner() != this && canSee(g))
+                noticeGrenade(g);
+        }
     }
 }
 
@@ -125,27 +128,77 @@ bool Bot::throwGrenadeAt(QPointF target)
     return true;
 }
 
-bool Bot::avoidOwnGrenade()
+void Bot::noticeGrenade(Grenade *grenade)
+{
+    for (SeenGrenade & seen : seenGrenades)
+        if (seen.grenade == grenade)
+        {
+            seen.at = grenade->pos();
+            return;
+        }
+    seenGrenades.append({grenade, grenade->pos()});
+}
+
+QVector<QPointF> Bot::grenadesToAvoid()
+{
+    // its own (it knows where that is), and others' where it last saw them; gone-off ones drop out
+    QVector<QPointF> spots;
+    if (ownGrenade)
+        spots.append(ownGrenade->pos());
+    for (int i = seenGrenades.size() - 1; i >= 0; i--)
+        if (!seenGrenades[i].grenade)
+            seenGrenades.remove(i);
+        else
+            spots.append(seenGrenades[i].at);
+    return spots;
+}
+
+bool Bot::avoidGrenades()
 {
     // returns true when the bot should stand still this tick
-    if (!ownGrenade)
+    const QVector<QPointF> spots = grenadesToAvoid();
+    if (spots.isEmpty())
         return false;
-    const QPointF grenade = ownGrenade->pos();
+    auto safe = [&](QPointF point) {
+        for (QPointF spot : spots)
+            if (QLineF(point, spot).length() < GRENADE_DANGER)
+                return false;
+        return true;
+    };
+    // the straight walk from here to `to` keeps clear of every grenade
+    auto safeWalk = [&](QPointF to) {
+        const QPointF from = centre(), d = to - from;
+        const qreal length2 = QPointF::dotProduct(d, d);
+        for (QPointF spot : spots)
+        {
+            const qreal t = length2 > 0 ? qBound<qreal>(0, QPointF::dotProduct(spot - from, d) / length2, 1) : 0;
+            if (QLineF(from + t * d, spot).length() < GRENADE_DANGER)
+                return false;
+        }
+        return true;
+    };
+    const QPointF destination = QPointF(destinationPoint) + QPointF(size/2, size/2);
 
-    if (QLineF(centre(), grenade).length() < GRENADE_DANGER)
+    QPointF nearest = spots.first();
+    for (QPointF spot : spots)
+        if (QLineF(centre(), spot).length() < QLineF(centre(), nearest).length())
+            nearest = spot;
+
+    if (QLineF(centre(), nearest).length() < GRENADE_DANGER)
     {
-        // too close: head away from it, unless already heading somewhere far enough
-        if (QLineF(QPointF(destinationPoint) + QPointF(size/2, size/2), grenade).length() >= GRENADE_DANGER + 20)
+        // too close: head away from it, unless already heading away to somewhere safe
+        const bool headingAway = QPointF::dotProduct(destination - centre(), centre() - nearest) > 0;
+        if (headingAway && safe(destination) && QLineF(destination, nearest).length() >= GRENADE_DANGER + 20)
             return false;
-        const QLineF away(grenade, centre());
+        const QLineF away(nearest, centre());
         for (qreal turn : {0.0, 45.0, -45.0, 90.0, -90.0, 135.0, -135.0})
         {
-            QLineF step = away.length() > 0.5 ? away : QLineF(grenade, grenade + QPointF(1, 0));
+            QLineF step = away.length() > 0.5 ? away : QLineF(nearest, nearest + QPointF(1, 0));
             step.setAngle(step.angle() + turn);
             step.setLength(GRENADE_DANGER + 40);
             const QPoint cell = ((step.p2() - QPointF(size/2, size/2)) / 10).toPoint();
             if (cell.x() < 0 || cell.x() > MAP_SIZE_X_10 - 1 || cell.y() < 0 || cell.y() > MAP_SIZE_Y_10 - 1
-                    || mapWidget->getMap()->checkIfPointIsTaken(cell))
+                    || mapWidget->getMap()->checkIfPointIsTaken(cell) || !safe(step.p2()))
                 continue;
             destinationPoint = cell * 10;
             path.clear();
@@ -155,8 +208,8 @@ bool Bot::avoidOwnGrenade()
         return false;
     }
 
-    // heading for a spot near it: wait there until it has gone off
-    return QLineF(QPointF(destinationPoint) + QPointF(size/2, size/2), grenade).length() < GRENADE_DANGER;
+    // heading for a spot near one, or past one: wait until it has gone off
+    return !safeWalk(destination);
 }
 
 void Bot::startLookingAround()
@@ -212,7 +265,7 @@ void Bot::move()
         return;
     }
 
-    if (avoidOwnGrenade())
+    if (avoidGrenades())
     {
         resetDirections();
         updateLineHeroMouse();
@@ -482,5 +535,6 @@ void Bot::death()
     headingToLastSeen = false;
     lookAroundTicks = 0;
     grenadeCooldownTicks = 0;
+    seenGrenades.clear();
     randomNewDestinationPoint();
 }

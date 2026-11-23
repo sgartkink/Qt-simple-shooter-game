@@ -44,6 +44,10 @@ MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, MainWidget *parent, Qt::W
         }
     });
     connect(&throwingGrenadeTimer, SIGNAL(timeout()), this, SLOT(stopThrowingGrenade()));
+    roundTimer.setSingleShot(true);
+    connect(&roundTimer, &GameTimer::timeout, this, &MapWidget::endRound);
+    connect(&roundClock, &GameTimer::timeout, this, &MapWidget::updateRoundClock);
+    updateRoundClock();
     connect(&timerChestCreating, SIGNAL(timeout()), this, SLOT(createChest()));
 
     scene->addItem(player);
@@ -53,7 +57,7 @@ MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, MainWidget *parent, Qt::W
 
 void MapWidget::start()
 {
-    Bot * bot = new Bot(this);
+    bot = new Bot(this);
     bot->setPos(450,300);
     scene->addItem(bot);
 
@@ -62,7 +66,10 @@ void MapWidget::start()
 
     countdown->start("Game starts in:", 3);
 
-    QTimer::singleShot(3000, this, [this, bot](){
+    GameClock::singleShot(3000, this, [this](){
+        roundTimer.start(roundLengthMs);
+        roundEndsAt = GameClock::now() + roundLengthMs;
+        roundClock.start(250);
         connect(mapView, SIGNAL(mousePressed()), player, SLOT(startShooting()));
         connect(mapView, SIGNAL(mouseReleased()), player, SLOT(stopShooting()));
         timerChestCreating.start(30000);
@@ -85,6 +92,54 @@ void MapWidget::showCountdown(const QString &text, const int &s)
 {
     if (countdown)
         countdown->start(text, s);
+}
+
+int MapWidget::roundMsLeft() const
+{
+    if (roundEndsAt < 0)
+        return roundLengthMs;
+    return int(qMax<qint64>(0, roundEndsAt - GameClock::now()));
+}
+
+QVector<HeroStats *> MapWidget::heroStats()
+{
+    QVector<HeroStats *> stats {player->getHeroStats()};
+    if (bot)
+        stats.append(bot->getHeroStats());
+    return stats;
+}
+
+void MapWidget::releaseControls()
+{
+    player->setDirectionUp(false);
+    player->setDirectionDown(false);
+    player->setDirectionLeft(false);
+    player->setDirectionRight(false);
+    player->stopShooting();
+    if (leaderboard)
+        leaderboard->setVisible(false);
+}
+
+void MapWidget::focusGame()
+{
+    mapView->setFocus();
+}
+
+void MapWidget::endRound()
+{
+    roundIsOver = true;
+    roundEndsAt = GameClock::now();     // the timer may fire a few ms early; time is up all the same
+    roundClock.stop();
+    updateRoundClock();
+    releaseControls();
+    GameClock::setPaused(true);     // everything stops where it is
+    emit roundOver();
+}
+
+void MapWidget::updateRoundClock()
+{
+    if (playerBarWidget)
+        playerBarWidget->updateTimeLeft((roundMsLeft() + 999) / 1000);
 }
 
 void MapWidget::heroAttacked(Hero *attacker, QPointF origin)
@@ -125,6 +180,15 @@ void MapWidget::applyFieldOfView()
 
 void MapWidget::keyPressEvent(QKeyEvent *event)
 {
+    if (event->key() == Qt::Key_Escape)
+    {
+        if (!event->isAutoRepeat() && !roundIsOver)
+            emit pauseRequested();
+        return;
+    }
+    if (GameClock::isPaused())      // paused or the round is over: the controls were let go and stay so
+        return;
+
     if (!event->isAutoRepeat())
         switch (event->key())
         {
@@ -179,6 +243,9 @@ void MapWidget::keyPressEvent(QKeyEvent *event)
 
 void MapWidget::keyReleaseEvent(QKeyEvent *event)
 {
+    if (GameClock::isPaused())
+        return;
+
     if (!event->isAutoRepeat())
         switch (event->key())
         {

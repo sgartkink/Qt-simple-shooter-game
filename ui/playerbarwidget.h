@@ -23,6 +23,10 @@ public slots:
     void updateArmor(int armor);
     void updateAmmoNoReloading(int ammoLoaded, int ammoOwned);
     void updateAmmoReloading(int ammoLoaded, int ammoOwned);
+    void updateTimeLeft(int seconds);
+
+public:
+    QString getTimeLeftText() const { return timeLeft.text(); }
 
 private:
     QProgressBar * reloadingBar = new QProgressBar();
@@ -41,6 +45,8 @@ private:
     QLabel textHP;
     QLabel textGrenades;
     QLabel textArmor;
+    QLabel textTimeLeft;
+    QLabel timeLeft;
 
     void reloadingAnimation();
 };

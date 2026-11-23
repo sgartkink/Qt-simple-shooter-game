@@ -38,7 +38,6 @@ private:
 
     bool reloading = false;
 
-    QTimer reloadTimer;
     int fireFrequency;
 
     void reloaded();

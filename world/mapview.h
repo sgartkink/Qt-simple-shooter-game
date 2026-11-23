@@ -3,7 +3,7 @@
 
 class ShakeScreen;
 #include <QGraphicsView>
-#include <QElapsedTimer>
+#include "core/gameclock.h"
 #include <QImage>
 #include <QMouseEvent>
 #include <QTimer>
@@ -26,7 +26,7 @@ public:
     void showShot(const QGraphicsItem * hero, QPointF origin);
     void clearShot();
     const ShotMarker & getShotMarker() const { return shotMarker; }
-    bool isShotMarkerShown() const { return markedHero && shotMarker.isActiveAt(shotClock.elapsed()); }
+    bool isShotMarkerShown() const { return markedHero && shotMarker.isActiveAt(msSinceShot()); }
 
 protected:
     void drawForeground(QPainter * painter, const QRectF & rect) override;
@@ -40,7 +40,8 @@ private:
 
     ShotMarker shotMarker;
     const QGraphicsItem * markedHero = nullptr;
-    QElapsedTimer shotClock;
+    qint64 shotAt = 0;             // game time of the shot marked, so its fade stops while the game is paused
+    qint64 msSinceShot() const { return GameClock::now() - shotAt; }
     QTimer shotMarkerTimer;        // repaints the marker while it shows: it fades, and follows the hero
     QRect shotMarkerPainted;       // the viewport area it was last drawn in
     const int SHOT_MARKER_FRAME = 16;

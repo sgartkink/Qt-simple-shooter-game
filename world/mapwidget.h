@@ -6,6 +6,8 @@
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include <QTimer>
+#include "core/gameclock.h"
+#include "core/settings.h"
 #include <QRandomGenerator>
 
 class MainWidget;
@@ -30,6 +32,14 @@ public:
     ~MapWidget();
 
     void start();
+    void setRoundLength(int ms) { roundLengthMs = ms; updateRoundClock(); }
+    int roundMsLeft() const;
+    bool isRoundOver() const { return roundIsOver; }
+    Player * getPlayer() { return player; }
+    Bot * getBot() { return bot; }
+    QVector<HeroStats *> heroStats();
+    void releaseControls();     // as if every key and the mouse button were let go
+    void focusGame();
     void setPowerGrenadeThrowing(PowerGrenadeThrowing * p) { powerGrenadeThrowing = p; }
     void setLeaderboard(Leaderboard * l) { leaderboard = l; }
     void setMessageAtTopOfScreen(MessageAtTopOfScreen * m) { messageAtTopOfScreen = m; }
@@ -48,6 +58,10 @@ public:
 public slots:
     void stopThrowingGrenade();
 
+signals:
+    void pauseRequested();      // Esc
+    void roundOver();           // time's up; the game clock is paused
+
 private:
     const int mainItemSize = 10;
 
@@ -63,8 +77,14 @@ private:
     MessageAtTopOfScreen * messageAtTopOfScreen = nullptr;
     Countdown * countdown = nullptr;
 
-    QTimer timerChestCreating;
-    QTimer throwingGrenadeTimer;
+    Bot * bot = nullptr;
+    GameTimer roundTimer;
+    GameTimer roundClock;       // refreshes the time left on the bar
+    int roundLengthMs = Settings::DEFAULT_ROUND_MINUTES * 60000;
+    qint64 roundEndsAt = -1;    // game time; -1 until the round starts
+    bool roundIsOver = false;
+    GameTimer timerChestCreating;
+    GameTimer throwingGrenadeTimer;
     QTimer fieldOfViewTimer;
     bool fieldOfViewPending = false;
     const int FIELD_OF_VIEW_FRAME = 16;
@@ -73,6 +93,8 @@ private:
     virtual void keyReleaseEvent(QKeyEvent *event);
 
     void startThrowingGrenade();
+    void endRound();
+    void updateRoundClock();
     void checkChestsInArea();
 
 private slots:

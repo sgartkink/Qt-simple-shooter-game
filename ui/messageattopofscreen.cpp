@@ -1,4 +1,5 @@
 #include "ui/messageattopofscreen.h"
+#include "core/gameclock.h"
 
 MessageAtTopOfScreen::MessageAtTopOfScreen(QWidget *parent, Qt::WindowFlags f)
     : QWidget(parent, f)
@@ -27,4 +28,5 @@ void MessageAtTopOfScreen::showMessage(QString text)
     animation->stop();
     label.setText(text);
     animation->start();
+    GameClock::track(animation);
 }

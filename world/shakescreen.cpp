@@ -6,7 +6,7 @@ ShakeScreen::ShakeScreen(MapView *mapView)
 {
     mapViewWidth = mapView->width();
     mapViewHeight = mapView->height();
-    connect(&shakeTimer, &QTimer::timeout, this, &ShakeScreen::shake);
+    connect(&shakeTimer, &GameTimer::timeout, this, &ShakeScreen::shake);
 }
 
 void ShakeScreen::start()

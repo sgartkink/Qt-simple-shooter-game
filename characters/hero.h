@@ -6,6 +6,7 @@ class MapWidget;
 #include <QTimer>
 #include <QtMath>
 #include <QVector>
+#include "core/gameclock.h"
 
 #include "weapons/shooting.h"
 #include "core/global_consts.h"
@@ -85,7 +86,6 @@ protected:
     Rifle rifle;
     Shotgun shotgun;
     QLineF lineHeroMouse;
-    QTimer shootingTimer;
     QVector<Gun *> heroGuns {&pistol, &rifle, &shotgun};
 
     bool directionUp = false;
@@ -112,7 +112,7 @@ private:
     const int TIME_MOVE = 20;
     const Qt::GlobalColor heroColor;
     bool alive = false;
-    QTimer moveTimer;
+    GameTimer moveTimer;
     void checkIfStillExist(Hero *owner = nullptr);
 
     void changeCurrentGun(Gun &newGun, guns newGunENUM);

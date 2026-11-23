@@ -12,9 +12,13 @@ public:
     explicit MainMenu(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~MainMenu();
 
+    // a game is frozen behind the menu: offer to continue it, and starting means a new one
+    void setGameInProgress(bool inProgress);
+
 private:
     QVBoxLayout *qvBoxLayout = new QVBoxLayout(this);
 
+    QPushButton *bContinue = new QPushButton("Continue");
     QPushButton *bStartGame = new QPushButton("Start game");
     QPushButton *bOptions = new QPushButton("Options");
     QPushButton *bExit = new QPushButton("Exit");

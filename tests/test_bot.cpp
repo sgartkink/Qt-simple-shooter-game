@@ -23,6 +23,8 @@ private slots:
     void grenadeLimits();
     void grenadeLandsWhereItWasAimed();
     void waitsForItsOwnGrenadeAndStepsAwayFromIt();
+    void dodgesAGrenadeItSees();
+    void ignoresAGrenadeItDoesNotSee();
 
 private:
     static bool notices(Bot & bot, Player * player, QPointF at, qreal facing, QPointF target);
@@ -362,6 +364,53 @@ void TestBot::waitsForItsOwnGrenadeAndStepsAwayFromIt()
     const QPointF before = bot.pos();
     bot.nextMove();
     QVERIFY(bot.pos() != before);
+}
+
+// a grenade of the player's lying still at `at`
+static Grenade * lyingGrenade(World & world, QPointF at)
+{
+    Grenade * grenade = new Grenade(world.player(), 0);
+    world.scene()->addItem(grenade);
+    grenade->setPos(at);
+    return grenade;
+}
+
+void TestBot::dodgesAGrenadeItSees()
+{
+    World world;
+    world.player()->setPos(100, 1400);
+    Bot & bot = *world.addBot(QPointF(700, 700));
+    bot.start();
+    bot.destinationPoint = QPoint(1000, 700);            // walking right, so facing right
+    face(bot, 0);
+    Grenade * grenade = lyingGrenade(world, bot.centre() + QPointF(45, 0));
+    grenade->moveTimer.stop();
+    for (int i = 0; i < 40; i++)
+        bot.nextMove();
+    QCOMPARE(bot.seenGrenades.size(), 1);
+    QVERIFY2(QLineF(bot.centre(), grenade->pos()).length() >= bot.GRENADE_DANGER,
+             qPrintable(QString("still %1 px away").arg(QLineF(bot.centre(), grenade->pos()).length())));
+
+    delete grenade;                                      // gone off: forgotten
+    bot.nextMove();
+    QVERIFY(bot.seenGrenades.isEmpty());
+}
+
+void TestBot::ignoresAGrenadeItDoesNotSee()
+{
+    World world;
+    world.player()->setPos(100, 1400);
+    Bot & bot = *world.addBot(QPointF(700, 700));
+    bot.start();
+    bot.destinationPoint = QPoint(1000, 700);
+    face(bot, 0);
+    Grenade * grenade = lyingGrenade(world, bot.centre() + QPointF(-45, 0));   // behind it, outside the near circle
+    grenade->moveTimer.stop();
+    for (int i = 0; i < 10; i++)
+        bot.nextMove();
+    QVERIFY(bot.seenGrenades.isEmpty());
+    QCOMPARE(bot.destinationPoint, QPoint(1000, 700));    // carries on as it was
+    QCOMPARE(bot.pos(), QPointF(720, 700));
 }
 
 int runTestBot(int argc, char *argv[])

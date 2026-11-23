@@ -49,7 +49,7 @@ void MapView::drawForeground(QPainter *painter, const QRectF &rect)
     painter->drawImage(rect, fogCache, QRectF(source.topLeft() * ratio, source.size() * ratio));
 
     if (markedHero)
-        shotMarker.paint(painter, markedHeroCentre(), shotClock.elapsed());
+        shotMarker.paint(painter, markedHeroCentre(), msSinceShot());
 }
 
 void MapView::showShot(const QGraphicsItem *hero, QPointF origin)
@@ -57,7 +57,7 @@ void MapView::showShot(const QGraphicsItem *hero, QPointF origin)
     if (!shotMarker.mark(hero->sceneBoundingRect().center(), origin, mapToScene(viewport()->rect()).boundingRect()))
         return;     // too far away to mark; a marker still fading from an earlier shot carries on
     markedHero = hero;
-    shotClock.start();
+    shotAt = GameClock::now();
     shotMarkerTimer.start();
     updateShotMarker();
 }
@@ -108,17 +108,23 @@ void MapView::rebuildFog(const QRect &area)
 
 void MapView::mouseMoveEvent(QMouseEvent *event)
 {
+    if (GameClock::isPaused())
+        return;
     emit (sendCord(event->pos()));
 }
 
 void MapView::mousePressEvent(QMouseEvent *event)
 {
+    if (GameClock::isPaused())
+        return;
     if (event->button() == 1)
         emit (mousePressed());
 }
 
 void MapView::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (GameClock::isPaused())
+        return;
     if (event->button() == 1)
         emit (mouseReleased());
 }

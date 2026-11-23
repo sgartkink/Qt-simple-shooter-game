@@ -2,7 +2,7 @@
 #define SHAKESCREEN_H
 
 #include <QObject>
-#include <QTimer>
+#include "core/gameclock.h"
 #include <QtMath>
 class MapView;
 
@@ -16,7 +16,7 @@ public:
 
 private:
     MapView * mapView = nullptr;
-    QTimer shakeTimer;
+    GameTimer shakeTimer;
     int mapViewHeight;
     int mapViewWidth;
 

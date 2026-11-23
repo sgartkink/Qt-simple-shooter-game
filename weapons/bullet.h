@@ -4,7 +4,7 @@
 class Hero;
 #include <QObject>
 #include <QGraphicsRectItem>
-#include <QTimer>
+#include "core/gameclock.h"
 
 class Bullet : public QObject, public QGraphicsRectItem
 {
@@ -24,7 +24,7 @@ private:
     const int damage;
 
     Hero * owner;
-    QTimer moveTimer;
+    GameTimer moveTimer;
 
 private slots:
     void move();

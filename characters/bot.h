@@ -55,7 +55,15 @@ private:
     const int GRENADE_COOLDOWN_TICKS = 300;     // 6 s between grenades
     const qreal GRENADE_MIN_DISTANCE = 100;     // never close enough to catch itself in the blast
     const qreal GRENADE_MAX_DISTANCE = 390;     // lands before the 5 s fuse runs out (a throw with power ~50)
-    const qreal GRENADE_DANGER = 70;            // stays this far from its own live grenade (blast radius 40)
+    const qreal GRENADE_DANGER = 70;            // stays this far from a live grenade (blast radius 40)
+
+    // other heroes' grenades it has seen, and where it last saw each: it dodges only what it has noticed
+    struct SeenGrenade
+    {
+        QPointer<Grenade> grenade;
+        QPointF at;
+    };
+    QVector<SeenGrenade> seenGrenades;
 
     void checkNearestArea();
     bool canSee(QGraphicsItem * item);
@@ -63,7 +71,9 @@ private:
     void startLookingAround();
     void dependingOnReloadingSetState();
     bool throwGrenadeAt(QPointF target);
-    bool avoidOwnGrenade();
+    void noticeGrenade(Grenade * grenade);
+    QVector<QPointF> grenadesToAvoid();
+    bool avoidGrenades();
     QPointF centre() { return mapToScene(rect().center()); }
     bool checkIfItemsBetweenBotAndTarget();
 

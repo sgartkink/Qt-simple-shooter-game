@@ -1,5 +1,6 @@
 #include "ui/playerbarwidget.h"
 #include "core/global_consts.h"
+#include "core/gameclock.h"
 #include <QtDebug>
 
 PlayerBarWidget::PlayerBarWidget(QWidget *parent, Qt::WindowFlags f)
@@ -21,6 +22,8 @@ PlayerBarWidget::PlayerBarWidget(QWidget *parent, Qt::WindowFlags f)
     gridLayout.addWidget(&qlcdArmor, 2, 1);
     gridLayout.addWidget(&textReloardingBar, 2, 2, Qt::AlignRight);
     gridLayout.addWidget(reloadingBar, 2, 3, 1, 2);
+    gridLayout.addWidget(&textTimeLeft, 0, 5, Qt::AlignCenter);
+    gridLayout.addWidget(&timeLeft, 1, 5, Qt::AlignTop | Qt::AlignHCenter);
 
     textCurrentGun.setText("Current gun:");
     textLoadedAmmo.setText("Loaded ammo:");
@@ -29,6 +32,11 @@ PlayerBarWidget::PlayerBarWidget(QWidget *parent, Qt::WindowFlags f)
     textGrenades.setText("Grenades:");
     textArmor.setText("Armor:");
     textReloardingBar.setText("Reloading bar:");
+    textTimeLeft.setText("Time left:");
+    QFont font = timeLeft.font();
+    font.setPointSize(font.pointSize() * 2);
+    font.setBold(true);
+    timeLeft.setFont(font);
 
     reloadingBar->setMinimum(0);
     reloadingBar->setMaximum(100);
@@ -73,10 +81,15 @@ void PlayerBarWidget::updateAmmoNoReloading(int ammoLoaded, int ammoOwned)
     qlcdOwnedAmmo.display(ammoOwned);
 }
 
+void PlayerBarWidget::updateTimeLeft(int seconds)
+{
+    timeLeft.setText(QString("%1:%2").arg(seconds / 60).arg(seconds % 60, 2, 10, QChar('0')));
+}
+
 void PlayerBarWidget::updateAmmoReloading(int ammoLoaded, int ammoOwned)
 {
     reloadingAnimation();
-    QTimer::singleShot(RELOADING_TIME, this, [this, ammoLoaded, ammoOwned]()
+    GameClock::singleShot(RELOADING_TIME, this, [this, ammoLoaded, ammoOwned]()
         {
             qlcdLoadedAmmo.display(ammoLoaded);
             qlcdOwnedAmmo.display(ammoOwned);
@@ -91,6 +104,7 @@ void PlayerBarWidget::reloadingAnimation()
     animation->setStartValue(0);
     animation->setEndValue(100);
     animation->start(QAbstractAnimation::DeleteWhenStopped);
+    GameClock::track(animation);
 }
 
 PlayerBarWidget::~PlayerBarWidget()

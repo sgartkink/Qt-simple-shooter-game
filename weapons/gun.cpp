@@ -1,5 +1,6 @@
 ﻿#include "weapons/gun.h"
 #include "core/global_consts.h"
+#include "core/gameclock.h"
 #include <QtDebug>
 Gun::Gun(bool automatic, int fireFrequency)
     : automatic(automatic), fireFrequency(fireFrequency)
@@ -11,7 +12,7 @@ void Gun::reload()
 {    
     reloading = true;
     reloaded();
-    QTimer::singleShot(RELOADING_TIME, this, [this](){ reloading = false; });
+    GameClock::singleShot(RELOADING_TIME, this, [this](){ reloading = false; });
 }
 
 void Gun::addAmmo(int ammo)

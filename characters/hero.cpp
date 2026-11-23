@@ -75,7 +75,7 @@ void Hero::resetHero()
     changeColor(Qt::white);
     emit (died());
 
-    QTimer::singleShot(TIME_RETURN_TO_LIFE, this, [this]()
+    GameClock::singleShot(TIME_RETURN_TO_LIFE, this, [this]()
     {
         this->start();
     });

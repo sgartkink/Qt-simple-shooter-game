@@ -16,12 +16,12 @@ void Shooting::start()
         if (gun->isAutomatic())
             timer.start(gun->getFireFrequency());
         else
-            QTimer::singleShot(200, this, [this](){ owner->setCurrentlyShooting(false); });
+            GameClock::singleShot(200, this, [this](){ owner->setCurrentlyShooting(false); });
     }
     else
     {
         gun->reload();
-        QTimer::singleShot(RELOADING_TIME, this, [this](){ owner->setCurrentlyShooting(false); });
+        GameClock::singleShot(RELOADING_TIME, this, [this](){ owner->setCurrentlyShooting(false); });
 
         if (mainPlayer)
             emit (owner->ammoChangedReloading());

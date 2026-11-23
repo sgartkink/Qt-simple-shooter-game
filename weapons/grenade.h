@@ -3,11 +3,10 @@
 
 #include <QGraphicsRectItem>
 #include <QGraphicsScene>
-#include <QDateTime>
 #include <QPropertyAnimation>
 #include <QObject>
 #include <QSet>
-#include <QTimer>
+#include "core/gameclock.h"
 
 class MapView;
 #include "world/itemsonscene.h"
@@ -21,6 +20,8 @@ class Grenade : public QObject, public QGraphicsRectItem
 public:
     Grenade(Hero * owner, double addedVelocity, MapView * mapView = nullptr);
     ~Grenade();
+
+    Hero * getOwner() const { return owner; }
 
     static constexpr double BASE_VELOCITY = 40;   // px/s; the throw's power (0..100) adds to it
     static constexpr double MAX_POWER = 100;
@@ -52,8 +53,8 @@ private:
     QList<QGraphicsItem *> corner1;
     QList<QGraphicsItem *> corner2;
 
-    QDateTime dateTimeStart;
-    QTimer moveTimer;
+    qint64 thrownAt;                // game time
+    GameTimer moveTimer;
     double currentVelocity;
     double dx;
     double dy;

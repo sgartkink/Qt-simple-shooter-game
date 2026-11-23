@@ -15,7 +15,7 @@ public:
     void increaseKills();
     void increaseDeath();
 
-    QString getName() { return name; }
+    QString getName() const { return name; }
     unsigned int getKills() const { return kills; }
     unsigned int getDeaths() const { return deaths; }
 

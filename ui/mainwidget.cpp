@@ -24,6 +24,22 @@ MainWidget::MainWidget(QWidget *parent, Qt::WindowFlags f)
     leaderboard->setMinimumWidth(WINDOW_WIDTH);
     leaderboard->setMinimumHeight(WINDOW_HEIGHT - playerBarWidget->height());
 
+    const int gameHeight = WINDOW_HEIGHT - playerBarWidget->minimumHeight();
+    pauseMenu = new PauseMenu(this);
+    pauseMenu->setFixedSize(300, 180);
+    pauseMenu->move((WINDOW_WIDTH - 300) / 2, (gameHeight - 180) / 2);
+    connect(pauseMenu, &PauseMenu::resumeClicked, this, &MainWidget::resume);
+    connect(pauseMenu, &PauseMenu::backToMenuClicked, this, &MainWidget::backToMenuRequested);
+
+    roundOverWidget = new RoundOverWidget(this);
+    roundOverWidget->setFixedSize(420, 260);
+    roundOverWidget->move((WINDOW_WIDTH - 420) / 2, (gameHeight - 260) / 2);
+    connect(roundOverWidget, &RoundOverWidget::playAgainClicked, this, &MainWidget::playAgainRequested);
+    connect(roundOverWidget, &RoundOverWidget::backToMenuClicked, this, &MainWidget::backToMenuRequested);
+
+    connect(mapWidget, &MapWidget::pauseRequested, this, &MainWidget::pause);
+    connect(mapWidget, &MapWidget::roundOver, this, &MainWidget::showRoundOver);
+
     mapWidget->setPowerGrenadeThrowing(powerGrenadeThrowing);
     mapWidget->setLeaderboard(leaderboard);
     mapWidget->setMessageAtTopOfScreen(messageAtTopOfScreen);
@@ -32,6 +48,30 @@ MainWidget::MainWidget(QWidget *parent, Qt::WindowFlags f)
     setLayout(qvboxLayout);
     qvboxLayout->addWidget(mapWidget);
     qvboxLayout->addWidget(playerBarWidget);
+}
+
+void MainWidget::pause()
+{
+    if (GameClock::isPaused() || mapWidget->isRoundOver())
+        return;
+    mapWidget->releaseControls();
+    GameClock::setPaused(true);
+    pauseMenu->showMenu();
+}
+
+void MainWidget::resume()
+{
+    if (mapWidget->isRoundOver())
+        return;
+    pauseMenu->setVisible(false);
+    GameClock::setPaused(false);
+    mapWidget->focusGame();
+}
+
+void MainWidget::showRoundOver()
+{
+    pauseMenu->setVisible(false);
+    roundOverWidget->showResult(mapWidget->heroStats(), mapWidget->getPlayer()->getHeroStats());
 }
 
 MainWidget::~MainWidget()

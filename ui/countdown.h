@@ -1,7 +1,7 @@
 #ifndef COUNTDOWNTOSTART_H
 #define COUNTDOWNTOSTART_H
 
-#include <QTimer>
+#include "core/gameclock.h"
 #include <QLabel>
 #include <QWidget>
 #include <QVBoxLayout>
@@ -16,7 +16,7 @@ public:
 
 private:
     QVBoxLayout * qvBoxLayout = new QVBoxLayout(this);
-    QTimer timer;
+    GameTimer timer;
 
     QLabel lText;
     QLabel lSecLeft;

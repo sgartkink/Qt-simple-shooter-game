@@ -2,7 +2,7 @@
 #define SHOOTING_H
 
 #include <QObject>
-#include <QTimer>
+#include "core/gameclock.h"
 #include <QGraphicsScene>
 #include <QRandomGenerator>
 
@@ -26,7 +26,7 @@ private:
     Hero * owner;
     Gun * gun;
     QGraphicsScene * mainScene;
-    QTimer timer;
+    GameTimer timer;
     qreal lineAngle;
 
     void createBullet();

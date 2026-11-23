@@ -1,4 +1,5 @@
 #include "ui/powergrenadethrowing.h"
+#include "core/gameclock.h"
 
 PowerGrenadeThrowing::PowerGrenadeThrowing(QWidget *parent)
     : QProgressBar(parent)
@@ -27,12 +28,14 @@ void PowerGrenadeThrowing::start()
     setVisible(true);
     effect->setOpacity(1);
     animationValue->start();
+    GameClock::track(animationValue);
 }
 
 void PowerGrenadeThrowing::stop()
 {
     animationValue->stop();
     animationOpacity->start();
+    GameClock::track(animationOpacity);
 }
 
 PowerGrenadeThrowing::~PowerGrenadeThrowing()

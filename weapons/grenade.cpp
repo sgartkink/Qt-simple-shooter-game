@@ -10,7 +10,7 @@ Grenade::Grenade(Hero *owner, double addedVelocity, MapView *mapView)
 {
     setTransformOriginPoint(2,2);
     setRotation(owner->lineAngle());
-    dateTimeStart = QDateTime::currentDateTime();
+    thrownAt = GameClock::now();
 
     velocity += addedVelocity;
     dx = 5*qCos(qDegreesToRadians(owner->lineAngle()))*velocity/500;
@@ -19,7 +19,7 @@ Grenade::Grenade(Hero *owner, double addedVelocity, MapView *mapView)
     connect(&moveTimer, SIGNAL(timeout()), this, SLOT(move()));
     moveTimer.start(10);
 
-    QTimer::singleShot(5000, this, SLOT(explode()));
+    GameClock::singleShot(5000, this, [this](){ explode(); });
 }
 
 Grenade::~Grenade()
@@ -52,8 +52,7 @@ double Grenade::powerFor(qreal distance)
 
 void Grenade::move()
 {
-    QDateTime dateTimeCurrent = QDateTime::currentDateTime();
-    double secondsDiff = dateTimeStart.msecsTo(dateTimeCurrent);
+    double secondsDiff = GameClock::now() - thrownAt;
     secondsDiff /= 1000;
     currentVelocity = velocity * qSin(sqrt(3)/2) - 9.81*secondsDiff;
     currentHeight = 10 + currentVelocity * secondsDiff * qSin(sqrt(3)/2)  - 9.81*secondsDiff*secondsDiff/2;
@@ -198,6 +197,7 @@ void Grenade::explode()
     animation->setStartValue(QRectF(0, 0, 0, 0));
     animation->setEndValue(QRectF(-radius, -radius, radius*2, radius*2));
     animation->start(QAbstractAnimation::DeleteWhenStopped);
+    GameClock::track(animation);
 
     QPainterPath path;
     path.addEllipse(x() - radius, y() - radius, radius*2, radius*2);
@@ -209,5 +209,5 @@ void Grenade::explode()
 
     owner->announceAttack(pos());
     mapView->startShakeScreen();
-    QTimer::singleShot(300, this, [this](){ delete this; });
+    GameClock::singleShot(300, this, [this](){ delete this; });
 }

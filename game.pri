@@ -11,6 +11,10 @@ CONFIG += c++1z
 INCLUDEPATH += $$PWD
 
 SOURCES += \
+    $$PWD/core/gameclock.cpp \
+    $$PWD/core/settings.cpp \
+    $$PWD/ui/pausemenu.cpp \
+    $$PWD/ui/roundoverwidget.cpp \
     $$PWD/ui/mainwindow.cpp \
     $$PWD/ui/mainmenu.cpp \
     $$PWD/ui/mainwidget.cpp \
@@ -47,6 +51,10 @@ SOURCES += \
 
 HEADERS += \
     $$PWD/core/global_consts.h \
+    $$PWD/core/gameclock.h \
+    $$PWD/core/settings.h \
+    $$PWD/ui/pausemenu.h \
+    $$PWD/ui/roundoverwidget.h \
     $$PWD/ui/mainwindow.h \
     $$PWD/ui/mainmenu.h \
     $$PWD/ui/mainwidget.h \

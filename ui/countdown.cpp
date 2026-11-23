@@ -24,7 +24,7 @@ void Countdown::start(const QString & text, const int & s)
 
     timer.start(1000);
 
-    QTimer::singleShot(secLeft*1000, this, [this](){
+    GameClock::singleShot(secLeft*1000, this, [this](){
         timer.stop();
         this->setVisible(false);
     });
