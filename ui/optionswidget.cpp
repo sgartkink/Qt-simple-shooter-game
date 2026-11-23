@@ -31,7 +31,7 @@ OptionsWidget::OptionsWidget(QWidget *parent, Qt::WindowFlags f)
 
     qvBoxLayout->addWidget(bBack);
 
-    connect(bBack, SIGNAL(clicked()), parent, SLOT(backToMenu()));
+    connect(bBack, &QPushButton::clicked, this, &OptionsWidget::backClicked);
 }
 
 void OptionsWidget::setRoundLengthLocked(bool locked)

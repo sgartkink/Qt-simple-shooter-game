@@ -12,7 +12,7 @@ Hero::Hero(MapWidget *mapWidget, Qt::GlobalColor color, qreal x, qreal y, qreal 
 
     changeColor(Qt::white);
 
-    connect(&moveTimer, SIGNAL(timeout()), this, SLOT(nextMove()));
+    connect(&moveTimer, &GameTimer::timeout, this, &Hero::nextMove);     // virtual: Player's or Bot's
 }
 
 void Hero::attackItem(int damage, Hero *owner)

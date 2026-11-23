@@ -12,7 +12,7 @@ Countdown::Countdown(QWidget *parent, Qt::WindowFlags f)
     qvBoxLayout->addWidget(&lText);
     qvBoxLayout->addWidget(&lSecLeft);
 
-    connect(&timer, SIGNAL(timeout()), this, SLOT(countdown()));
+    connect(&timer, &GameTimer::timeout, this, &Countdown::countdown);
 }
 
 void Countdown::start(const QString & text, const int & s)

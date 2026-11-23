@@ -10,32 +10,32 @@ MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, MainWidget *parent, Qt::W
     qhboxLayout->addWidget(mapView);
     setStyleSheet("border: 0px");
 
-    connect(player, &Player::ammoChangedReloading, [playerBarWidget, this]()
+    connect(player, &Player::ammoChangedReloading, playerBarWidget, [playerBarWidget, this]()
         { playerBarWidget->updateAmmoReloading(player->gun()->ammoLoaded(), player->gun()->ammoOwned()); }
     );
-    connect(player, &Player::ammoChangedNoReloading, [playerBarWidget, this]()
+    connect(player, &Player::ammoChangedNoReloading, playerBarWidget, [playerBarWidget, this]()
         { playerBarWidget->updateAmmoNoReloading(player->gun()->ammoLoaded(), player->gun()->ammoOwned()); }
     );
     emit (player->ammoChangedNoReloading());
-    connect(player, &Player::hpChanged, [playerBarWidget, this](){ playerBarWidget->updatePlayerHP(player->getHP()); });
+    connect(player, &Player::hpChanged, playerBarWidget, [playerBarWidget, this](){ playerBarWidget->updatePlayerHP(player->getHP()); });
     emit (player->hpChanged());
-    connect(player, &Player::grenadesChanged, [playerBarWidget, this](){
+    connect(player, &Player::grenadesChanged, playerBarWidget, [playerBarWidget, this](){
         playerBarWidget->updateGrenades(player->getGrenades());
     });
     emit (player->grenadesChanged());
-    connect(player, &Player::armorChanged, [playerBarWidget, this](){ playerBarWidget->updateArmor(player->getArmor()); });
+    connect(player, &Player::armorChanged, playerBarWidget, [playerBarWidget, this](){ playerBarWidget->updateArmor(player->getArmor()); });
     emit (player->armorChanged());
-    connect(player, &Player::gunChanged, [playerBarWidget, this](){ playerBarWidget->updateCurrentGun(player->gunENUM()); });
+    connect(player, &Player::gunChanged, playerBarWidget, [playerBarWidget, this](){ playerBarWidget->updateCurrentGun(player->gunENUM()); });
     emit (player->gunChanged());
 
-    connect(mapView, SIGNAL(sendCord(QPoint)), player, SLOT(updateLineHeroMouse(QPoint)));
-    connect(player, SIGNAL(posChanged()), this, SLOT(changeSceneRect()));
-    connect(player, SIGNAL(posChanged()), this, SLOT(updateFieldOfView()));
-    connect(player, SIGNAL(viewChanged()), this, SLOT(updateFieldOfView()));
+    connect(mapView, &MapView::sendCord, player, &Player::updateLineHeroMouse);
+    connect(player, &Player::posChanged, this, &MapWidget::changeSceneRect);
+    connect(player, &Player::posChanged, this, &MapWidget::updateFieldOfView);
+    connect(player, &Player::viewChanged, this, &MapWidget::updateFieldOfView);
     connect(player, &Player::died, mapView, &MapView::clearShot);
     fieldOfViewTimer.setSingleShot(true);
     fieldOfViewTimer.setInterval(FIELD_OF_VIEW_FRAME);
-    connect(&fieldOfViewTimer, &QTimer::timeout, [this]()
+    connect(&fieldOfViewTimer, &QTimer::timeout, this, [this]()
     {
         if (fieldOfViewPending)
         {
@@ -43,12 +43,12 @@ MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, MainWidget *parent, Qt::W
             fieldOfViewTimer.start();
         }
     });
-    connect(&throwingGrenadeTimer, SIGNAL(timeout()), this, SLOT(stopThrowingGrenade()));
+    connect(&throwingGrenadeTimer, &GameTimer::timeout, this, &MapWidget::stopThrowingGrenade);
     roundTimer.setSingleShot(true);
     connect(&roundTimer, &GameTimer::timeout, this, &MapWidget::roundTimeUp);
     connect(&roundClock, &GameTimer::timeout, this, &MapWidget::updateRoundClock);
     updateRoundClock();
-    connect(&timerChestCreating, SIGNAL(timeout()), this, SLOT(createChest()));
+    connect(&timerChestCreating, &GameTimer::timeout, this, &MapWidget::createChest);
 
     scene->addItem(player);
     player->setPos(200,240);
@@ -70,8 +70,8 @@ void MapWidget::start()
         roundTimer.start(roundLengthMs);
         roundEndsAt = GameClock::now() + roundLengthMs;
         roundClock.start(250);
-        connect(mapView, SIGNAL(mousePressed()), player, SLOT(startShooting()));
-        connect(mapView, SIGNAL(mouseReleased()), player, SLOT(stopShooting()));
+        connect(mapView, &MapView::mousePressed, player, &Player::startShooting);
+        connect(mapView, &MapView::mouseReleased, player, &Player::stopShooting);
         timerChestCreating.start(30000);
         player->start();
         bot->start();

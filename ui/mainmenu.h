@@ -15,6 +15,12 @@ public:
     // a game is frozen behind the menu: offer to continue it, and starting means a new one
     void setGameInProgress(bool inProgress);
 
+signals:
+    void continueClicked();
+    void startClicked();
+    void optionsClicked();
+    void exitClicked();
+
 private:
     QVBoxLayout *qvBoxLayout = new QVBoxLayout(this);
 

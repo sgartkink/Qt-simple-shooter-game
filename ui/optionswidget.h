@@ -10,6 +10,7 @@
 
 class OptionsWidget : public QWidget
 {
+    Q_OBJECT
 public:
     explicit OptionsWidget(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 
@@ -35,6 +36,9 @@ public:
     QComboBox * getRoundLengthBox() { return roundLength; }
     // a game is frozen behind the menu: its round length can't change under it
     void setRoundLengthLocked(bool locked);
+
+signals:
+    void backClicked();
 
 private:
 

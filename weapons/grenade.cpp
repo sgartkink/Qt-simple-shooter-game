@@ -16,7 +16,7 @@ Grenade::Grenade(Hero *owner, double addedVelocity, MapView *mapView)
     dx = 5*qCos(qDegreesToRadians(owner->lineAngle()))*velocity/500;
     dy = -5*qSin(qDegreesToRadians(owner->lineAngle()))*velocity/500;
 
-    connect(&moveTimer, SIGNAL(timeout()), this, SLOT(move()));
+    connect(&moveTimer, &GameTimer::timeout, this, &Grenade::move);
     moveTimer.start(10);
 
     GameClock::singleShot(5000, this, [this](){ explode(); });

@@ -5,7 +5,7 @@
 Shooting::Shooting(Hero *owner, Gun *gun, QGraphicsScene *mainScene, bool mainPlayer)
     : mainPlayer(mainPlayer), owner(owner), gun(gun), mainScene(mainScene)
 {
-    connect(&timer, SIGNAL(timeout()), this, SLOT(shot()));
+    connect(&timer, &GameTimer::timeout, this, &Shooting::shot);
 }
 
 void Shooting::start()

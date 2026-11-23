@@ -15,7 +15,7 @@ LeaderboardSlot::LeaderboardSlot(Leaderboard *lb, HeroStats *hS)
     if (hS)
         setHeroStats(hS);
 
-    connect(this, SIGNAL(changed()), lb, SLOT(update()));
+    connect(this, &LeaderboardSlot::changed, lb, &Leaderboard::update);
 }
 
 void LeaderboardSlot::setHeroStats(HeroStats *hS)

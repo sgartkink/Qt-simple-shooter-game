@@ -9,10 +9,10 @@ MainMenu::MainMenu(QWidget *parent, Qt::WindowFlags f)
     qvBoxLayout->addWidget(bOptions);
     qvBoxLayout->addWidget(bExit);
 
-    connect(bContinue, SIGNAL(clicked()), parent, SLOT(continueGame()));
-    connect(bStartGame, SIGNAL(clicked()), parent, SLOT(startProgram()));
-    connect(bOptions, SIGNAL(clicked()), parent, SLOT(showOptions()));
-    connect(bExit, SIGNAL(clicked()), parent, SLOT(stopProgram()));
+    connect(bContinue, &QPushButton::clicked, this, &MainMenu::continueClicked);
+    connect(bStartGame, &QPushButton::clicked, this, &MainMenu::startClicked);
+    connect(bOptions, &QPushButton::clicked, this, &MainMenu::optionsClicked);
+    connect(bExit, &QPushButton::clicked, this, &MainMenu::exitClicked);
 }
 
 void MainMenu::setGameInProgress(bool inProgress)

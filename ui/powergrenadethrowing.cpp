@@ -19,7 +19,7 @@ PowerGrenadeThrowing::PowerGrenadeThrowing(QWidget *parent)
     animationOpacity->setStartValue(1);
     animationOpacity->setEndValue(0);
 
-    connect(animationOpacity, &QPropertyAnimation::finished, [this](){ setVisible(false); });
+    connect(animationOpacity, &QPropertyAnimation::finished, this, [this](){ setVisible(false); });
 }
 
 void PowerGrenadeThrowing::start()

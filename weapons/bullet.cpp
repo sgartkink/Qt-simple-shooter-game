@@ -9,7 +9,7 @@ Bullet::Bullet(Hero *owner, int damage, double dx, double dy)
 {
     setTransformOriginPoint(2, 1);
     setRotation(-1 * owner->lineAngle());
-    connect(&moveTimer, SIGNAL(timeout()), this, SLOT(move()));
+    connect(&moveTimer, &GameTimer::timeout, this, &Bullet::move);
     moveTimer.start(10);
 }
 

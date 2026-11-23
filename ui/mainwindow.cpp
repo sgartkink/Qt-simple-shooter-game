@@ -16,6 +16,12 @@ MainWindow::MainWindow(QWidget *parent) :
     stackedWidget->setCurrentWidget(mainMenu);
 
     setCentralWidget(stackedWidget);
+
+    connect(mainMenu, &MainMenu::continueClicked, this, &MainWindow::continueGame);
+    connect(mainMenu, &MainMenu::startClicked, this, &MainWindow::startProgram);
+    connect(mainMenu, &MainMenu::optionsClicked, this, &MainWindow::showOptions);
+    connect(mainMenu, &MainMenu::exitClicked, this, &MainWindow::stopProgram);
+    connect(optionsWidget, &OptionsWidget::backClicked, this, &MainWindow::backToMenu);
 }
 
 void MainWindow::startProgram()

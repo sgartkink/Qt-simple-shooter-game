@@ -5,7 +5,7 @@ One class per lowercase `.h/.cpp` pair, kept side by side in folders by game are
 
 ## Layout
 
-- `main.cpp`, `shooter.pro` (the game), `game.pri` (every game source except `main.cpp`; shared by the game and the tests): project root
+- `main.cpp`, `README.md` (screenshot in `docs/`), `shooter.pro` (the game), `game.pri` (every game source except `main.cpp`; shared by the game and the tests): project root
 - `tests/`: Qt Test suite (`tests.pro`, one `test_*.cpp` per area, shared setup in `helpers.h`)
 - `core/`: `global_consts.h`, `GameClock` / `GameTimer` (game time that pauses), `Settings` (options kept between runs)
 - `ui/`: windows, menus, HUD and overlays (`MainWindow`, `MainMenu`, `MainWidget`, `OptionsWidget`, `PlayerBarWidget`, `Leaderboard`, `LeaderboardSlot`, `Countdown`, `MessageAtTopOfScreen`, `PowerGrenadeThrowing`, `PauseMenu`, `RoundOverWidget`)
@@ -45,7 +45,7 @@ mkdir -p build/tests && cd build/tests && qmake ../../tests/tests.pro && make -j
 
 ## Architecture
 
-- **Widgets:** `MainWindow` (`QStackedWidget`, fixed 1024×720) → `MainMenu` / `MainWidget` / `OptionsWidget`. `MainMenu` and `OptionsWidget` wire their buttons to the parent's slots via old-style `SLOT()`.
+- **Widgets:** `MainWindow` (`QStackedWidget`, fixed 1024×720) → `MainMenu` / `MainWidget` / `OptionsWidget`. `MainMenu` and `OptionsWidget` emit signals for their buttons (`startClicked`, `backClicked`, …), which `MainWindow` connects.
 - **Game lifetime:** every new game is a new `MainWidget` (`MainWindow::startProgram`); `endGame()` deletes it and everything in it. Back to menu from the pause menu (`leaveGame`) keeps the game frozen behind the menu: the menu then shows Continue (`continueGame`, which resumes it) and "Start game" reads "New game" (which ends the frozen one first). Back to menu from the round-over screen ends the game. While a game exists, Options locks the round length. Signals from inside the game to `MainWindow` are queued, since they may delete the widget that sent them.
 - **Pause:** Esc in `MapWidget` emits `pauseRequested`; `MainWidget::pause` lets go of the controls (`MapWidget::releaseControls`), pauses the `GameClock` and shows `PauseMenu` (Resume, Back to menu; Esc there resumes). While the clock is paused `MapWidget` ignores keys and `MapView` the mouse.
 - **Round:** its length (1, 3 or 5 min, `Settings::roundMinutes`, default 3, chosen in Options, stored with `QSettings` as an ini file) is set by `MainWindow` before `MapWidget::start`. The round starts when the 3 s countdown ends (`roundTimer`; when it fires, `roundTimeUp` ends the round only if the game clock agrees, since timers may fire a few ms early); the bar shows the time left (`PlayerBarWidget::updateTimeLeft`, refreshed by `roundClock`). When it runs out `MapWidget::endRound` lets go of the controls, pauses the clock and emits `roundOver`; `MainWidget` shows `RoundOverWidget`: the winner by kills (`resultFor`: most kills wins, equal top kills is a draw), the table, Play again / Back to menu. No pausing over it.
@@ -64,7 +64,7 @@ mkdir -p build/tests && cd build/tests && qmake ../../tests/tests.pro && make -j
 
 ## Conventions
 
-- Mix of old-style `SIGNAL/SLOT` and lambda `connect`s; follow whatever the surrounding code uses.
+- Connections use function pointers (`connect(a, &A::signal, b, &B::slot)`), never `SIGNAL()`/`SLOT()` strings, so the compiler checks them. A lambda always gets a context object (`connect(a, &A::signal, receiver, [..]{...})`), so it's disconnected when the receiver goes. A widget never connects to its parent's slots: it emits a signal and the parent connects it.
 - **Game time:** anything that happens over time in a game uses the `GameClock`, so that pausing freezes it: `GameTimer` instead of `QTimer`, `GameClock::singleShot(ms, context, lambda)` instead of `QTimer::singleShot` (dropped if the context is deleted first), `GameClock::now()` instead of wall-clock time, and `GameClock::track(animation)` after starting a `QPropertyAnimation`. Only pure rendering timers (the field-of-view throttle, the shot marker's repaint) stay `QTimer`. Tests that pause the clock must `GameClock::reset()` afterwards.
 - Many members are created with in-class `new` initializers and deleted manually in destructors.
 - Hero state changes `emit` signals (`hpChanged`, `ammoChangedNoReloading`, …). Lambdas in the `MapWidget` constructor forward them to `PlayerBarWidget`.
