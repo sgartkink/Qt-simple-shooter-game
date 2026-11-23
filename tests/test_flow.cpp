@@ -23,6 +23,7 @@ private slots:
     void backToMenuFreezesTheGame();
     void roundResult();
     void roundEndsWhenTimeIsUp();
+    void roundDoesNotEndEarlyWhenItsTimerFiresEarly();
     void roundLengthComesFromTheOptions();
 
 private:
@@ -271,6 +272,29 @@ void TestFlow::roundEndsWhenTimeIsUp()
     QVERIFY(!GameClock::isPaused());
     window.showOptions();
     QVERIFY(window.findChild<QComboBox *>()->isEnabled());
+}
+
+void TestFlow::roundDoesNotEndEarlyWhenItsTimerFiresEarly()
+{
+    // timers may fire a few ms early; the round used to end then, with the bar still showing 0:01
+    MainWindow window;
+    window.show();
+    window.startProgram();
+    MainWidget * game = window.getMainWidget();
+    MapWidget * mapWidget = game->getMapWidget();
+    mapWidget->setRoundLength(800);
+    runFor(3000 + 200);
+    QVERIFY(mapWidget->roundMsLeft() > 0);
+
+    emit mapWidget->roundTimer.timeout();                 // fires ~600 ms early
+    QVERIFY(!mapWidget->isRoundOver());
+    QVERIFY(!GameClock::isPaused());
+    QVERIFY(mapWidget->roundTimer.isActive());            // waiting out the rest
+
+    runFor(800);
+    QVERIFY(mapWidget->isRoundOver());
+    QCOMPARE(mapWidget->roundMsLeft(), 0);
+    QCOMPARE(game->getPlayerBarWidget()->getTimeLeftText(), QString("0:00"));
 }
 
 void TestFlow::roundLengthComesFromTheOptions()

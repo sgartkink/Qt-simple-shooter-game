@@ -45,7 +45,7 @@ MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, MainWidget *parent, Qt::W
     });
     connect(&throwingGrenadeTimer, SIGNAL(timeout()), this, SLOT(stopThrowingGrenade()));
     roundTimer.setSingleShot(true);
-    connect(&roundTimer, &GameTimer::timeout, this, &MapWidget::endRound);
+    connect(&roundTimer, &GameTimer::timeout, this, &MapWidget::roundTimeUp);
     connect(&roundClock, &GameTimer::timeout, this, &MapWidget::updateRoundClock);
     updateRoundClock();
     connect(&timerChestCreating, SIGNAL(timeout()), this, SLOT(createChest()));
@@ -123,6 +123,16 @@ void MapWidget::releaseControls()
 void MapWidget::focusGame()
 {
     mapView->setFocus();
+}
+
+void MapWidget::roundTimeUp()
+{
+    // the game clock decides: a timer may fire a few ms early, and the round would end with time still on it
+    const int left = roundMsLeft();
+    if (left > 0)
+        roundTimer.start(left);
+    else
+        endRound();
 }
 
 void MapWidget::endRound()

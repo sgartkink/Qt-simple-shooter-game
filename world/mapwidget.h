@@ -26,6 +26,7 @@ class MainWidget;
 class MapWidget : public QWidget
 {
     Q_OBJECT
+    friend class TestFlow;
 public:
     explicit MapWidget(PlayerBarWidget * playerBarWidget,
                        MainWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
@@ -93,6 +94,7 @@ private:
     virtual void keyReleaseEvent(QKeyEvent *event);
 
     void startThrowingGrenade();
+    void roundTimeUp();
     void endRound();
     void updateRoundClock();
     void checkChestsInArea();
