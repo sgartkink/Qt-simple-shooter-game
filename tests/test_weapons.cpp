@@ -20,6 +20,7 @@ private slots:
     void grenadeRangeMatchesThePower();
     void grenadesBounceOffHeroesFlyingLowerThanThem();
     void grenadesComingDownOnSomethingBounceBack();
+    void grenadesBounceOffTheSideTheyHit();
 
 private:
     QRectF fire(World & world, QPointF start, qreal degrees);
@@ -237,6 +238,56 @@ void TestWeapons::grenadesComingDownOnSomethingBounceBack()
     world.scene()->removeItem(&hero);
     world.scene()->removeItem(&roofThrower);
     world.scene()->removeItem(&seamThrower);
+}
+
+void TestWeapons::grenadesBounceOffTheSideTheyHit()
+{
+    // one step at a time against the wall at x 400..440, y 280..360 (two buildings; their outline adds 0.5 px), from
+    // just outside it and low enough to hit it.
+    // The old corner checks looked at 3 of the grenade's 4 corners and guessed the side from the direction.
+    World world;
+    struct Hit { QPointF at; qreal dx, dy; bool flipX, flipY; const char * what; };
+    const Hit hits[] = {
+        { {395.4, 300}, 0.4, 0.3, true, false, "left side, moving right and down" },
+        { {395.4, 300}, 0.4, -0.3, true, false, "left side, moving right and up" },
+        { {440.7, 300}, -0.4, 0.3, true, false, "right side, moving left and down" },
+        { {440.7, 300}, -0.4, -0.3, true, false, "right side, moving left and up" },
+        { {420, 275.4}, 0.3, 0.4, false, true, "top, moving down and right" },
+        { {420, 275.4}, -0.3, 0.4, false, true, "top, moving down and left" },
+        { {420, 360.7}, 0.3, -0.4, false, true, "bottom, moving up and right" },
+        { {395.4, 275.4}, 0.4, 0.4, true, true, "top-left corner, diagonally" },
+        { {440.9, 360.9}, -0.8, -0.8, true, true, "bottom-right corner, diagonally" },   // past the bevel of the outline's corner
+    };
+    for (const Hit & hit : hits)
+    {
+        Grenade * grenade = new Grenade(world.player(), 0);
+        grenade->moveTimer.stop();
+        world.scene()->addItem(grenade);
+        grenade->setPos(hit.at);
+        grenade->dx = hit.dx;
+        grenade->dy = hit.dy;
+        grenade->thrownAt = GameClock::now();             // just thrown: 10 high, the wall is 50
+        grenade->move();
+        QVERIFY2((grenade->dx == -hit.dx) == hit.flipX && (grenade->dy == -hit.dy) == hit.flipY,
+                 qPrintable(QString("%1: now moving %2, %3").arg(hit.what).arg(grenade->dx).arg(grenade->dy)));
+        QCOMPARE(grenade->pos(), hit.at);                 // it doesn't go into the wall
+        grenade->move();
+        QVERIFY2(!QRectF(400, 280, 40, 80).intersects(QRectF(grenade->pos(), QSizeF(4, 4))),
+                 qPrintable(QString("%1: went into the wall").arg(hit.what)));
+        delete grenade;
+    }
+
+    // in the open it just flies on
+    Grenade * grenade = new Grenade(world.player(), 0);
+    grenade->moveTimer.stop();
+    world.scene()->addItem(grenade);
+    grenade->setPos(700, 700);
+    grenade->dx = 0.4;
+    grenade->dy = 0.3;
+    grenade->thrownAt = GameClock::now();
+    grenade->move();
+    QCOMPARE(grenade->pos(), QPointF(700.4, 700.3));
+    delete grenade;
 }
 
 int runTestWeapons(int argc, char *argv[])

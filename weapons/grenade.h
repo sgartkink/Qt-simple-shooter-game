@@ -16,6 +16,7 @@ class Grenade : public QObject, public QGraphicsRectItem
 {
     Q_OBJECT
     friend class TestBot;
+    friend class TestWeapons;
 
 public:
     Grenade(Hero * owner, double addedVelocity, MapView * mapView = nullptr);
@@ -41,17 +42,12 @@ private:
     double previousHeight = 10;     // at the last step
     int damage = 2;
     int size = 4;
-    bool mayMove = true;
 
     Hero * owner;
     GrenadeEllipseItem * ellipse = new GrenadeEllipseItem();
-    QGraphicsItem * previousHitItem = nullptr;
     QSet<QGraphicsItem *> cameDownOn;       // everything it bounced back from above, e.g. both buildings at a seam
     QGraphicsScene * mainScene = nullptr;
     MapView * mapView = nullptr;
-    QList<QGraphicsItem *> corner0;
-    QList<QGraphicsItem *> corner1;
-    QList<QGraphicsItem *> corner2;
 
     qint64 thrownAt;                // game time
     GameTimer moveTimer;
@@ -60,7 +56,9 @@ private:
     double dy;
 
     void setNewSize(int size_);
-    void setNewRotation();
+    bool blocks(QGraphicsItem * item) const;
+    static bool touches(QGraphicsItem * item, const QRectF & area);
+    void faceTheWayItFlies();
     bool bounceBackIfComingDownOnSomething();
     void stopMoving();
 

@@ -13,7 +13,7 @@ public:
     virtual ~ItemsOnScene();
 
     virtual void attackItem(int damage = 0, Hero * owner = nullptr) = 0;
-    double getHeight() { return height; }
+    double getHeight() const { return height; }
 
 protected:
     double height = 0;          // how tall it is for grenades: they bounce off it while flying lower
