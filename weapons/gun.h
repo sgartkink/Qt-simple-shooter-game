@@ -12,6 +12,10 @@ public:
     Gun(bool automatic = false, int fireFrequency = 0);
 
     int getFireFrequency() { return fireFrequency; }
+    int getBulletSpeed() const { return bulletSpeed; }     // px per 10 ms step
+    // single-shot guns with a fire frequency can't fire again before it has passed (game time)
+    bool readyToFire() const;
+    void markFired();
     int getDamage() { return damage; }
     int ammoLoaded() { return currentLoadedAmmo; }
     int ammoOwned() { return currentOwnedAmmo; }
@@ -32,6 +36,7 @@ protected:
     int currentLoadedAmmo;
     int maxAmmo;
     int currentOwnedAmmo;
+    int bulletSpeed = 5;
 
 private:
     const bool automatic;
@@ -39,6 +44,7 @@ private:
     bool reloading = false;
 
     int fireFrequency;
+    qint64 lastShotAt = -1;
 
     void reloaded();
 };

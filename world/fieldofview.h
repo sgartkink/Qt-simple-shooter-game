@@ -24,6 +24,8 @@ public:
     // whether an eye aiming at aimAngle notices the target: within NOTICE_ANGLE of the aim or NEAR_RADIUS of the eye,
     // with no building in between
     bool canSee(QPointF eye, qreal aimAngle, QPointF target) const;
+    // how far from `from` towards `to` before the first building wall (at most the distance to `to`)
+    qreal clearDistance(QPointF from, QPointF to) const;
 
 private:
     const qreal VIEW_ANGLE = 30;

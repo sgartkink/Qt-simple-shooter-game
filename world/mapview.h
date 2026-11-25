@@ -58,6 +58,7 @@ private:
 signals:
     void sendCord(QPoint mousePoint);
     void mousePressed();
+    void rightClicked();
     void mouseReleased();
 };
 

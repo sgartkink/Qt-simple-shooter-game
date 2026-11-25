@@ -12,6 +12,11 @@ void Shooting::start()
 {
     if (gun->ammoLoaded() > 0)
     {
+        if (!gun->readyToFire())
+        {
+            owner->setCurrentlyShooting(false);
+            return;
+        }
         shot();
         if (gun->isAutomatic())
             timer.start(gun->getFireFrequency());
@@ -36,6 +41,7 @@ void Shooting::stop()
 void Shooting::shot()
 {
     lineAngle = owner->lineAngle();
+    gun->markFired();
     if (owner->gunENUM() == SHOTGUN)
         for (int i = -4; i <= 4; i+=2)
             createBullet(i);
@@ -58,8 +64,8 @@ void Shooting::shot()
 
 void Shooting::createBullet()
 {
-    Bullet * bullet = new Bullet(owner, gun->getDamage(), 5*qCos(qDegreesToRadians(lineAngle)),
-                                 -5*qSin(qDegreesToRadians(lineAngle)));
+    Bullet * bullet = new Bullet(owner, gun->getDamage(), gun->getBulletSpeed()*qCos(qDegreesToRadians(lineAngle)),
+                                 -gun->getBulletSpeed()*qSin(qDegreesToRadians(lineAngle)));
     bullet->setPos(owner->x() + 5, owner->y() + 5);
     mainScene->addItem(bullet);
 }
@@ -68,7 +74,7 @@ void Shooting::createBullet(int xy_)
 {
     qreal angle = qDegreesToRadians(lineAngle + QRandomGenerator::global()->bounded(-7,7));
     Bullet * bullet = new Bullet(owner, gun->getDamage() + QRandomGenerator::global()->bounded(3),
-                                 5*qCos(angle), -5*qSin(angle));
+                                 gun->getBulletSpeed()*qCos(angle), -gun->getBulletSpeed()*qSin(angle));
     bullet->setPos(owner->x() + 5 + xy_, owner->y() + 5 + xy_);
     mainScene->addItem(bullet);
 }

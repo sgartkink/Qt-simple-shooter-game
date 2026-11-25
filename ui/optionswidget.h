@@ -23,7 +23,8 @@ private:
     QLabel lReload {"Reload: R"};
     QLabel lGrenade {"Start throwing grenade: Q (hold to throw stronger)"};
     QLabel lChest {"Open chest: E"};
-    QLabel lGuns {"1 - PISTOL, 2 - RIFLE, 3 - SHOTGUN"};
+    QLabel lGuns {"1 - PISTOL, 2 - RIFLE, 3 - SHOTGUN, 4 - SNIPER RIFLE"};
+    QLabel lScope {"Sniper rifle: right click to look through the scope, hold Shift to move the view with the mouse"};
     QLabel lLeaderboard {"Show leaderboard: X"};
     QLabel lPause {"Pause: Esc"};
 

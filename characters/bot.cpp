@@ -41,8 +41,7 @@ void Bot::checkNearestArea()
 {
     // the same view as the player: a screen-sized area around the bot, of which FieldOfView decides what's in sight
     const QSizeF view = mapWidget->viewSize();
-    const QPointF eye = mapToScene(rect().center());
-    const QRectF area(eye - QPointF(view.width()/2, view.height()/2), view);
+    const QRectF area(viewCentre() - QPointF(view.width()/2, view.height()/2), view);
 
     QList<QGraphicsItem *> listOfItemsInNearestArea = scene->items(area);
     for (auto it = listOfItemsInNearestArea.begin(); it != listOfItemsInNearestArea.end(); it++)

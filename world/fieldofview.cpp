@@ -65,6 +65,15 @@ bool FieldOfView::canSee(QPointF eye, qreal aimAngle, QPointF target) const
     return rayDistance(eye, direction, line.length(), hitAxis) >= line.length();
 }
 
+qreal FieldOfView::clearDistance(QPointF from, QPointF to) const
+{
+    const QLineF line(from, to);
+    if (line.length() < 0.001)
+        return 0;
+    int hitAxis = -1;
+    return qMin(line.length(), rayDistance(from, (to - from) / line.length(), line.length(), hitAxis));
+}
+
 QPolygonF FieldOfView::castRays(QPointF origin, qreal fromAngle, qreal toAngle, qreal maxDistance, qreal step,
                                 QVector<qreal> *rayAngles) const
 {

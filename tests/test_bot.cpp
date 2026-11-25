@@ -25,6 +25,7 @@ private slots:
     void waitsForItsOwnGrenadeAndStepsAwayFromIt();
     void dodgesAGrenadeItSees();
     void ignoresAGrenadeItDoesNotSee();
+    void seesFurtherThroughTheScope();
 
 private:
     static bool notices(Bot & bot, Player * player, QPointF at, qreal facing, QPointF target);
@@ -411,6 +412,19 @@ void TestBot::ignoresAGrenadeItDoesNotSee()
     QVERIFY(bot.seenGrenades.isEmpty());
     QCOMPARE(bot.destinationPoint, QPoint(1000, 700));    // carries on as it was
     QCOMPARE(bot.pos(), QPointF(720, 700));
+}
+
+void TestBot::seesFurtherThroughTheScope()
+{
+    // its view is the screen around what it looks at, like the player's
+    World world;
+    Player * player = world.player();
+    Bot & bot = *world.addBot(QPointF(300, 1200));
+    const QPointF eye = bot.centre();
+    QVERIFY(!notices(bot, player, QPointF(300, 1200), 0, eye + QPointF(700, 0)));   // past the screen's edge
+    bot.setScope(true, QPointF(600, 0));
+    QVERIFY(notices(bot, player, QPointF(300, 1200), 0, eye + QPointF(700, 0)));
+    bot.setScope(false);
 }
 
 int runTestBot(int argc, char *argv[])

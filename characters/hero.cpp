@@ -24,6 +24,12 @@ void Hero::attackItem(int damage, Hero *owner)
     }
 }
 
+void Hero::setScope(bool on, QPointF offset)
+{
+    scoped = on;
+    viewOffset = on ? offset : QPointF();
+}
+
 void Hero::announceAttack(QPointF origin)
 {
     mapWidget->heroAttacked(this, origin);
@@ -73,6 +79,7 @@ void Hero::resetHero()
     heroStats.increaseDeath();
     randNewPos();
     changeColor(Qt::white);
+    setScope(false);
     emit (died());
 
     GameClock::singleShot(TIME_RETURN_TO_LIFE, this, [this]()
@@ -110,6 +117,9 @@ void Hero::setCurrentGun(int gun_)
         break;
     case SHOTGUN:
         changeCurrentGun(shotgun, SHOTGUN);
+        break;
+    case SNIPER:
+        changeCurrentGun(sniper, SNIPER);
         break;
     }
 }

@@ -18,7 +18,8 @@ SOURCES += \
     test_bot.cpp \
     test_game.cpp \
     test_shotmarker.cpp \
-    test_flow.cpp
+    test_flow.cpp \
+    test_sniper.cpp
 
 HEADERS += \
     helpers.h

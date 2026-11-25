@@ -14,7 +14,8 @@ const int WINDOW_WIDTH = 1024;
 enum guns {
     PISTOL,
     RIFLE,
-    SHOTGUN
+    SHOTGUN,
+    SNIPER
 };
 
 #endif // GLOBAL_CONSTS_H

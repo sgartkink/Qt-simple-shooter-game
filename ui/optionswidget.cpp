@@ -12,6 +12,7 @@ OptionsWidget::OptionsWidget(QWidget *parent, Qt::WindowFlags f)
     qvBoxLayout->addWidget(&lGrenade);
     qvBoxLayout->addWidget(&lChest);
     qvBoxLayout->addWidget(&lGuns);
+    qvBoxLayout->addWidget(&lScope);
     qvBoxLayout->addWidget(&lLeaderboard);
     qvBoxLayout->addWidget(&lPause);
 

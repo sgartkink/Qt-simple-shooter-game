@@ -57,6 +57,9 @@ void PlayerBarWidget::updateCurrentGun(int gun)
     case SHOTGUN:
         currentGun.setText("SHOTGUN");
         break;
+    case SNIPER:
+        currentGun.setText("SNIPER RIFLE");
+        break;
     }
 }
 

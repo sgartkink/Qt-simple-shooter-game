@@ -44,6 +44,7 @@ SOURCES += \
     $$PWD/weapons/pistol.cpp \
     $$PWD/weapons/rifle.cpp \
     $$PWD/weapons/shotgun.cpp \
+    $$PWD/weapons/sniper.cpp \
     $$PWD/weapons/shooting.cpp \
     $$PWD/weapons/bullet.cpp \
     $$PWD/weapons/grenade.cpp \
@@ -84,6 +85,7 @@ HEADERS += \
     $$PWD/weapons/pistol.h \
     $$PWD/weapons/rifle.h \
     $$PWD/weapons/shotgun.h \
+    $$PWD/weapons/sniper.h \
     $$PWD/weapons/shooting.h \
     $$PWD/weapons/bullet.h \
     $$PWD/weapons/grenade.h \

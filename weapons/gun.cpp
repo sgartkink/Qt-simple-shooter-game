@@ -15,6 +15,16 @@ void Gun::reload()
     GameClock::singleShot(RELOADING_TIME, this, [this](){ reloading = false; });
 }
 
+bool Gun::readyToFire() const
+{
+    return automatic || fireFrequency <= 0 || lastShotAt < 0 || GameClock::now() - lastShotAt >= fireFrequency;
+}
+
+void Gun::markFired()
+{
+    lastShotAt = GameClock::now();
+}
+
 void Gun::addAmmo(int ammo)
 {
     if (currentLoadedAmmo + ammo > capacityAmmo)

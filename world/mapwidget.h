@@ -2,6 +2,7 @@
 #define MAPWIDGET_H
 
 #include <QWidget>
+#include <QLabel>
 #include <QHBoxLayout>
 #include <QMouseEvent>
 #include <QKeyEvent>
@@ -27,6 +28,7 @@ class MapWidget : public QWidget
 {
     Q_OBJECT
     friend class TestFlow;
+    friend class TestSniper;
 public:
     explicit MapWidget(PlayerBarWidget * playerBarWidget,
                        MainWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
@@ -36,6 +38,20 @@ public:
     void setRoundLength(int ms) { roundLengthMs = ms; updateRoundClock(); }
     int roundMsLeft() const;
     bool isRoundOver() const { return roundIsOver; }
+
+    // the sniper's scope (right click): the hero stands still; holding Shift the mouse moves the target (the point
+    // under the cursor) and the screen follows it, so the cursor stays put. The target never goes where the hero
+    // couldn't see it: behind a building, more than MAX_LOOK_DISTANCE away, off the map; it slides along instead.
+    // Where the screen can't follow (the map's edge), the cursor moves. A crosshair cursor and a line at the top show
+    // which mode is on.
+    void toggleScope();
+    void exitScope();
+    void setPanning(bool on);
+    void panScope(QPointF delta);
+    bool isPanning() const { return panning; }
+    QPointF getLookPoint() const { return lookPoint; }
+    QString getScopeHint() const { return scopeHint->isVisible() ? scopeHint->text() : QString(); }
+    static constexpr qreal MAX_LOOK_DISTANCE = 1000;
     Player * getPlayer() { return player; }
     Bot * getBot() { return bot; }
     QVector<HeroStats *> heroStats();
@@ -98,6 +114,17 @@ private:
     void endRound();
     void updateRoundClock();
     void checkChestsInArea();
+
+    bool panning = false;
+    QPointF lookPoint;          // the target while panning: under the cursor, always somewhere the hero can see
+    QPoint cursorAt;            // the cursor on the view, kept still while panning
+    QLabel * scopeHint = new QLabel(this);
+
+    void cursorMoved(QPoint at);
+    bool canLookAt(QPointF point) const;
+    QPointF cameraCentreFor(QPointF centre) const;      // the nearest screen centre that keeps the screen on the map
+    void followTarget();
+    void showScopeMode();
 
 private slots:
     void changeSceneRect();

@@ -117,8 +117,10 @@ void MapView::mousePressEvent(QMouseEvent *event)
 {
     if (GameClock::isPaused())
         return;
-    if (event->button() == 1)
+    if (event->button() == Qt::LeftButton)
         emit (mousePressed());
+    else if (event->button() == Qt::RightButton)
+        emit (rightClicked());
 }
 
 void MapView::mouseReleaseEvent(QMouseEvent *event)

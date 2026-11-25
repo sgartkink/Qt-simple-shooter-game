@@ -1,6 +1,8 @@
 #include "world/mapwidget.h"
 #include "core/global_consts.h"
 #include "ui/mainwidget.h"
+#include <QCursor>
+#include <algorithm>
 #include <QtDebug>
 
 MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, MainWidget *parent, Qt::WindowFlags f)
@@ -28,7 +30,12 @@ MapWidget::MapWidget(PlayerBarWidget *playerBarWidget, MainWidget *parent, Qt::W
     connect(player, &Player::gunChanged, playerBarWidget, [playerBarWidget, this](){ playerBarWidget->updateCurrentGun(player->gunENUM()); });
     emit (player->gunChanged());
 
-    connect(mapView, &MapView::sendCord, player, &Player::updateLineHeroMouse);
+    connect(mapView, &MapView::sendCord, this, &MapWidget::cursorMoved);
+    connect(mapView, &MapView::rightClicked, this, &MapWidget::toggleScope);
+    connect(player, &Player::died, this, &MapWidget::exitScope);
+    scopeHint->setVisible(false);
+    scopeHint->setStyleSheet("background-color: rgba(0, 0, 0, 170); color: white; padding: 4px 10px; font-weight: bold;");
+    scopeHint->setAttribute(Qt::WA_TransparentForMouseEvents);
     connect(player, &Player::posChanged, this, &MapWidget::changeSceneRect);
     connect(player, &Player::posChanged, this, &MapWidget::updateFieldOfView);
     connect(player, &Player::viewChanged, this, &MapWidget::updateFieldOfView);
@@ -109,8 +116,147 @@ QVector<HeroStats *> MapWidget::heroStats()
     return stats;
 }
 
+void MapWidget::cursorMoved(QPoint at)
+{
+    if (panning)
+    {
+        // the mouse moves the target: how far it went, then the cursor goes back over the target
+        const QPoint delta = at - cursorAt;
+        if (!delta.isNull())
+        {
+            panScope(delta);
+            QCursor::setPos(mapView->viewport()->mapToGlobal(cursorAt));
+        }
+        return;
+    }
+    cursorAt = at;
+    player->updateLineHeroMouse(at);
+}
+
+void MapWidget::toggleScope()
+{
+    if (player->isScoped())
+        exitScope();
+    else if (player->isAlive() && player->gunENUM() == SNIPER && !GameClock::isPaused())
+    {
+        // standing still from now on; the screen stays where it is until Shift moves it
+        player->setDirectionUp(false);
+        player->setDirectionDown(false);
+        player->setDirectionLeft(false);
+        player->setDirectionRight(false);
+        player->setScope(true);
+        showScopeMode();
+    }
+}
+
+void MapWidget::exitScope()
+{
+    setPanning(false);
+    if (player->isScoped())
+    {
+        player->setScope(false);
+        changeSceneRect();
+        player->updateLineHeroMouse(cursorAt);
+    }
+    showScopeMode();
+}
+
+void MapWidget::setPanning(bool on)
+{
+    if (on == panning || (on && !player->isScoped()))
+        return;
+    panning = on;
+    // while panning the view gets the mouse even outside it: a quick flick could otherwise carry the pointer out of
+    // the window before it is put back, and no more movement would arrive
+    if (on)
+        mapView->viewport()->grabMouse();
+    else
+        mapView->viewport()->releaseMouse();
+    if (on)
+    {
+        // the target starts under the cursor, or, if that spot is hidden or too far, at the nearest point towards it
+        // that isn't: from here on it is always somewhere the hero can see
+        const QPointF hero = player->centre();
+        const QPointF under = mapView->mapToScene(cursorAt);
+        QLineF line(hero, QPointF(qBound<qreal>(1, under.x(), MAP_SIZE_X_FULL - 1), qBound<qreal>(1, under.y(), MAP_SIZE_Y_FULL - 1)));
+        line.setLength(qMax<qreal>(0, std::min({line.length(), MAX_LOOK_DISTANCE, fieldOfView.clearDistance(hero, line.p2()) - 0.5})));
+        lookPoint = line.p2();
+        followTarget();
+    }
+    showScopeMode();
+}
+
+QPointF MapWidget::cameraCentreFor(QPointF centre) const
+{
+    const QSizeF screen = mapView->viewport()->size();
+    return QPointF(qBound(screen.width() / 2, centre.x(), MAP_SIZE_X_FULL - screen.width() / 2),
+                   qBound(screen.height() / 2, centre.y(), MAP_SIZE_Y_FULL - screen.height() / 2));
+}
+
+bool MapWidget::canLookAt(QPointF point) const
+{
+    // a pixel inside the map, so at its edge the cursor over the target is still on the view
+    if (point.x() < 1 || point.x() > MAP_SIZE_X_FULL - 1 || point.y() < 1 || point.y() > MAP_SIZE_Y_FULL - 1)
+        return false;
+    const qreal distance = QLineF(player->centre(), point).length();
+    return distance <= MAX_LOOK_DISTANCE && fieldOfView.clearDistance(player->centre(), point) >= distance - 0.01;
+}
+
+void MapWidget::panScope(QPointF delta)
+{
+    if (!panning)
+        return;
+    // the target moves with the mouse, but never to where the hero couldn't see it (behind a building, too far, off
+    // the map). Where the whole step can't go, its sideways and its up/down parts are tried alone, so it slides along.
+    for (QPointF step : {delta, QPointF(delta.x(), 0), QPointF(0, delta.y())})
+    {
+        if (step.manhattanLength() < 0.001 || !canLookAt(lookPoint + step))
+            continue;
+        lookPoint += step;
+        followTarget();
+        return;
+    }
+}
+
+void MapWidget::followTarget()
+{
+    // the screen moves so the target stays under the cursor; where it can't (the map's edge), the cursor moves to the
+    // target instead
+    const QPointF cursorFromCentre = QPointF(cursorAt) - QRectF(mapView->viewport()->rect()).center();
+    const QPointF centre = cameraCentreFor(lookPoint - cursorFromCentre);
+    player->setScope(true, centre - player->centre());
+    changeSceneRect();
+    const QRect view = mapView->viewport()->rect();
+    const QPoint mapped = mapView->mapFromScene(lookPoint);
+    const QPoint onScreen(qBound(view.left(), mapped.x(), view.right()), qBound(view.top(), mapped.y(), view.bottom()));
+    if ((onScreen - cursorAt).manhattanLength() > 1)
+    {
+        cursorAt = onScreen;
+        QCursor::setPos(mapView->viewport()->mapToGlobal(cursorAt));
+    }
+    player->updateLineHeroMouse(cursorAt);      // aims at the target
+}
+
+void MapWidget::showScopeMode()
+{
+    if (!player->isScoped())
+    {
+        scopeHint->setVisible(false);
+        mapView->viewport()->unsetCursor();
+        return;
+    }
+    scopeHint->setText(panning ? "SCOPE - moving the view (let go of Shift to aim)"
+                               : "SCOPE - hold Shift to move the view, right click to leave");
+    scopeHint->adjustSize();
+    scopeHint->move((width() - scopeHint->width()) / 2, 50);
+    scopeHint->setVisible(true);
+    scopeHint->raise();
+    mapView->viewport()->setCursor(panning ? Qt::SizeAllCursor : Qt::CrossCursor);
+}
+
 void MapWidget::releaseControls()
 {
+    setPanning(false);
     player->setDirectionUp(false);
     player->setDirectionDown(false);
     player->setDirectionLeft(false);
@@ -163,7 +309,7 @@ void MapWidget::changeSceneRect()
     // centred on the player, but never past the map's edge; sized to the viewport (what is actually shown),
     // measured each time, so it stays right if the window size changes
     const QSize screen = mapView->viewport()->size();
-    const QPointF centre = player->pos() + QPointF(mainItemSize / 2.0, mainItemSize / 2.0);
+    const QPointF centre = player->viewCentre();      // the hero, or where its scope looks
     const qreal x = qBound<qreal>(0, centre.x() - screen.width() / 2.0, MAP_SIZE_X_FULL - screen.width());
     const qreal y = qBound<qreal>(0, centre.y() - screen.height() / 2.0, MAP_SIZE_Y_FULL - screen.height());
     mapView->setSceneRect(x, y, screen.width(), screen.height());
@@ -198,6 +344,10 @@ void MapWidget::keyPressEvent(QKeyEvent *event)
     }
     if (GameClock::isPaused())      // paused or the round is over: the controls were let go and stay so
         return;
+    const bool walkKey = event->key() == Qt::Key_W || event->key() == Qt::Key_A
+            || event->key() == Qt::Key_S || event->key() == Qt::Key_D;
+    if (player->isScoped() && walkKey)      // standing still while looking through the scope
+        return;
 
     if (!event->isAutoRepeat())
         switch (event->key())
@@ -226,6 +376,13 @@ void MapWidget::keyPressEvent(QKeyEvent *event)
             player->setCurrentGun(SHOTGUN);
             emit (static_cast<void>(player->gunChanged()), player->ammoChangedNoReloading());
             break;
+        case Qt::Key_4:
+            player->setCurrentGun(SNIPER);
+            emit (static_cast<void>(player->gunChanged()), player->ammoChangedNoReloading());
+            break;
+        case Qt::Key_Shift:
+            setPanning(true);
+            break;
         case Qt::Key_X:
             leaderboard->setVisible(1);
             break;
@@ -249,6 +406,9 @@ void MapWidget::keyPressEvent(QKeyEvent *event)
                     break;
                 }
         }
+
+    if (player->isScoped() && player->gunENUM() != SNIPER)     // another gun: no scope
+        exitScope();
 }
 
 void MapWidget::keyReleaseEvent(QKeyEvent *event)
@@ -259,6 +419,9 @@ void MapWidget::keyReleaseEvent(QKeyEvent *event)
     if (!event->isAutoRepeat())
         switch (event->key())
         {
+        case Qt::Key_Shift:
+            setPanning(false);
+            break;
         case Qt::Key_W:
             player->setDirectionUp(false);
             break;

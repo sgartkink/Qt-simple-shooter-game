@@ -15,6 +15,7 @@ class MapWidget;
 #include "weapons/pistol.h"
 #include "weapons/rifle.h"
 #include "weapons/shotgun.h"
+#include "weapons/sniper.h"
 #include "weapons/grenade.h"
 #include "characters/herostats.h"
 
@@ -40,6 +41,11 @@ public:
     bool isThrowingGrenade() { return throwingGrenade; }
     bool isCurrentlyShooting() { return currentlyShooting; }
     bool isAlive() { return alive; }
+    QPointF centre() const { return sceneBoundingRect().center(); }
+    // looking through the sniper's scope: its screen is moved by viewOffset from the hero, which stays put
+    bool isScoped() const { return scoped; }
+    QPointF viewCentre() const { return centre() + viewOffset; }
+    void setScope(bool on, QPointF offset = QPointF());
 
     virtual void attackItem(int damage = 0, Hero * owner = nullptr);
     void announceAttack(QPointF origin);     // tells the map this hero just fired, or its grenade went off, at origin
@@ -85,8 +91,9 @@ protected:
     Pistol pistol;
     Rifle rifle;
     Shotgun shotgun;
+    Sniper sniper;
     QLineF lineHeroMouse;
-    QVector<Gun *> heroGuns {&pistol, &rifle, &shotgun};
+    QVector<Gun *> heroGuns {&pistol, &rifle, &shotgun, &sniper};
 
     bool directionUp = false;
     bool directionRight = false;
@@ -94,6 +101,8 @@ protected:
     bool directionLeft = false;
     bool throwingGrenade = false;
     bool currentlyShooting = false;
+    bool scoped = false;
+    QPointF viewOffset;
 
     void resetHero();
     void randNewPos();
