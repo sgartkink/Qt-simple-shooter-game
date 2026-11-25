@@ -26,12 +26,20 @@ private slots:
     void dodgesAGrenadeItSees();
     void ignoresAGrenadeItDoesNotSee();
     void seesFurtherThroughTheScope();
+    void snipesWhenThePlayerIsFar();
+    void usesTheRifleUpClose();
+    void usesTheRifleWithoutSniperAmmo();
+    void leavesTheScopeToSearchWhenThePlayerIsGone();
+    void scansThroughTheScopeWhileLookingAround();
+    void leavesTheScopeToDodgeAGrenade();
 
 private:
     static bool notices(Bot & bot, Player * player, QPointF at, qreal facing, QPointF target);
     static void face(Bot & bot, qreal degrees);
     static QPointF from(QPointF point, qreal degrees, qreal distance);
     static void loseSightOfThePlayer(World & world, Bot & bot, QPointF & spot);
+    static Bot & sniperBot(World & world, QPointF playerAt);
+    static void emptySniper(Bot & bot);
 };
 
 void TestBot::face(Bot &bot, qreal degrees)
@@ -425,6 +433,148 @@ void TestBot::seesFurtherThroughTheScope()
     bot.setScope(true, QPointF(600, 0));
     QVERIFY(notices(bot, player, QPointF(300, 1200), 0, eye + QPointF(700, 0)));
     bot.setScope(false);
+}
+
+// open ground along y 1200 from x 300 to the right; the bot faces right
+void TestBot::emptySniper(Bot &bot)
+{
+    // shot and reloaded until nothing is loaded or left
+    while (bot.sniper.ammoLoaded() > 0)
+    {
+        bot.sniper.decreaseAmmo();
+        if (bot.sniper.ammoLoaded() == 0)
+            bot.sniper.reload();
+    }
+    QCOMPARE(bot.sniper.ammoOwned(), 0);
+}
+
+Bot & TestBot::sniperBot(World & world, QPointF playerAt)
+{
+    Bot & bot = *world.addBot(QPointF(300, 1200));
+    bot.start();
+    bot.destinationPoint = QPoint(300, 1200);
+    bot.lineHeroMouse.setLine(bot.x(), bot.y(), bot.x() + 100, bot.y());
+    world.player()->setPos(playerAt);
+    world.player()->start();
+    return bot;
+}
+
+void TestBot::snipesWhenThePlayerIsFar()
+{
+    World world;
+    Bot & bot = sniperBot(world, QPointF(750, 1200));    // 450 px away
+    const QPointF at = bot.pos();
+    bot.nextMove();
+    QCOMPARE(bot.gunENUM(), SNIPER);
+    QVERIFY(bot.isScoped());
+    QVERIFY(QLineF(bot.viewCentre(), world.player()->centre()).length() < 1);   // looking at the player
+    QCOMPARE(bot.sniper.ammoLoaded(), 4);                // and fired
+    for (int i = 0; i < 20; i++)
+        bot.nextMove();
+    QCOMPARE(bot.pos(), at);                              // standing still
+    QCOMPARE(bot.sniper.ammoLoaded(), 4);                // one shot per 1.5 s
+}
+
+void TestBot::usesTheRifleUpClose()
+{
+    World world;
+    Bot & bot = sniperBot(world, QPointF(750, 1200));
+    bot.nextMove();
+    QCOMPARE(bot.gunENUM(), SNIPER);
+    world.player()->setPos(500, 1200);                   // 200 px: too close for the scope
+    bot.nextMove();
+    QCOMPARE(bot.gunENUM(), RIFLE);
+    QVERIFY(!bot.isScoped());
+
+    World other;
+    Bot & near = sniperBot(other, QPointF(580, 1200));   // 280 px: between the two, so it keeps what it has
+    near.nextMove();
+    QCOMPARE(near.gunENUM(), RIFLE);
+    QVERIFY(!near.isScoped());
+}
+
+void TestBot::usesTheRifleWithoutSniperAmmo()
+{
+    World world;
+    Bot & bot = *world.addBot(QPointF(300, 1200));
+    emptySniper(bot);
+    QVERIFY(!bot.sniperHasAmmo());
+    bot.start();
+    bot.destinationPoint = QPoint(300, 1200);
+    bot.lineHeroMouse.setLine(bot.x(), bot.y(), bot.x() + 100, bot.y());
+    world.player()->setPos(750, 1200);
+    bot.nextMove();
+    QCOMPARE(bot.gunENUM(), RIFLE);
+    QVERIFY(!bot.isScoped());
+}
+
+void TestBot::leavesTheScopeToSearchWhenThePlayerIsGone()
+{
+    World world;
+    Bot & bot = sniperBot(world, QPointF(750, 1200));
+    bot.nextMove();
+    QVERIFY(bot.isScoped());
+    world.player()->setPos(100, 100);                    // gone
+    bot.nextMove();
+    QVERIFY(!bot.isScoped());
+    QVERIFY(bot.headingToLastSeen);
+    const QPointF at = bot.pos();
+    bot.nextMove();
+    QVERIFY(bot.pos() != at);                             // walking there
+}
+
+void TestBot::scansThroughTheScopeWhileLookingAround()
+{
+    // looking around at the last seen spot, through the scope it notices the player further than its screen reaches
+    World world;
+    Player * player = world.player();
+    player->setPos(1100, 1200);                           // 800 px right: past the screen's edge (~500)
+    Bot & bot = *world.addBot(QPointF(300, 1200));
+    bot.start();
+    bot.lineHeroMouse.setLine(bot.x(), bot.y(), bot.x(), bot.y() - 100);
+    bot.startLookingAround();
+    bool scoped = false, noticed = false;
+    for (int i = 0; i < bot.LOOK_AROUND_TICKS && !noticed; i++)
+    {
+        bot.nextMove();
+        scoped |= bot.isScoped();
+        noticed = bot.chasing;
+        if (bot.isScoped() && !noticed)
+            QVERIFY(QLineF(bot.centre(), bot.viewCentre()).length() <= bot.SCAN_DISTANCE + 0.01);
+    }
+    QVERIFY(scoped);
+    QVERIFY(noticed);
+
+    World without;                                        // without sniper ammo it doesn't scan, and doesn't see that far
+    without.player()->setPos(1100, 1200);
+    Bot & plain = *without.addBot(QPointF(300, 1200));
+    emptySniper(plain);
+    plain.start();
+    plain.lineHeroMouse.setLine(plain.x(), plain.y(), plain.x(), plain.y() - 100);
+    plain.startLookingAround();
+    for (int i = 0; i < plain.LOOK_AROUND_TICKS; i++)
+    {
+        plain.nextMove();
+        QVERIFY(!plain.isScoped());
+        QVERIFY(!plain.chasing);
+    }
+}
+
+void TestBot::leavesTheScopeToDodgeAGrenade()
+{
+    World world;
+    Bot & bot = sniperBot(world, QPointF(750, 1200));
+    bot.nextMove();
+    QVERIFY(bot.isScoped());
+    Grenade * grenade = new Grenade(world.player(), 0);
+    grenade->moveTimer.stop();
+    world.scene()->addItem(grenade);
+    grenade->setPos(bot.centre() + QPointF(30, 0));      // in front of it, in view
+    const QPointF at = bot.pos();
+    for (int i = 0; i < 30; i++)
+        bot.nextMove();
+    QVERIFY(bot.pos() != at);
+    QVERIFY(QLineF(bot.centre(), grenade->pos()).length() >= bot.GRENADE_DANGER);
 }
 
 int runTestBot(int argc, char *argv[])

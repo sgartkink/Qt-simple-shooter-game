@@ -57,6 +57,18 @@ private:
     const qreal GRENADE_MAX_DISTANCE = 390;     // lands before the 5 s fuse runs out (a throw with power ~50)
     const qreal GRENADE_DANGER = 70;            // stays this far from a live grenade (blast radius 40)
 
+    // the sniper rifle: switched to when the target is further than SNIPE_FROM, back to the rifle under SNIPE_UNTIL;
+    // like the player it stands still looking through the scope, which follows the target. While looking around it
+    // scans through the scope too, SCAN_DISTANCE ahead (never past a building)
+    const qreal SNIPE_FROM = 320;
+    const qreal SNIPE_UNTIL = 250;
+    const qreal SCAN_DISTANCE = 400;
+    const qreal MAX_LOOK_DISTANCE = 1000;
+    bool sniperHasAmmo() { return sniper.ammoLoaded() + sniper.ammoOwned() > 0; }
+    void chooseWeapon();
+    void updateScope();
+    QPointF lookOffsetTowards(QPointF point) const;
+
     // other heroes' grenades it has seen, and where it last saw each: it dodges only what it has noticed
     struct SeenGrenade
     {
@@ -74,7 +86,6 @@ private:
     void noticeGrenade(Grenade * grenade);
     QVector<QPointF> grenadesToAvoid();
     bool avoidGrenades();
-    QPointF centre() { return mapToScene(rect().center()); }
     bool checkIfItemsBetweenBotAndTarget();
 
     void move();

@@ -10,7 +10,7 @@ A top-down 2D shooter written in C++17 with Qt Widgets. You fight one AI bot on 
 - **Shot marker:** a red arc around your hero points to where an enemy just fired from (or where its grenade went off), hit or miss, so you can react to shots from the dark. Closer shots give a thicker arc.
 - **Weapons:** pistol, automatic rifle, shotgun and sniper rifle, each with its own magazine and reserve, plus grenades. Through the sniper's scope you stand still and, holding Shift, move your view with the mouse past the screen's edge; it stops where you would be looking behind a building. Hold Q longer to throw further. Grenades fly in an arc, bounce off walls, chests and heroes, and explode after 5 seconds.
 - **Chests:** one appears every 30 seconds, with ammo, health, armour or grenades inside.
-- **The bot** sees exactly what you would in its place. It fights you, hides while reloading, searches the spot where it last saw you, throws grenades around corners and dodges the grenades it sees.
+- **The bot** sees exactly what you would in its place. It fights you (with the sniper rifle's scope when you are far away), hides while reloading, searches the spot where it last saw you (scanning through the scope), throws grenades around corners and dodges the grenades it sees.
 - **Rounds, pause and menu:** Esc pauses the game. Going back to the menu keeps the game frozen, so you can continue it later. The round length is set in Options.
 
 ## Controls

@@ -26,5 +26,5 @@ int main(int argc, char *argv[])
  * 15. playerbarwidget jest zawsze w rogu - DONE
  * 16. bouncing grenade off the itemsonscene - DONE
  * 17. the bot uses the sniper rifle: switches to it and looks through the scope when the player is far away,
- *     and scans with it while searching the last seen spot
+ *     and scans with it while searching the last seen spot - DONE
  */

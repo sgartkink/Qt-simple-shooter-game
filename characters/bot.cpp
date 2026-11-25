@@ -1,5 +1,6 @@
 ﻿#include "characters/bot.h"
 #include <QtDebug>
+#include <algorithm>
 #include "characters/player.h"
 #include "world/chest.h"
 #include "world/mapwidget.h"
@@ -25,7 +26,14 @@ void Bot::nextMove()
     if (STATE_HIDE && targetAttack)
         throwGrenadeAt(targetAttack->mapToScene(targetAttack->rect().center()));
 
-    move();
+    if (STATE_ATTACK)
+        chooseWeapon();
+    updateScope();
+
+    if (isScoped() && lookAroundTicks == 0)
+        updateLineHeroMouse();      // sniping: standing still, like the player in the scope
+    else
+        move();
 
     if (STATE_ATTACK)
         attack();
@@ -500,6 +508,46 @@ void Bot::updateLineHeroMouse([[maybe_unused]] QPoint mousePoint)
     else
         lineHeroMouse.setLine(x(), y(), destinationPoint.x(), destinationPoint.y());
     setRotation(-1 * lineHeroMouse.angle());
+}
+
+void Bot::chooseWeapon()
+{
+    const qreal distance = QLineF(centre(), targetAttack->centre()).length();
+    if (currentGunENUM != SNIPER && distance > SNIPE_FROM && sniperHasAmmo())
+        setCurrentGun(SNIPER);
+    else if (currentGunENUM == SNIPER && (distance < SNIPE_UNTIL || !sniperHasAmmo()))
+        setCurrentGun(RIFLE);
+}
+
+QPointF Bot::lookOffsetTowards(QPointF point) const
+{
+    // the same limits as the player's scope: at most MAX_LOOK_DISTANCE away and never past a building
+    QLineF line(centre(), point);
+    line.setLength(std::min({line.length(), MAX_LOOK_DISTANCE, mapWidget->getFieldOfView().clearDistance(centre(), point)}));
+    return line.p2() - centre();
+}
+
+void Bot::updateScope()
+{
+    // a grenade it knows of close by comes first: it has to move
+    for (QPointF spot : grenadesToAvoid())
+        if (QLineF(centre(), spot).length() < GRENADE_DANGER)
+        {
+            setScope(false);
+            return;
+        }
+
+    if (STATE_ATTACK && targetAttack && currentGunENUM == SNIPER)
+        setScope(true, lookOffsetTowards(targetAttack->centre()));
+    else if (lookAroundTicks > 0 && sniperHasAmmo())
+    {
+        if (currentGunENUM != SNIPER)
+            setCurrentGun(SNIPER);
+        const qreal angle = qDegreesToRadians(lookAroundAngle);
+        setScope(true, lookOffsetTowards(centre() + SCAN_DISTANCE * QPointF(qCos(angle), -qSin(angle))));
+    }
+    else if (isScoped())
+        setScope(false);
 }
 
 void Bot::attack()
